@@ -4,7 +4,7 @@
  * Based on UX/UI Spec v1
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,10 +12,13 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Animated,
+  AccessibilityInfo,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useResponsive } from '../../src/hooks/useResponsive';
 import { useSettingsStore } from '../../src/stores/settingsStore';
@@ -46,6 +49,20 @@ export default function HomeScreen() {
   const { language, lastReadBible, setTheme, theme } = useSettingsStore();
 
   const greeting = useMemo(() => getGreeting(language), [language]);
+
+  // Theme toggle animation
+  const rotateAnim = useRef(new Animated.Value(isDark ? 1 : 0)).current;
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // Check for reduce motion accessibility setting
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReduceMotion
+    );
+    return () => subscription.remove();
+  }, []);
 
   // Daily verse from database
   const {
@@ -140,11 +157,27 @@ export default function HomeScreen() {
   }), [rs, rf, actionCardWidth]);
 
   const toggleTheme = () => {
-    if (theme === 'system') {
-      setTheme(isDark ? 'light' : 'dark');
+    // Haptic feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Determine new theme
+    const newTheme = theme === 'system'
+      ? (isDark ? 'light' : 'dark')
+      : (theme === 'dark' ? 'light' : 'dark');
+
+    // Animate icon rotation (skip if reduce motion is enabled)
+    if (!reduceMotion) {
+      Animated.spring(rotateAnim, {
+        toValue: newTheme === 'dark' ? 1 : 0,
+        useNativeDriver: true,
+        tension: 100,
+        friction: 8,
+      }).start();
     } else {
-      setTheme(theme === 'dark' ? 'light' : 'dark');
+      rotateAnim.setValue(newTheme === 'dark' ? 1 : 0);
     }
+
+    setTheme(newTheme);
   };
 
   const quickActions = [
@@ -194,12 +227,33 @@ export default function HomeScreen() {
           <TouchableOpacity
             onPress={toggleTheme}
             style={[styles.themeButton, dynamicStyles.themeButton, { backgroundColor: colors.surfaceHover }]}
+            accessibilityLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            accessibilityRole="button"
           >
-            <Ionicons
-              name={isDark ? 'sunny' : 'moon'}
-              size={rs(22)}
-              color={colors.textSecondary}
-            />
+            <Animated.View
+              style={{
+                transform: [
+                  {
+                    rotate: rotateAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '180deg'],
+                    }),
+                  },
+                  {
+                    scale: rotateAnim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [1, 0.85, 1],
+                    }),
+                  },
+                ],
+              }}
+            >
+              <Ionicons
+                name={isDark ? 'sunny' : 'moon'}
+                size={rs(22)}
+                color={colors.textSecondary}
+              />
+            </Animated.View>
           </TouchableOpacity>
         </View>
 

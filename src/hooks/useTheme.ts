@@ -1,16 +1,24 @@
 /**
  * useTheme Hook
- * Provides theme colors based on system color scheme
+ * Provides theme colors based on user preference or system color scheme
  */
 
 import { useColorScheme } from 'react-native';
 import { getThemeColors, colors, ColorScheme } from '../theme/colors';
 import { typography, getAdjustedTypography, FontSizeSetting } from '../theme/typography';
 import { spacing, layout, shadows } from '../theme/spacing';
+import { useSettingsStore } from '../stores/settingsStore';
 
 export function useTheme(fontSizeSetting: FontSizeSetting = 'M') {
   const systemScheme = useColorScheme();
-  const scheme: ColorScheme = systemScheme === 'dark' ? 'dark' : 'light';
+  const themeSetting = useSettingsStore((state) => state.theme);
+
+  // Determine effective scheme: respect user preference, fall back to system
+  const scheme: ColorScheme =
+    themeSetting === 'system'
+      ? (systemScheme === 'dark' ? 'dark' : 'light')
+      : themeSetting;
+
   const isDark = scheme === 'dark';
   
   const themeColors = getThemeColors(scheme);
