@@ -14,20 +14,24 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore, FontSizeSetting } from '../../src/stores/settingsStore';
+import { useLibrary } from '../../src/hooks/useLibrary';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { colors, shadows, isDark } = useTheme();
-  const { 
-    language, 
+  const {
+    language,
     setLanguage,
     fontSize,
     setFontSize,
     theme,
     setTheme,
   } = useSettingsStore();
+  const { counts } = useLibrary();
 
   const labels = {
     title: language === 'ht' ? 'Plis' : 'Plus',
@@ -53,10 +57,10 @@ export default function SettingsScreen() {
   };
 
   const libraryItems = [
-    { icon: 'bookmark', label: labels.bookmarks, count: 12 },
-    { icon: 'brush', label: labels.highlights, count: 24 },
-    { icon: 'heart', label: labels.favorites, count: 8 },
-    { icon: 'time', label: labels.history, count: null },
+    { icon: 'bookmark', label: labels.bookmarks, count: counts.bookmarks, route: '/library/bookmarks' },
+    { icon: 'brush', label: labels.highlights, count: counts.highlights, route: '/library/highlights' },
+    { icon: 'heart', label: labels.favorites, count: counts.favorites, route: '/library/favorites' },
+    { icon: 'time', label: labels.history, count: null, route: '/library/history' },
   ];
 
   const fontSizeOptions: FontSizeSetting[] = ['XS', 'S', 'M', 'L', 'XL'];
@@ -77,6 +81,7 @@ export default function SettingsScreen() {
         <TouchableOpacity
           style={[styles.searchBar, { backgroundColor: colors.surfaceHover }]}
           activeOpacity={0.7}
+          onPress={() => router.push('/search' as Href)}
         >
           <Ionicons name="search" size={20} color={colors.textTertiary} />
           <Text style={[styles.searchPlaceholder, { color: colors.textTertiary }]}>
@@ -107,6 +112,7 @@ export default function SettingsScreen() {
                   },
                 ]}
                 activeOpacity={0.7}
+                onPress={() => router.push(item.route as any)}
               >
                 <Ionicons name={item.icon as any} size={20} color={colors.primary} />
                 <Text style={[styles.listLabel, { color: colors.text }]}>{item.label}</Text>
@@ -256,12 +262,17 @@ export default function SettingsScreen() {
             <TouchableOpacity
               style={[styles.listItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
               activeOpacity={0.7}
+              onPress={() => router.push('/about' as Href)}
             >
               <Ionicons name="information-circle" size={20} color={colors.primary} />
               <Text style={[styles.listLabel, { color: colors.text }]}>{labels.about}</Text>
               <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.listItem} activeOpacity={0.7}>
+            <TouchableOpacity
+              style={styles.listItem}
+              activeOpacity={0.7}
+              onPress={() => router.push('/feedback' as Href)}
+            >
               <Ionicons name="chatbubble" size={20} color={colors.primary} />
               <Text style={[styles.listLabel, { color: colors.text }]}>{labels.feedback}</Text>
               <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />

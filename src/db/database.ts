@@ -2,6 +2,7 @@ import * as SQLite from 'expo-sqlite';
 import { Asset } from 'expo-asset';
 // @ts-ignore
 import * as FileSystem from 'expo-file-system/src/legacy';
+import { runMigrations } from './migrations';
 
 const DB_NAME = 'lafwa.db';
 
@@ -65,6 +66,17 @@ export async function openDatabase() {
   } catch (e) {
     console.error('Error verifying DB:', e);
     throw e;
+  }
+
+  // Run migrations after verification
+  try {
+    const migrationResult = await runMigrations(db);
+    if (migrationResult.migrationsRun.length > 0) {
+      console.log('Migrations completed:', migrationResult.migrationsRun);
+    }
+  } catch (error) {
+    console.error('Migration failed:', error);
+    // Don't throw - app should still work with existing schema
   }
 
   return db;

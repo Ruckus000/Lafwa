@@ -1,6 +1,13 @@
 import { openDatabase } from './database';
 import { getDayOfYear } from '../domain/dailyVerse';
 import { getBookByName } from '../data/bibleBooks';
+import {
+  LibraryCounts,
+  Bookmark,
+  Highlight,
+  HistoryItem,
+  HighlightColor,
+} from '../types/library';
 
 export const searchBible = async (query: string, version: 'ht' | 'fr' = 'ht') => {
   const db = await openDatabase();
@@ -65,19 +72,19 @@ export const toggleBookmark = async (type: 'bible' | 'hymn', id: number) => {
   }
 };
 
-export const getBookmarks = async (type: 'bible' | 'hymn') => {
+export const getBookmarks = async (type: 'bible' | 'hymn'): Promise<Bookmark[]> => {
   const db = await openDatabase();
   if (type === 'bible') {
-    return await db.getAllAsync(`
-            SELECT b.*, v.book, v.chapter, v.verse, v.text 
+    return await db.getAllAsync<Bookmark>(`
+            SELECT b.*, v.book, v.chapter, v.verse, v.text
             FROM bookmarks b
             JOIN bible_verses v ON b.reference_id = v.id
             WHERE b.type = 'bible'
             ORDER BY b.created_at DESC
         `);
   } else {
-    return await db.getAllAsync(`
-            SELECT b.*, h.number, h.title 
+    return await db.getAllAsync<Bookmark>(`
+            SELECT b.*, h.number, h.title
             FROM bookmarks b
             JOIN hymns h ON b.reference_id = h.id
             WHERE b.type = 'hymn'
@@ -198,4 +205,148 @@ function formatVerseReference(
     : book;
   const verseRange = verseEnd ? `${verseStart}-${verseEnd}` : `${verseStart}`;
   return `${localizedBook} ${chapter}:${verseRange}`;
+}
+
+// ============================================
+// LIBRARY COUNT QUERIES
+// ============================================
+
+export async function getLibraryCounts(): Promise<LibraryCounts> {
+  const db = await openDatabase();
+
+  const [bookmarksResult, highlightsResult, favoritesResult] = await Promise.all([
+    db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM bookmarks WHERE type = ?',
+      ['bible']
+    ),
+    db.getFirstAsync<{ count: number }>('SELECT COUNT(*) as count FROM highlights'),
+    db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM bookmarks WHERE type = ?',
+      ['hymn']
+    ),
+  ]);
+
+  return {
+    bookmarks: bookmarksResult?.count ?? 0,
+    highlights: highlightsResult?.count ?? 0,
+    favorites: favoritesResult?.count ?? 0,
+  };
+}
+
+// ============================================
+// HIGHLIGHT QUERIES
+// ============================================
+
+export async function getAllHighlights(version: 'ht' | 'fr' = 'ht'): Promise<Highlight[]> {
+  const db = await openDatabase();
+
+  return await db.getAllAsync<Highlight>(
+    `
+    SELECT h.*, v.book, v.chapter, v.verse, v.text
+    FROM highlights h
+    JOIN bible_verses v ON h.verse_id = v.id
+    WHERE v.version = ?
+    ORDER BY h.created_at DESC
+    LIMIT 100
+  `,
+    [version]
+  );
+}
+
+export async function addHighlight(verseId: number, color: HighlightColor): Promise<number> {
+  const db = await openDatabase();
+
+  // Upsert: update color if exists, insert if not
+  await db.runAsync(
+    `
+    INSERT INTO highlights (verse_id, color) VALUES (?, ?)
+    ON CONFLICT(verse_id) DO UPDATE SET color = excluded.color
+  `,
+    [verseId, color]
+  );
+
+  const result = await db.getFirstAsync<{ id: number }>(
+    'SELECT id FROM highlights WHERE verse_id = ?',
+    [verseId]
+  );
+
+  return result?.id ?? 0;
+}
+
+export async function removeHighlight(verseId: number): Promise<void> {
+  const db = await openDatabase();
+  await db.runAsync('DELETE FROM highlights WHERE verse_id = ?', [verseId]);
+}
+
+export async function getHighlightForVerse(verseId: number): Promise<HighlightColor | null> {
+  const db = await openDatabase();
+  const result = await db.getFirstAsync<{ color: HighlightColor }>(
+    'SELECT color FROM highlights WHERE verse_id = ?',
+    [verseId]
+  );
+  return result?.color ?? null;
+}
+
+// ============================================
+// HISTORY QUERIES
+// ============================================
+
+export async function getReadingHistory(limit: number = 20): Promise<HistoryItem[]> {
+  const db = await openDatabase();
+
+  const rows = await db.getAllAsync<HistoryItem>(
+    `
+    SELECT *,
+      CASE
+        WHEN type = 'bible' THEN book || ' ' || chapter
+        ELSE 'Kantik #' || hymn_number
+      END as displayTitle
+    FROM reading_history
+    ORDER BY last_read_at DESC
+    LIMIT ?
+  `,
+    [limit]
+  );
+
+  return rows;
+}
+
+export async function recordReading(
+  type: 'bible' | 'hymn',
+  reference: string,
+  metadata: { book?: string; chapter?: number; hymnNumber?: number }
+): Promise<void> {
+  const db = await openDatabase();
+
+  await db.runAsync(
+    `
+    INSERT INTO reading_history (type, reference, book, chapter, hymn_number)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(type, reference) DO UPDATE SET
+      last_read_at = CURRENT_TIMESTAMP,
+      read_count = read_count + 1
+  `,
+    [type, reference, metadata.book ?? null, metadata.chapter ?? null, metadata.hymnNumber ?? null]
+  );
+}
+
+export async function clearReadingHistory(): Promise<void> {
+  const db = await openDatabase();
+  await db.runAsync('DELETE FROM reading_history');
+}
+
+// ============================================
+// FAVORITES (uses bookmarks table with type='hymn')
+// ============================================
+
+export async function getFavoriteHymns(): Promise<Bookmark[]> {
+  return getBookmarks('hymn');
+}
+
+export async function toggleFavoriteHymn(hymnId: number): Promise<boolean> {
+  return toggleBookmark('hymn', hymnId);
+}
+
+export async function isHymnFavorite(hymnId: number): Promise<boolean> {
+  return isBookmarked('hymn', hymnId);
 }
