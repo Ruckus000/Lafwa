@@ -1,4 +1,6 @@
 import { openDatabase } from './database';
+import { getDayOfYear } from '../domain/dailyVerse';
+import { getBookByName } from '../data/bibleBooks';
 
 export const searchBible = async (query: string, version: 'ht' | 'fr' = 'ht') => {
   const db = await openDatabase();
@@ -89,3 +91,111 @@ export const isBookmarked = async (type: 'bible' | 'hymn', id: number) => {
   const result = await db.getFirstAsync('SELECT id FROM bookmarks WHERE type = ? AND reference_id = ?', [type, id]);
   return !!result;
 };
+
+// Daily Verse Types
+export interface DailyVerse {
+  dayOfYear: number;
+  book: string;
+  chapter: number;
+  verseStart: number;
+  verseEnd: number | null;
+  theme: string | null;
+  verseId: number;
+  text: string;
+  reference: string;
+}
+
+interface DailyVerseRow {
+  dayOfYear: number;
+  book: string;
+  chapter: number;
+  verseStart: number;
+  verseEnd: number | null;
+  theme: string | null;
+  verseId: number;
+  text: string;
+}
+
+/**
+ * Retrieves the daily verse for today (or a specific day).
+ *
+ * @param version - Bible version ('ht' or 'fr')
+ * @param dayOverride - Optional day of year override (for testing)
+ * @returns The daily verse with full text, or null if not found
+ */
+export const getDailyVerse = async (
+  version: 'ht' | 'fr' = 'ht',
+  dayOverride?: number
+): Promise<DailyVerse | null> => {
+  const db = await openDatabase();
+  const today = dayOverride ?? getDayOfYear();
+
+  const sql = `
+    SELECT
+      dv.day_of_year as dayOfYear,
+      dv.book,
+      dv.chapter,
+      dv.verse_start as verseStart,
+      dv.verse_end as verseEnd,
+      dv.theme,
+      bv.id as verseId,
+      CASE
+        WHEN dv.verse_end IS NULL THEN bv.text
+        ELSE (
+          SELECT GROUP_CONCAT(text, ' ')
+          FROM bible_verses
+          WHERE book = dv.book
+            AND chapter = dv.chapter
+            AND verse >= dv.verse_start
+            AND verse <= dv.verse_end
+            AND version = ?
+          ORDER BY verse
+        )
+      END as text
+    FROM daily_verses dv
+    JOIN bible_verses bv
+      ON bv.book = dv.book
+      AND bv.chapter = dv.chapter
+      AND bv.verse = dv.verse_start
+      AND bv.version = ?
+    WHERE dv.day_of_year = ?
+    LIMIT 1
+  `;
+
+  const result = await db.getFirstAsync<DailyVerseRow>(sql, [version, version, today]);
+
+  if (!result) {
+    console.warn(`No daily verse found for day ${today}`);
+    return null;
+  }
+
+  const reference = formatVerseReference(
+    result.book,
+    result.chapter,
+    result.verseStart,
+    result.verseEnd,
+    version
+  );
+
+  return { ...result, reference };
+};
+
+/**
+ * Formats a verse reference string with localized book name.
+ * The database stores French book names, so we translate to Haitian when needed.
+ */
+function formatVerseReference(
+  book: string,
+  chapter: number,
+  verseStart: number,
+  verseEnd: number | null,
+  version: 'ht' | 'fr'
+): string {
+  const bookData = getBookByName(book);
+  // Database has French names; translate to Haitian if needed
+  const localizedBook = bookData
+    ? (version === 'ht' ? bookData.nameHt : bookData.nameFr)
+    : book;
+  const verseRange = verseEnd ? `${verseStart}-${verseEnd}` : `${verseStart}`;
+  return `${localizedBook} ${chapter}:${verseRange}`;
+}

@@ -99,3 +99,23 @@ CREATE TABLE IF NOT EXISTS bookmarks (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(type, reference_id)
 );
+
+-- Daily Verses
+-- Maps day-of-year (1-366) to a specific Bible verse reference
+CREATE TABLE IF NOT EXISTS daily_verses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    day_of_year INTEGER NOT NULL,
+    book TEXT NOT NULL,           -- Kreyòl book name (matches bible_verses.book)
+    chapter INTEGER NOT NULL,
+    verse_start INTEGER NOT NULL,
+    verse_end INTEGER,            -- NULL for single verse, or end verse for range
+    theme TEXT,                   -- Optional: 'hope', 'faith', 'love', etc.
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT day_range CHECK (day_of_year >= 1 AND day_of_year <= 366),
+    CONSTRAINT chapter_positive CHECK (chapter >= 1),
+    CONSTRAINT verse_positive CHECK (verse_start >= 1),
+    CONSTRAINT verse_range_valid CHECK (verse_end IS NULL OR verse_end >= verse_start)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_verses_day
+    ON daily_verses(day_of_year);

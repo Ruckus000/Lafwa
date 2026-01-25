@@ -19,6 +19,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useResponsive } from '../../src/hooks/useResponsive';
 import { useSettingsStore } from '../../src/stores/settingsStore';
+import { useDailyVerse } from '../../src/hooks/useDailyVerse';
+import { VerseCardSkeleton } from '../../src/components/VerseCardSkeleton';
 
 // Time-based greetings
 const getGreeting = (language: 'ht' | 'fr') => {
@@ -36,17 +38,6 @@ const getGreeting = (language: 'ht' | 'fr') => {
   return { text: language === 'ht' ? 'Bòn nwit!' : 'Bonne nuit!', emoji: '🌙' };
 };
 
-// Sample verse of the day (in production, this would come from the database)
-const VERSE_OF_DAY = {
-  ht: {
-    text: 'Pawòl la tounen moun. Li te vin viv nan mitan nou, li te gen tout bon bagay Bondye bay la, li te gen verite a nèt ale.',
-    reference: 'Jan 1:14',
-  },
-  fr: {
-    text: 'Et la Parole a été faite chair, et elle a habité parmi nous, pleine de grâce et de vérité.',
-    reference: 'Jean 1:14',
-  },
-};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -55,7 +46,16 @@ export default function HomeScreen() {
   const { language, lastReadBible, setTheme, theme } = useSettingsStore();
 
   const greeting = useMemo(() => getGreeting(language), [language]);
-  const verse = VERSE_OF_DAY[language];
+
+  // Daily verse from database
+  const {
+    verse,
+    isLoading: verseLoading,
+    isBookmarked: verseBookmarked,
+    handleBookmark,
+    handleShare,
+    handleReadMore,
+  } = useDailyVerse();
 
   // Calculate responsive grid width for quick actions
   const actionCardWidth = rw(50, rs(12), 2);
@@ -204,45 +204,62 @@ export default function HomeScreen() {
         </View>
 
         {/* Verse of the Day */}
-        <View
-          style={[
-            styles.verseCard,
-            dynamicStyles.verseCard,
-            {
-              backgroundColor: isDark ? colors.surface : colors.primaryLight,
-              borderColor: colors.border,
-            },
-            !isDark && shadows.card,
-          ]}
-        >
-          <View style={styles.verseHeader}>
-            <Text style={[styles.verseLabel, dynamicStyles.verseLabel, { color: colors.primary }]}>
-              {language === 'ht' ? 'Vèsè Jounen An' : 'Verset du Jour'}
-            </Text>
-          </View>
-
-          <Text style={[styles.verseText, dynamicStyles.verseText, { color: colors.text }]}>
-            "{verse.text}"
-          </Text>
-
-          <View style={styles.verseFooter}>
-            <Text style={[styles.verseRef, { color: colors.textSecondary }]}>
-              {verse.reference}
-            </Text>
-            <View style={styles.verseActions}>
-              <TouchableOpacity
-                style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
-              >
-                <Ionicons name="bookmark-outline" size={rs(20)} color={colors.primary} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
-              >
-                <Ionicons name="share-outline" size={rs(20)} color={colors.primary} />
-              </TouchableOpacity>
+        {verseLoading ? (
+          <VerseCardSkeleton />
+        ) : verse ? (
+          <TouchableOpacity
+            onPress={handleReadMore}
+            activeOpacity={0.9}
+            style={[
+              styles.verseCard,
+              dynamicStyles.verseCard,
+              {
+                backgroundColor: isDark ? colors.surface : colors.primaryLight,
+                borderColor: colors.border,
+              },
+              !isDark && shadows.card,
+            ]}
+          >
+            <View style={styles.verseHeader}>
+              <Text style={[styles.verseLabel, dynamicStyles.verseLabel, { color: colors.primary }]}>
+                {language === 'ht' ? 'Vèsè Jounen An' : 'Verset du Jour'}
+              </Text>
             </View>
-          </View>
-        </View>
+
+            <Text
+              style={[styles.verseText, dynamicStyles.verseText, { color: colors.text }]}
+              numberOfLines={4}
+            >
+              "{verse.text}"
+            </Text>
+
+            <View style={styles.verseFooter}>
+              <Text style={[styles.verseRef, { color: colors.textSecondary }]}>
+                {verse.reference}
+              </Text>
+              <View style={styles.verseActions}>
+                <TouchableOpacity
+                  onPress={handleBookmark}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
+                >
+                  <Ionicons
+                    name={verseBookmarked ? 'bookmark' : 'bookmark-outline'}
+                    size={rs(20)}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleShare}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
+                >
+                  <Ionicons name="share-outline" size={rs(20)} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ) : null}
 
         {/* Continue Reading */}
         {lastReadBible && (

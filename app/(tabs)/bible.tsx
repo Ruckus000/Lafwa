@@ -3,7 +3,7 @@
  * Navigation flow: BookPicker → ChapterPicker → Reading View
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,6 +12,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore } from '../../src/stores/settingsStore';
@@ -24,17 +25,37 @@ type Screen = 'bookPicker' | 'chapterPicker' | 'reader';
 
 export default function BibleScreen() {
   const { colors, isDark } = useTheme();
-  const { 
-    bibleVersion, 
+  const {
+    bibleVersion,
     setBibleVersion,
     lastReadBible,
     setLastReadBible,
   } = useSettingsStore();
 
+  // Deep linking params (from daily verse "read more")
+  const params = useLocalSearchParams<{
+    book?: string;
+    chapter?: string;
+    verse?: string;
+  }>();
+
   // Navigation state
   const [screen, setScreen] = useState<Screen>('bookPicker');
   const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
+
+  // Handle deep linking from daily verse
+  useEffect(() => {
+    if (params.book && params.chapter) {
+      const bookData = getBookByName(params.book);
+      if (bookData) {
+        setSelectedBook(bookData);
+        setSelectedChapter(parseInt(params.chapter, 10));
+        setScreen('reader');
+        setLastReadBible(bookData.nameHt, parseInt(params.chapter, 10));
+      }
+    }
+  }, [params.book, params.chapter, setLastReadBible]);
 
   // Handle book selection
   const handleSelectBook = useCallback((book: BibleBook) => {
