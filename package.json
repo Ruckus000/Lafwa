@@ -1,7 +1,7 @@
 {
   "name": "lafwa",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,13 +9,29 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.35",
+    "axios": "^1.13.2",
+    "cheerio": "^1.2.0",
     "expo": "~54.0.32",
+    "expo-asset": "~12.0.12",
+    "expo-constants": "~18.0.13",
+    "expo-file-system": "~19.0.21",
+    "expo-font": "~14.0.11",
+    "expo-linking": "~8.0.11",
+    "expo-router": "~6.0.22",
+    "expo-splash-screen": "~31.0.13",
+    "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
+    "@types/node": "^25.0.10",
     "@types/react": "~19.1.0",
+    "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2",
     "typescript": "~5.9.2"
   },
   "private": true

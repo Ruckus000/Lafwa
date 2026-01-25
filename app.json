@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Lafwa",
+    "scheme": "lafwa",
     "slug": "Lafwa",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,6 +26,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-asset",
+      "expo-router"
+    ]
   }
 }

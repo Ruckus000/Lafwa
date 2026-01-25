@@ -1,0 +1,23 @@
+Subject: Request for Data Export - Lafwa App
+
+Dear Chant d'Espérance Team,
+
+I hope this message finds you well.
+
+As we discussed regarding the development of the "Lafwa" mobile application, we are currently in the content acquisition phase. We are committed to ensuring the highest accuracy and integrity of the hymns in our digital format.
+
+To support this goal and ensure our users have the correct lyrics, would it be possible for you to provide a structured data export (JSON, CSV, or XML) of the hymn lyrics?
+
+Having the official data directly from you would:
+1.  Ensure 100% accuracy of the text (titles, verses, choruses).
+2.  Speed up our development timeline significantly.
+3.  Prevent any errors that might occur from scraping or manual entry.
+
+If this is possible, please let us know the format and how we might receive the file. We are happy to sign any necessary data usage agreements.
+
+Thank you for your partnership and support.
+
+Best regards,
+
+[Your Name/Team Name]
+Lafwa Project Team
