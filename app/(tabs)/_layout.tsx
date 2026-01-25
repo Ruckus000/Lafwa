@@ -1,61 +1,69 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from 'react-native';
+import { useTheme } from '../../src/hooks/useTheme';
+import { useResponsive } from '../../src/hooks/useResponsive';
 
 export default function TabLayout() {
-    const colorScheme = useColorScheme();
-    const isDark = colorScheme === 'dark';
+  const { colors } = useTheme();
+  const { rs, safeAreaInsets } = useResponsive();
 
-    return (
-        <Tabs
-            screenOptions={{
-                headerShown: true,
-                tabBarActiveTintColor: isDark ? '#fff' : '#000',
-                tabBarStyle: {
-                    backgroundColor: isDark ? '#1c1c1e' : '#fff',
-                    borderTopWidth: 0,
-                    elevation: 0,
-                    shadowOpacity: 0,
-                },
-                headerStyle: {
-                    backgroundColor: isDark ? '#1c1c1e' : '#fff',
-                    shadowOpacity: 0,
-                    elevation: 0,
-                },
-                headerTitleStyle: {
-                    fontWeight: 'bold',
-                    color: isDark ? '#fff' : '#000',
-                }
-            }}>
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: 'Home',
-                    headerTitle: 'Lafwa',
-                    tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
-                }}
-            />
-            <Tabs.Screen
-                name="bible"
-                options={{
-                    title: 'Bible',
-                    tabBarIcon: ({ color, size }) => <Ionicons name="book" size={size} color={color} />,
-                }}
-            />
-            <Tabs.Screen
-                name="hymns"
-                options={{
-                    title: 'Hymns',
-                    tabBarIcon: ({ color, size }) => <Ionicons name="musical-notes" size={size} color={color} />,
-                }}
-            />
-            <Tabs.Screen
-                name="settings"
-                options={{
-                    title: 'Settings',
-                    tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
-                }}
-            />
-        </Tabs>
-    );
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textTertiary,
+        tabBarStyle: {
+          backgroundColor: colors.bg,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          height: rs(60) + safeAreaInsets.bottom,
+          paddingBottom: safeAreaInsets.bottom + rs(8),
+          paddingTop: rs(8),
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Lakay',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="home" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="bible"
+        options={{
+          title: 'Bib la',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="book" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="hymns"
+        options={{
+          title: 'Kantik',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="musical-notes" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Plis',
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="ellipsis-horizontal" size={24} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
 }

@@ -1,50 +1,418 @@
-import { StyleSheet, Text, View } from 'react-native';
+/**
+ * Home Tab
+ * Daily engagement hub with verse of the day and quick actions
+ * Based on UX/UI Spec v1
+ */
+
+import React, { useMemo } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../src/hooks/useTheme';
+import { useResponsive } from '../../src/hooks/useResponsive';
+import { useSettingsStore } from '../../src/stores/settingsStore';
+
+// Time-based greetings
+const getGreeting = (language: 'ht' | 'fr') => {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) {
+    return { text: language === 'ht' ? 'Bonjou!' : 'Bonjour!', emoji: '☀️' };
+  }
+  if (hour >= 12 && hour < 18) {
+    return { text: language === 'ht' ? 'Bon aprè-midi!' : 'Bon après-midi!', emoji: '🌤' };
+  }
+  if (hour >= 18 && hour < 22) {
+    return { text: language === 'ht' ? 'Bonswa!' : 'Bonsoir!', emoji: '🌅' };
+  }
+  return { text: language === 'ht' ? 'Bòn nwit!' : 'Bonne nuit!', emoji: '🌙' };
+};
+
+// Sample verse of the day (in production, this would come from the database)
+const VERSE_OF_DAY = {
+  ht: {
+    text: 'Pawòl la tounen moun. Li te vin viv nan mitan nou, li te gen tout bon bagay Bondye bay la, li te gen verite a nèt ale.',
+    reference: 'Jan 1:14',
+  },
+  fr: {
+    text: 'Et la Parole a été faite chair, et elle a habité parmi nous, pleine de grâce et de vérité.',
+    reference: 'Jean 1:14',
+  },
+};
 
 export default function HomeScreen() {
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Vèsè pou jodi a</Text>
-            <View style={styles.card}>
-                <Text style={styles.verse}>"Nan kòmansman, Bondye kreye syèl la ak latè a."</Text>
-                <Text style={styles.reference}>Jenèz 1:1</Text>
-            </View>
+  const router = useRouter();
+  const { colors, shadows, isDark } = useTheme();
+  const { rs, rf, rw } = useResponsive();
+  const { language, lastReadBible, setTheme, theme } = useSettingsStore();
+
+  const greeting = useMemo(() => getGreeting(language), [language]);
+  const verse = VERSE_OF_DAY[language];
+
+  // Calculate responsive grid width for quick actions
+  const actionCardWidth = rw(50, rs(12), 2);
+
+  // Dynamic styles that depend on responsive values
+  const dynamicStyles = useMemo(() => ({
+    content: {
+      padding: rs(20),
+      paddingBottom: rs(100),
+    },
+    header: {
+      marginBottom: rs(28),
+    },
+    greeting: {
+      fontSize: rf(15),
+    },
+    title: {
+      fontSize: rf(34),
+    },
+    themeButton: {
+      width: rs(44),
+      height: rs(44),
+      borderRadius: rs(22),
+    },
+    verseCard: {
+      borderRadius: rs(20),
+      padding: rs(20),
+      marginBottom: rs(24),
+    },
+    verseLabel: {
+      fontSize: 14, // Fixed for accessibility
+    },
+    verseText: {
+      fontSize: 22, // Fixed, prominent
+      lineHeight: 35.2, // 1.6 ratio
+    },
+    verseAction: {
+      width: rs(40),
+      height: rs(40),
+      borderRadius: rs(20),
+    },
+    sectionTitle: {
+      fontSize: 14, // Fixed for accessibility
+      marginBottom: rs(14),
+    },
+    continueCard: {
+      padding: rs(16),
+      borderRadius: rs(16),
+    },
+    continueIcon: {
+      width: rs(52),
+      height: rs(52),
+      borderRadius: rs(12),
+      marginRight: rs(12),
+    },
+    continueTitle: {
+      fontSize: rf(17),
+    },
+    continueSubtitle: {
+      fontSize: rf(14),
+    },
+    actionsGrid: {
+      gap: rs(12),
+    },
+    actionCard: {
+      width: actionCardWidth,
+      padding: rs(16),
+      borderRadius: rs(16),
+    },
+    actionIcon: {
+      width: rs(48),
+      height: rs(48),
+      borderRadius: rs(12),
+      marginBottom: rs(12),
+    },
+    actionLabel: {
+      fontSize: rf(17),
+    },
+    actionDesc: {
+      fontSize: rf(14),
+    },
+  }), [rs, rf, actionCardWidth]);
+
+  const toggleTheme = () => {
+    if (theme === 'system') {
+      setTheme(isDark ? 'light' : 'dark');
+    } else {
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+    }
+  };
+
+  const quickActions = [
+    {
+      icon: 'book',
+      label: language === 'ht' ? 'Bib la' : 'Bible',
+      desc: '66 liv',
+      onPress: () => router.push('/bible'),
+    },
+    {
+      icon: 'musical-notes',
+      label: language === 'ht' ? 'Kantik' : 'Cantiques',
+      desc: '800+ chante',
+      onPress: () => router.push('/hymns'),
+    },
+    {
+      icon: 'search',
+      label: language === 'ht' ? 'Chèche' : 'Rechercher',
+      desc: language === 'ht' ? 'Bib & Kantik' : 'Bible & Cantiques',
+      onPress: () => router.push('/settings'),
+    },
+    {
+      icon: 'heart',
+      label: language === 'ht' ? 'Favori' : 'Favoris',
+      desc: language === 'ht' ? 'Makè yo' : 'Signets',
+      onPress: () => router.push('/settings'),
+    },
+  ];
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['top']}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={dynamicStyles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={[styles.header, dynamicStyles.header]}>
+          <View>
+            <Text style={[styles.greeting, dynamicStyles.greeting, { color: colors.textTertiary }]}>
+              {greeting.emoji} {greeting.text}
+            </Text>
+            <Text style={[styles.title, dynamicStyles.title, { color: colors.text }]}>Lafwa</Text>
+          </View>
+          <TouchableOpacity
+            onPress={toggleTheme}
+            style={[styles.themeButton, dynamicStyles.themeButton, { backgroundColor: colors.surfaceHover }]}
+          >
+            <Ionicons
+              name={isDark ? 'sunny' : 'moon'}
+              size={rs(22)}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
         </View>
-    );
+
+        {/* Verse of the Day */}
+        <View
+          style={[
+            styles.verseCard,
+            dynamicStyles.verseCard,
+            {
+              backgroundColor: isDark ? colors.surface : colors.primaryLight,
+              borderColor: colors.border,
+            },
+            !isDark && shadows.card,
+          ]}
+        >
+          <View style={styles.verseHeader}>
+            <Text style={[styles.verseLabel, dynamicStyles.verseLabel, { color: colors.primary }]}>
+              {language === 'ht' ? 'Vèsè Jounen An' : 'Verset du Jour'}
+            </Text>
+          </View>
+
+          <Text style={[styles.verseText, dynamicStyles.verseText, { color: colors.text }]}>
+            "{verse.text}"
+          </Text>
+
+          <View style={styles.verseFooter}>
+            <Text style={[styles.verseRef, { color: colors.textSecondary }]}>
+              {verse.reference}
+            </Text>
+            <View style={styles.verseActions}>
+              <TouchableOpacity
+                style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
+              >
+                <Ionicons name="bookmark-outline" size={rs(20)} color={colors.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.verseAction, dynamicStyles.verseAction, { backgroundColor: colors.bg }]}
+              >
+                <Ionicons name="share-outline" size={rs(20)} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Continue Reading */}
+        {lastReadBible && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { color: colors.textTertiary }]}>
+              {language === 'ht' ? 'KONTINYE' : 'CONTINUER'}
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.continueCard,
+                dynamicStyles.continueCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+                shadows.card,
+              ]}
+              onPress={() => router.push('/bible')}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.continueIcon, dynamicStyles.continueIcon, { backgroundColor: colors.primaryLight }]}>
+                <Ionicons name="book" size={rs(26)} color={colors.primary} />
+              </View>
+              <View style={styles.continueText}>
+                <Text style={[styles.continueTitle, dynamicStyles.continueTitle, { color: colors.text }]}>
+                  {lastReadBible.book} {lastReadBible.chapter}
+                </Text>
+                <Text style={[styles.continueSubtitle, dynamicStyles.continueSubtitle, { color: colors.textTertiary }]}>
+                  {language === 'ht' ? 'Kontinye li' : 'Continuer la lecture'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={rs(22)} color={colors.textTertiary} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { color: colors.textTertiary }]}>
+            {language === 'ht' ? 'AKSYON RAPID' : 'ACCÈS RAPIDE'}
+          </Text>
+          <View style={[styles.actionsGrid, dynamicStyles.actionsGrid]}>
+            {quickActions.map((action) => (
+              <TouchableOpacity
+                key={action.label}
+                style={[
+                  styles.actionCard,
+                  dynamicStyles.actionCard,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
+                  shadows.card,
+                ]}
+                onPress={action.onPress}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.actionIcon, dynamicStyles.actionIcon, { backgroundColor: colors.primaryLight }]}>
+                  <Ionicons name={action.icon as any} size={rs(26)} color={colors.primary} />
+                </View>
+                <Text style={[styles.actionLabel, dynamicStyles.actionLabel, { color: colors.text }]}>
+                  {action.label}
+                </Text>
+                <Text style={[styles.actionDesc, dynamicStyles.actionDesc, { color: colors.textTertiary }]}>
+                  {action.desc}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    card: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        alignItems: 'center',
-    },
-    verse: {
-        fontSize: 18,
-        fontStyle: 'italic',
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    reference: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#666',
-    },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  greeting: {
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  title: {
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
+  themeButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verseCard: {
+    borderWidth: 1,
+  },
+  verseHeader: {
+    marginBottom: 12,
+  },
+  verseLabel: {
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  verseText: {
+    fontStyle: 'italic',
+    marginBottom: 16,
+  },
+  verseFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  verseRef: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  verseActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  verseAction: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  continueCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  continueIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  continueText: {
+    flex: 1,
+  },
+  continueTitle: {
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  continueSubtitle: {},
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  actionCard: {
+    borderWidth: 1,
+  },
+  actionIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionLabel: {
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  actionDesc: {},
 });
