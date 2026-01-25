@@ -1,0 +1,36 @@
+[
+  {
+    "number": 1,
+    "slug": "gloire-a-dieu",
+    "title_fr": "Gloire à Dieu",
+    "title_ht": "Gloire à Dieu",
+    "sections": [
+      {
+        "type": "verse",
+        "number": 1,
+        "order": 1,
+        "text_fr": "Gloire à Dieu notre Créateur!\nGloire à Christ notre Rédempteur!\nGloire à l'Esprit Consolateur!\nLouange et gloire au Dieu Sauveur!",
+        "text_ht": "Gloire à Dieu notre Créateur!\nGloire à Christ notre Rédempteur!\nGloire à l'Esprit Consolateur!\nLouange et gloire au Dieu Sauveur!"
+      }
+    ],
+    "scraped_at": "2026-01-25T17:51:16.692Z",
+    "quality_score": 65
+  },
+  {
+    "number": 6,
+    "slug": "agneau-de-dieu",
+    "title_fr": "Agneau de Dieu",
+    "title_ht": "Agneau de Dieu",
+    "sections": [
+      {
+        "type": "verse",
+        "number": 1,
+        "order": 1,
+        "text_fr": "Agneau de Dieu, par tes langueurs\nTu pris sur Toi notre misère,\nEt tu nous fis, pour Dieu, ton Père,\nEt rois et sacrificateurs.\nEnsemble aussi nous te rendrons,\nHonneur, gloire et magnificence,\nForce, pouvoir, obéissance\nEt dans nos coeurs nous t'adorons,\nAmen! Amen! Seigneur, Amen!",
+        "text_ht": "Agneau de Dieu, par tes langueurs\nTu pris sur Toi notre misère,\nEt tu nous fis, pour Dieu, ton Père,\nEt rois et sacrificateurs.\nEnsemble aussi nous te rendrons,\nHonneur, gloire et magnificence,\nForce, pouvoir, obéissance\nEt dans nos coeurs nous t'adorons,\nAmen! Amen! Seigneur, Amen!"
+      }
+    ],
+    "scraped_at": "2026-01-25T17:51:23.788Z",
+    "quality_score": 65
+  }
+]

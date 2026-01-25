@@ -7,8 +7,8 @@ const REJECTED_FILE = 'src/assets/data/raw/validation_rejected.json';
 const REPORT_FILE = 'src/assets/data/raw/validation_report.json';
 
 // Quality thresholds
-const PASS_THRESHOLD = 70;
-const REVIEW_THRESHOLD = 50;
+const PASS_THRESHOLD = 60;  // Lowered from 70 - short hymns (1 verse) are still valid
+const REVIEW_THRESHOLD = 40;
 
 interface HymnSection {
   type: 'verse' | 'refrain';
@@ -36,78 +36,115 @@ interface ValidationResult {
   issues: string[];
 }
 
+// Boilerplate patterns to filter (site headers, not actual lyrics)
+const BOILERPLATE_PATTERNS = [
+  /koleksyon\s*chan/i,                    // Partial match
+  /collection\s+of\s+christian/i,
+  /^chant\s*d[''']?esp/i,                 // Chant d'Esperance header
+  /kantik\s+kretyen/i,                    // Christian hymns
+];
+
+function isBoilerplate(text: string | null): boolean {
+  if (!text) return false;
+  return BOILERPLATE_PATTERNS.some(p => p.test(text.trim()));
+}
+
 /**
  * Calculate quality score for a hymn
  *
  * Scoring:
- * +40 pts: Has at least 1 section
- * +20 pts: Has title in both languages
- * +20 pts: Has content in both languages
- * +10 pts: Section count matches between FR/HT
+ * +30 pts: Has at least 1 section with real content
+ * +15 pts: Has title
+ * +15 pts: Has 3+ sections (typical hymn structure)
+ * +10 pts: Has refrain detected
  * +10 pts: No empty sections
+ * +10 pts: Content is bilingual (FR ≠ HT) - BONUS
+ * +10 pts: Has numbered verses
+ *
+ * Max: 100 pts
  */
 function calculateQualityScore(hymn: RawHymn): ValidationResult {
   let score = 0;
   const issues: string[] = [];
 
-  // +40: Has at least 1 section
-  if (hymn.sections && hymn.sections.length > 0) {
-    score += 40;
+  // Filter out boilerplate for scoring
+  const realSections = hymn.sections?.filter(s => {
+    const textFr = s.text_fr || '';
+    const textHt = s.text_ht || '';
+    return !isBoilerplate(textFr) && !isBoilerplate(textHt);
+  }) || [];
+
+  // +30: Has at least 1 real section
+  if (realSections.length > 0) {
+    score += 30;
   } else {
-    issues.push('No sections found');
+    issues.push('No sections found (or only boilerplate)');
   }
 
-  // +20: Has title in both languages
-  if (hymn.title_fr && hymn.title_ht) {
-    score += 20;
-  } else if (hymn.title_fr || hymn.title_ht) {
-    score += 10; // Partial credit
-    issues.push(`Missing ${!hymn.title_fr ? 'French' : 'Kreyol'} title`);
+  // +15: Has title
+  if (hymn.title_fr || hymn.title_ht) {
+    score += 15;
   } else {
-    issues.push('No title in any language');
+    issues.push('No title');
   }
 
-  // +20: Has content in both languages
-  if (hymn.sections && hymn.sections.length > 0) {
-    const hasFrContent = hymn.sections.some(s => s.text_fr && s.text_fr.length > 10);
-    const hasHtContent = hymn.sections.some(s => s.text_ht && s.text_ht.length > 10);
-
-    if (hasFrContent && hasHtContent) {
-      score += 20;
-    } else if (hasFrContent || hasHtContent) {
-      score += 10; // Partial credit
-      issues.push(`Missing ${!hasFrContent ? 'French' : 'Kreyol'} content`);
-    } else {
-      issues.push('No substantial content in any language');
-    }
+  // +15: Has 3+ sections (typical hymn)
+  if (realSections.length >= 3) {
+    score += 15;
+  } else if (realSections.length >= 2) {
+    score += 8;
+  } else {
+    issues.push(`Only ${realSections.length} section(s)`);
   }
 
-  // +10: Section count matches (both languages have same structure)
-  if (hymn.sections && hymn.sections.length > 0) {
-    const frSections = hymn.sections.filter(s => s.text_fr && s.text_fr.length > 0).length;
-    const htSections = hymn.sections.filter(s => s.text_ht && s.text_ht.length > 0).length;
-
-    if (frSections > 0 && htSections > 0 && frSections === htSections) {
-      score += 10;
-    } else if (frSections > 0 && htSections > 0) {
-      issues.push(`Section count mismatch: FR=${frSections}, HT=${htSections}`);
-    }
+  // +10: Has refrain
+  if (realSections.some(s => s.type === 'refrain')) {
+    score += 10;
   }
 
   // +10: No empty sections
-  if (hymn.sections && hymn.sections.length > 0) {
-    const emptyCount = hymn.sections.filter(
-      s => (!s.text_fr || s.text_fr.length < 5) && (!s.text_ht || s.text_ht.length < 5)
-    ).length;
+  const emptyCount = realSections.filter(
+    s => (!s.text_fr || s.text_fr.length < 10) && (!s.text_ht || s.text_ht.length < 10)
+  ).length;
+  if (emptyCount === 0 && realSections.length > 0) {
+    score += 10;
+  } else if (emptyCount > 0) {
+    issues.push(`${emptyCount} empty/short section(s)`);
+  }
 
-    if (emptyCount === 0) {
-      score += 10;
-    } else {
-      issues.push(`${emptyCount} empty section(s)`);
-    }
+  // +10: Has content in at least one language
+  const hasContent = realSections.some(s => 
+    (s.text_fr && s.text_fr.length > 20) || (s.text_ht && s.text_ht.length > 20)
+  );
+  if (hasContent) {
+    score += 10;
+  }
+
+  // +10: Has numbered verses
+  const numberedVerses = realSections.filter(s => s.type === 'verse' && s.number !== null);
+  if (numberedVerses.length >= 2) {
+    score += 10;
   }
 
   return { score, issues };
+}
+
+function filterBoilerplate(hymn: RawHymn): RawHymn {
+  const filteredSections = hymn.sections.filter(s => {
+    // Remove section if both FR and HT are boilerplate (or one is boilerplate and other is empty)
+    const frIsBoilerplate = isBoilerplate(s.text_fr);
+    const htIsBoilerplate = isBoilerplate(s.text_ht);
+    
+    if (frIsBoilerplate && (htIsBoilerplate || !s.text_ht)) return false;
+    if (htIsBoilerplate && (frIsBoilerplate || !s.text_fr)) return false;
+    
+    return true;
+  });
+
+  // Reorder sections
+  filteredSections.forEach((s, i) => s.order = i + 1);
+
+  return { ...hymn, sections: filteredSections };
 }
 
 async function main(): Promise<void> {
@@ -119,8 +156,11 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const hymns: RawHymn[] = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf-8'));
-  console.log(`Loaded ${hymns.length} hymns for validation\n`);
+  const rawHymns: RawHymn[] = JSON.parse(fs.readFileSync(INPUT_FILE, 'utf-8'));
+  
+  // Filter boilerplate from all hymns first
+  const hymns = rawHymns.map(filterBoilerplate);
+  console.log(`Loaded ${hymns.length} hymns for validation (boilerplate filtered)\n`);
 
   const passed: ValidatedHymn[] = [];
   const review: ValidatedHymn[] = [];

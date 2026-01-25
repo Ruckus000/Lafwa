@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-01-25T18:01:05.691Z",
+  "timestamp": "2026-01-25T18:32:27.532Z",
   "thresholds": {
-    "pass": 70,
-    "review": 50
+    "pass": 60,
+    "review": 40
   },
   "total_input": 336,
   "passed_count": 336,
@@ -15,8 +15,8 @@
     "range_301_335": 35
   },
   "quality_breakdown": {
-    "high_90_plus": 336,
-    "good_70_89": 0
+    "high_90_plus": 329,
+    "good_70_89": 5
   },
   "review_numbers": [],
   "rejected_numbers": []

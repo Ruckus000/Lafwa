@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-01-25T18:35:37.496Z",
+  "summary": {
+    "passed": true,
+    "criticalFailures": 0,
+    "warnings": 1
+  },
+  "results": [
+    {
+      "name": "File exists: hymnsIndex",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "File exists: hymnsRaw",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "File exists: hymnsParsed",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "File exists: hymnsFinal",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "File exists: validationReport",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "File exists: database",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "Hymn count within expected range",
+      "category": "critical",
+      "passed": true,
+      "message": "Found 336 hymns, expected 300-400",
+      "details": {
+        "actual": 336
+      }
+    },
+    {
+      "name": "No gaps in hymn numbering",
+      "category": "warning",
+      "passed": true,
+      "message": "Found 0 gaps in numbering",
+      "details": {
+        "gaps": [],
+        "totalGaps": 0
+      }
+    },
+    {
+      "name": "No duplicate hymn numbers",
+      "category": "critical",
+      "passed": true,
+      "message": "Found 0 duplicate numbers",
+      "details": {
+        "duplicates": []
+      }
+    },
+    {
+      "name": "All hymns have at least one title",
+      "category": "critical",
+      "passed": true,
+      "message": "0 hymns missing both titles",
+      "details": {
+        "hymnNumbers": []
+      }
+    },
+    {
+      "name": "All hymns have at least one section",
+      "category": "critical",
+      "passed": true,
+      "message": "0 hymns have no sections",
+      "details": {
+        "hymnNumbers": []
+      }
+    },
+    {
+      "name": "Average sections per hymn is reasonable",
+      "category": "warning",
+      "passed": true,
+      "message": "Average 4.3 sections, expected >= 3",
+      "details": {
+        "averageSections": "4.32"
+      }
+    },
+    {
+      "name": "All sections have at least one language text",
+      "category": "critical",
+      "passed": true,
+      "message": "0 sections have no text in either language"
+    },
+    {
+      "name": "No boilerplate text in hymns",
+      "category": "warning",
+      "passed": false,
+      "message": "0.3% of hymns still contain boilerplate (1 hymns)",
+      "details": {
+        "hymnsWithBoilerplate": 1,
+        "hymnNumbers": [
+          128
+        ]
+      }
+    },
+    {
+      "name": "Quality scores have variance",
+      "category": "warning",
+      "passed": true,
+      "message": "Score range: 65-100, avg: 93.9"
+    },
+    {
+      "name": "Bilingual status documented",
+      "category": "info",
+      "passed": true,
+      "message": "KNOWN LIMITATION: cesperance.com serves identical FR/HT content. App will display same text for both languages."
+    },
+    {
+      "name": "All hymns have content in at least one language",
+      "category": "critical",
+      "passed": true,
+      "message": "336/336 hymns have content"
+    },
+    {
+      "name": "Section ordering is sequential",
+      "category": "warning",
+      "passed": true,
+      "message": "0 hymns have non-sequential section ordering",
+      "details": {
+        "hymnNumbers": []
+      }
+    },
+    {
+      "name": "All section types are valid (verse/refrain)",
+      "category": "critical",
+      "passed": true,
+      "message": "0 sections have invalid types"
+    },
+    {
+      "name": "Refrain detection rate",
+      "category": "info",
+      "passed": true,
+      "message": "41.4% of hymns have a refrain",
+      "details": {
+        "hymnsWithRefrain": 139
+      }
+    },
+    {
+      "name": "Verse numbering rate",
+      "category": "info",
+      "passed": true,
+      "message": "100.0% of hymns have numbered verses"
+    },
+    {
+      "name": "No encoding issues (mojibake)",
+      "category": "critical",
+      "passed": true,
+      "message": "Found 0 encoding issues",
+      "details": {
+        "issues": []
+      }
+    },
+    {
+      "name": "Kreyòl accent characters present",
+      "category": "info",
+      "passed": true,
+      "message": "Found Kreyòl accent characters"
+    },
+    {
+      "name": "Table exists: hymns",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "Table exists: hymn_sections",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "Table exists: bible_verses",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "Table exists: bookmarks",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "FTS table exists: bible_fts",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "FTS table exists: hymns_fts",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "FTS table exists: sections_fts",
+      "category": "critical",
+      "passed": true,
+      "message": ""
+    },
+    {
+      "name": "Hymns table has data",
+      "category": "critical",
+      "passed": true,
+      "message": "Hymns table has 336 rows"
+    },
+    {
+      "name": "Hymn sections table has data",
+      "category": "critical",
+      "passed": true,
+      "message": "Hymn sections table has 1450 rows"
+    },
+    {
+      "name": "Hymns FTS is synced",
+      "category": "critical",
+      "passed": true,
+      "message": "FTS has 336 rows, hymns has 336"
+    },
+    {
+      "name": "FTS search works (query: \"Dieu\")",
+      "category": "critical",
+      "passed": true,
+      "message": "Found 5 results"
+    },
+    {
+      "name": "FTS accent search works (query: \"Jésus\")",
+      "category": "warning",
+      "passed": true,
+      "message": "Found 5 results"
+    },
+    {
+      "name": "No orphan hymn sections",
+      "category": "critical",
+      "passed": true,
+      "message": "Found 0 orphan sections"
+    }
+  ]
+}

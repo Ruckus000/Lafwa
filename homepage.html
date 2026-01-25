@@ -1,0 +1,1885 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online | ChandesperansOnline.com: Chants d&#039;Espérance Haïtiens Français Online, Haitian Chants of Hope</title>
+<!--[if IE 6]><link rel="stylesheet" href="https://s0.wp.com/wp-content/themes/pub/springloaded/ie6.css?m=1252654158i" type="text/css" media="screen" /><![endif]-->
+<link rel="pingback" href="https://chandesperansonline.com/xmlrpc.php" />
+<!--[if lt IE 7.]>
+<script defer type="text/javascript" src="https://s0.wp.com/wp-content/themes/pub/springloaded/pngfix.js?m=1323834278i"></script>
+<![endif]-->
+<meta name='robots' content='max-image-preview:large' />
+
+<!-- Async WordPress.com Remote Login -->
+<script id="wpcom_remote_login_js">
+var wpcom_remote_login_extra_auth = '';
+function wpcom_remote_login_remove_dom_node_id( element_id ) {
+	var dom_node = document.getElementById( element_id );
+	if ( dom_node ) { dom_node.parentNode.removeChild( dom_node ); }
+}
+function wpcom_remote_login_remove_dom_node_classes( class_name ) {
+	var dom_nodes = document.querySelectorAll( '.' + class_name );
+	for ( var i = 0; i < dom_nodes.length; i++ ) {
+		dom_nodes[ i ].parentNode.removeChild( dom_nodes[ i ] );
+	}
+}
+function wpcom_remote_login_final_cleanup() {
+	wpcom_remote_login_remove_dom_node_classes( "wpcom_remote_login_msg" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_validate" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_js" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_iframe" );
+	wpcom_remote_login_remove_dom_node_id( "wpcom_request_access_styles" );
+}
+
+// Watch for messages back from the remote login
+window.addEventListener( "message", function( e ) {
+	if ( e.origin === "https://r-login.wordpress.com" ) {
+		var data = {};
+		try {
+			data = JSON.parse( e.data );
+		} catch( e ) {
+			wpcom_remote_login_final_cleanup();
+			return;
+		}
+
+		if ( data.msg === 'LOGIN' ) {
+			// Clean up the login check iframe
+			wpcom_remote_login_remove_dom_node_id( "wpcom_remote_login_key" );
+
+			var id_regex = new RegExp( /^[0-9]+$/ );
+			var token_regex = new RegExp( /^.*|.*|.*$/ );
+			if (
+				token_regex.test( data.token )
+				&& id_regex.test( data.wpcomid )
+			) {
+				// We have everything we need to ask for a login
+				var script = document.createElement( "script" );
+				script.setAttribute( "id", "wpcom_remote_login_validate" );
+				script.src = '/remote-login.php?wpcom_remote_login=validate'
+					+ '&wpcomid=' + data.wpcomid
+					+ '&token=' + encodeURIComponent( data.token )
+					+ '&host=' + window.location.protocol
+					+ '//' + window.location.hostname
+					+ '&postid=595'
+					+ '&is_singular=';
+				document.body.appendChild( script );
+			}
+
+			return;
+		}
+
+		// Safari ITP, not logged in, so redirect
+		if ( data.msg === 'LOGIN-REDIRECT' ) {
+			window.location = 'https://wordpress.com/log-in?redirect_to=' + window.location.href;
+			return;
+		}
+
+		// Safari ITP, storage access failed, remove the request
+		if ( data.msg === 'LOGIN-REMOVE' ) {
+			var css_zap = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } * html body { margin-top: 0 !important; } }';
+			var style_zap = document.createElement( 'style' );
+			style_zap.type = 'text/css';
+			style_zap.appendChild( document.createTextNode( css_zap ) );
+			document.body.appendChild( style_zap );
+
+			var e = document.getElementById( 'wpcom_request_access_iframe' );
+			e.parentNode.removeChild( e );
+
+			document.cookie = 'wordpress_com_login_access=denied; path=/; max-age=31536000';
+
+			return;
+		}
+
+		// Safari ITP
+		if ( data.msg === 'REQUEST_ACCESS' ) {
+			console.log( 'request access: safari' );
+
+			// Check ITP iframe enable/disable knob
+			if ( wpcom_remote_login_extra_auth !== 'safari_itp_iframe' ) {
+				return;
+			}
+
+			// If we are in a "private window" there is no ITP.
+			var private_window = false;
+			try {
+				var opendb = window.openDatabase( null, null, null, null );
+			} catch( e ) {
+				private_window = true;
+			}
+
+			if ( private_window ) {
+				console.log( 'private window' );
+				return;
+			}
+
+			var iframe = document.createElement( 'iframe' );
+			iframe.id = 'wpcom_request_access_iframe';
+			iframe.setAttribute( 'scrolling', 'no' );
+			iframe.setAttribute( 'sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-top-navigation-by-user-activation' );
+			iframe.src = 'https://r-login.wordpress.com/remote-login.php?wpcom_remote_login=request_access&origin=' + encodeURIComponent( data.origin ) + '&wpcomid=' + encodeURIComponent( data.wpcomid );
+
+			var css = 'html { -webkit-transition: margin-top 1s; transition: margin-top 1s; } /* 9001 */ html { margin-top: 46px !important; } * html body { margin-top: 46px !important; } @media screen and ( max-width: 660px ) { html { margin-top: 71px !important; } * html body { margin-top: 71px !important; } #wpcom_request_access_iframe { display: block; height: 71px !important; } } #wpcom_request_access_iframe { border: 0px; height: 46px; position: fixed; top: 0; left: 0; width: 100%; min-width: 100%; z-index: 99999; background: #23282d; } ';
+
+			var style = document.createElement( 'style' );
+			style.type = 'text/css';
+			style.id = 'wpcom_request_access_styles';
+			style.appendChild( document.createTextNode( css ) );
+			document.body.appendChild( style );
+
+			document.body.appendChild( iframe );
+		}
+
+		if ( data.msg === 'DONE' ) {
+			wpcom_remote_login_final_cleanup();
+		}
+	}
+}, false );
+
+// Inject the remote login iframe after the page has had a chance to load
+// more critical resources
+window.addEventListener( "DOMContentLoaded", function( e ) {
+	var iframe = document.createElement( "iframe" );
+	iframe.style.display = "none";
+	iframe.setAttribute( "scrolling", "no" );
+	iframe.setAttribute( "id", "wpcom_remote_login_key" );
+	iframe.src = "https://r-login.wordpress.com/remote-login.php"
+		+ "?wpcom_remote_login=key"
+		+ "&origin=aHR0cHM6Ly9jaGFuZGVzcGVyYW5zb25saW5lLmNvbQ%3D%3D"
+		+ "&wpcomid=15007624"
+		+ "&time=" + Math.floor( Date.now() / 1000 );
+	document.body.appendChild( iframe );
+}, false );
+</script>
+<link rel='dns-prefetch' href='//s0.wp.com' />
+<link rel='dns-prefetch' href='//af.pubmine.com' />
+<link rel="alternate" type="application/rss+xml" title="Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online &raquo; Feed" href="https://chandesperansonline.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online &raquo; Comments Feed" href="https://chandesperansonline.com/comments/feed/" />
+	<script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script>
+	<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-1' href='/_static/??-eJx9jEsOwjAMRC9EsApFZYM4S0hMcet8VDuKevumEt0hNiM9zcyDmo1LUTEqhGIyl5GiQCU/ogpgaW2aCQ3bCoohs1UUEF0Zz07kBL8FE2q2bv4yhJT28IXbmeKbIikacUtiPnj95zs2oB8MzZHLCyQvFEdO1qPfv8/w6Ibb9XLvh66fNq2JUeA=&cssminify=yes' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-2-1' href='/wp-content/plugins/gutenberg-core/v22.4.0/build/styles/block-library/style.min.css?m=1768935615i&cssminify=yes' type='text/css' media='all' />
+<style id='wp-block-library-inline-css'>
+.has-text-align-justify {
+	text-align:justify;
+}
+.has-text-align-justify{text-align:justify;}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style><style id='wp-block-embed-inline-css'>
+.wp-block-embed.alignleft,.wp-block-embed.alignright,.wp-block[data-align=left]>[data-type="core/embed"],.wp-block[data-align=right]>[data-type="core/embed"]{max-width:360px;width:100%}.wp-block-embed.alignleft .wp-block-embed__wrapper,.wp-block-embed.alignright .wp-block-embed__wrapper,.wp-block[data-align=left]>[data-type="core/embed"] .wp-block-embed__wrapper,.wp-block[data-align=right]>[data-type="core/embed"] .wp-block-embed__wrapper{min-width:280px}.wp-block-cover .wp-block-embed{min-height:240px;min-width:320px}.wp-block-group.is-layout-flex .wp-block-embed{flex:1 1 0%;min-width:0}.wp-block-embed{overflow-wrap:break-word}.wp-block-embed :where(figcaption){margin-bottom:1em;margin-top:.5em}.wp-block-embed iframe{max-width:100%}.wp-block-embed__wrapper{position:relative}.wp-embed-responsive .wp-has-aspect-ratio .wp-block-embed__wrapper:before{content:"";display:block;padding-top:50%}.wp-embed-responsive .wp-has-aspect-ratio iframe{bottom:0;height:100%;left:0;position:absolute;right:0;top:0;width:100%}.wp-embed-responsive .wp-embed-aspect-21-9 .wp-block-embed__wrapper:before{padding-top:42.85%}.wp-embed-responsive .wp-embed-aspect-18-9 .wp-block-embed__wrapper:before{padding-top:50%}.wp-embed-responsive .wp-embed-aspect-16-9 .wp-block-embed__wrapper:before{padding-top:56.25%}.wp-embed-responsive .wp-embed-aspect-4-3 .wp-block-embed__wrapper:before{padding-top:75%}.wp-embed-responsive .wp-embed-aspect-1-1 .wp-block-embed__wrapper:before{padding-top:100%}.wp-embed-responsive .wp-embed-aspect-9-16 .wp-block-embed__wrapper:before{padding-top:177.77%}.wp-embed-responsive .wp-embed-aspect-1-2 .wp-block-embed__wrapper:before{padding-top:200%}
+/*# sourceURL=https://s0.wp.com/wp-content/plugins/gutenberg-core/v22.4.0/build/styles/block-library/embed/style.min.css */
+</style>
+<style id='wp-block-paragraph-inline-css'>
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=https://s0.wp.com/wp-content/plugins/gutenberg-core/v22.4.0/build/styles/block-library/paragraph/style.min.css */
+</style>
+<style id='global-styles-inline-css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-family--albert-sans: 'Albert Sans', sans-serif;--wp--preset--font-family--alegreya: Alegreya, serif;--wp--preset--font-family--arvo: Arvo, serif;--wp--preset--font-family--bodoni-moda: 'Bodoni Moda', serif;--wp--preset--font-family--bricolage-grotesque: 'Bricolage Grotesque', sans-serif;--wp--preset--font-family--cabin: Cabin, sans-serif;--wp--preset--font-family--chivo: Chivo, sans-serif;--wp--preset--font-family--commissioner: Commissioner, sans-serif;--wp--preset--font-family--cormorant: Cormorant, serif;--wp--preset--font-family--courier-prime: 'Courier Prime', monospace;--wp--preset--font-family--crimson-pro: 'Crimson Pro', serif;--wp--preset--font-family--dm-mono: 'DM Mono', monospace;--wp--preset--font-family--dm-sans: 'DM Sans', sans-serif;--wp--preset--font-family--dm-serif-display: 'DM Serif Display', serif;--wp--preset--font-family--domine: Domine, serif;--wp--preset--font-family--eb-garamond: 'EB Garamond', serif;--wp--preset--font-family--epilogue: Epilogue, sans-serif;--wp--preset--font-family--fahkwang: Fahkwang, sans-serif;--wp--preset--font-family--figtree: Figtree, sans-serif;--wp--preset--font-family--fira-sans: 'Fira Sans', sans-serif;--wp--preset--font-family--fjalla-one: 'Fjalla One', sans-serif;--wp--preset--font-family--fraunces: Fraunces, serif;--wp--preset--font-family--gabarito: Gabarito, system-ui;--wp--preset--font-family--ibm-plex-mono: 'IBM Plex Mono', monospace;--wp--preset--font-family--ibm-plex-sans: 'IBM Plex Sans', sans-serif;--wp--preset--font-family--ibarra-real-nova: 'Ibarra Real Nova', serif;--wp--preset--font-family--instrument-serif: 'Instrument Serif', serif;--wp--preset--font-family--inter: Inter, sans-serif;--wp--preset--font-family--josefin-sans: 'Josefin Sans', sans-serif;--wp--preset--font-family--jost: Jost, sans-serif;--wp--preset--font-family--libre-baskerville: 'Libre Baskerville', serif;--wp--preset--font-family--libre-franklin: 'Libre Franklin', sans-serif;--wp--preset--font-family--literata: Literata, serif;--wp--preset--font-family--lora: Lora, serif;--wp--preset--font-family--merriweather: Merriweather, serif;--wp--preset--font-family--montserrat: Montserrat, sans-serif;--wp--preset--font-family--newsreader: Newsreader, serif;--wp--preset--font-family--noto-sans-mono: 'Noto Sans Mono', sans-serif;--wp--preset--font-family--nunito: Nunito, sans-serif;--wp--preset--font-family--open-sans: 'Open Sans', sans-serif;--wp--preset--font-family--overpass: Overpass, sans-serif;--wp--preset--font-family--pt-serif: 'PT Serif', serif;--wp--preset--font-family--petrona: Petrona, serif;--wp--preset--font-family--piazzolla: Piazzolla, serif;--wp--preset--font-family--playfair-display: 'Playfair Display', serif;--wp--preset--font-family--plus-jakarta-sans: 'Plus Jakarta Sans', sans-serif;--wp--preset--font-family--poppins: Poppins, sans-serif;--wp--preset--font-family--raleway: Raleway, sans-serif;--wp--preset--font-family--roboto: Roboto, sans-serif;--wp--preset--font-family--roboto-slab: 'Roboto Slab', serif;--wp--preset--font-family--rubik: Rubik, sans-serif;--wp--preset--font-family--rufina: Rufina, serif;--wp--preset--font-family--sora: Sora, sans-serif;--wp--preset--font-family--source-sans-3: 'Source Sans 3', sans-serif;--wp--preset--font-family--source-serif-4: 'Source Serif 4', serif;--wp--preset--font-family--space-mono: 'Space Mono', monospace;--wp--preset--font-family--syne: Syne, sans-serif;--wp--preset--font-family--texturina: Texturina, serif;--wp--preset--font-family--urbanist: Urbanist, sans-serif;--wp--preset--font-family--work-sans: 'Work Sans', sans-serif;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}.has-albert-sans-font-family{font-family: var(--wp--preset--font-family--albert-sans) !important;}.has-alegreya-font-family{font-family: var(--wp--preset--font-family--alegreya) !important;}.has-arvo-font-family{font-family: var(--wp--preset--font-family--arvo) !important;}.has-bodoni-moda-font-family{font-family: var(--wp--preset--font-family--bodoni-moda) !important;}.has-bricolage-grotesque-font-family{font-family: var(--wp--preset--font-family--bricolage-grotesque) !important;}.has-cabin-font-family{font-family: var(--wp--preset--font-family--cabin) !important;}.has-chivo-font-family{font-family: var(--wp--preset--font-family--chivo) !important;}.has-commissioner-font-family{font-family: var(--wp--preset--font-family--commissioner) !important;}.has-cormorant-font-family{font-family: var(--wp--preset--font-family--cormorant) !important;}.has-courier-prime-font-family{font-family: var(--wp--preset--font-family--courier-prime) !important;}.has-crimson-pro-font-family{font-family: var(--wp--preset--font-family--crimson-pro) !important;}.has-dm-mono-font-family{font-family: var(--wp--preset--font-family--dm-mono) !important;}.has-dm-sans-font-family{font-family: var(--wp--preset--font-family--dm-sans) !important;}.has-dm-serif-display-font-family{font-family: var(--wp--preset--font-family--dm-serif-display) !important;}.has-domine-font-family{font-family: var(--wp--preset--font-family--domine) !important;}.has-eb-garamond-font-family{font-family: var(--wp--preset--font-family--eb-garamond) !important;}.has-epilogue-font-family{font-family: var(--wp--preset--font-family--epilogue) !important;}.has-fahkwang-font-family{font-family: var(--wp--preset--font-family--fahkwang) !important;}.has-figtree-font-family{font-family: var(--wp--preset--font-family--figtree) !important;}.has-fira-sans-font-family{font-family: var(--wp--preset--font-family--fira-sans) !important;}.has-fjalla-one-font-family{font-family: var(--wp--preset--font-family--fjalla-one) !important;}.has-fraunces-font-family{font-family: var(--wp--preset--font-family--fraunces) !important;}.has-gabarito-font-family{font-family: var(--wp--preset--font-family--gabarito) !important;}.has-ibm-plex-mono-font-family{font-family: var(--wp--preset--font-family--ibm-plex-mono) !important;}.has-ibm-plex-sans-font-family{font-family: var(--wp--preset--font-family--ibm-plex-sans) !important;}.has-ibarra-real-nova-font-family{font-family: var(--wp--preset--font-family--ibarra-real-nova) !important;}.has-instrument-serif-font-family{font-family: var(--wp--preset--font-family--instrument-serif) !important;}.has-inter-font-family{font-family: var(--wp--preset--font-family--inter) !important;}.has-josefin-sans-font-family{font-family: var(--wp--preset--font-family--josefin-sans) !important;}.has-jost-font-family{font-family: var(--wp--preset--font-family--jost) !important;}.has-libre-baskerville-font-family{font-family: var(--wp--preset--font-family--libre-baskerville) !important;}.has-libre-franklin-font-family{font-family: var(--wp--preset--font-family--libre-franklin) !important;}.has-literata-font-family{font-family: var(--wp--preset--font-family--literata) !important;}.has-lora-font-family{font-family: var(--wp--preset--font-family--lora) !important;}.has-merriweather-font-family{font-family: var(--wp--preset--font-family--merriweather) !important;}.has-montserrat-font-family{font-family: var(--wp--preset--font-family--montserrat) !important;}.has-newsreader-font-family{font-family: var(--wp--preset--font-family--newsreader) !important;}.has-noto-sans-mono-font-family{font-family: var(--wp--preset--font-family--noto-sans-mono) !important;}.has-nunito-font-family{font-family: var(--wp--preset--font-family--nunito) !important;}.has-open-sans-font-family{font-family: var(--wp--preset--font-family--open-sans) !important;}.has-overpass-font-family{font-family: var(--wp--preset--font-family--overpass) !important;}.has-pt-serif-font-family{font-family: var(--wp--preset--font-family--pt-serif) !important;}.has-petrona-font-family{font-family: var(--wp--preset--font-family--petrona) !important;}.has-piazzolla-font-family{font-family: var(--wp--preset--font-family--piazzolla) !important;}.has-playfair-display-font-family{font-family: var(--wp--preset--font-family--playfair-display) !important;}.has-plus-jakarta-sans-font-family{font-family: var(--wp--preset--font-family--plus-jakarta-sans) !important;}.has-poppins-font-family{font-family: var(--wp--preset--font-family--poppins) !important;}.has-raleway-font-family{font-family: var(--wp--preset--font-family--raleway) !important;}.has-roboto-font-family{font-family: var(--wp--preset--font-family--roboto) !important;}.has-roboto-slab-font-family{font-family: var(--wp--preset--font-family--roboto-slab) !important;}.has-rubik-font-family{font-family: var(--wp--preset--font-family--rubik) !important;}.has-rufina-font-family{font-family: var(--wp--preset--font-family--rufina) !important;}.has-sora-font-family{font-family: var(--wp--preset--font-family--sora) !important;}.has-source-sans-3-font-family{font-family: var(--wp--preset--font-family--source-sans-3) !important;}.has-source-serif-4-font-family{font-family: var(--wp--preset--font-family--source-serif-4) !important;}.has-space-mono-font-family{font-family: var(--wp--preset--font-family--space-mono) !important;}.has-syne-font-family{font-family: var(--wp--preset--font-family--syne) !important;}.has-texturina-font-family{font-family: var(--wp--preset--font-family--texturina) !important;}.has-urbanist-font-family{font-family: var(--wp--preset--font-family--urbanist) !important;}.has-work-sans-font-family{font-family: var(--wp--preset--font-family--work-sans) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<style id='classic-theme-styles-inline-css'>
+.wp-block-button__link{background-color:#32373c;border-radius:9999px;box-shadow:none;color:#fff;font-size:1.125em;padding:calc(.667em + 2px) calc(1.333em + 2px);text-decoration:none}.wp-block-file__button{background:#32373c;color:#fff}.wp-block-accordion-heading{margin:0}.wp-block-accordion-heading__toggle{background-color:inherit!important;color:inherit!important}.wp-block-accordion-heading__toggle:not(:focus-visible){outline:none}.wp-block-accordion-heading__toggle:focus,.wp-block-accordion-heading__toggle:hover{background-color:inherit!important;border:none;box-shadow:none;color:inherit;padding:var(--wp--preset--spacing--20,1em) 0;text-decoration:none}.wp-block-accordion-heading__toggle:focus-visible{outline:auto;outline-offset:0}
+/*# sourceURL=/wp-content/plugins/gutenberg-core/v22.4.0/build/styles/block-library/classic.min.css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-4-1' href='/_static/??-eJyFkd1OwzAMhV8INyqtBlwgniU/XmZwmihOVnj7uSAYCKm7iXys8/nEiVkL+Lw0XJop3CMtYnx2nP2bmPthfBxGEEqFESqeh9kEkvbjAGkfjIMXuTO/BqUO11kVtZ+KbZsjYSCLjElte9hKIWJTXL5raPi+jxSNAedKRRHQM1FP0E6aJf+4r7Yp3RkplZbI2QYM5uY+0p34SqVRVnXMzHnd85/yGSu47hxr3s3xFfVho5bxc/Wr3IMiZtDvsNud/gg4sqW6oS/peXyYx8PTNM3T6wV8t7uu&cssminify=yes' type='text/css' media='all' />
+<link crossorigin='anonymous' rel='stylesheet' id='print-css-5-1' href='/wp-content/mu-plugins/global-print/global-print.css?m=1465851035i&cssminify=yes' type='text/css' media='print' />
+<style id='jetpack-global-styles-frontend-style-inline-css'>
+:root { --font-headings: unset; --font-base: unset; --font-headings-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif; --font-base-default: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;}
+/*# sourceURL=jetpack-global-styles-frontend-style-inline-css */
+</style>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-8-1' href='/_static/??-eJyNjEEOgkAMRS9kbdAxwYXxLMAMpaYzJbZkrg8kLAwrd+8n7z+sMwxaPBVHn1JOhlNAEu07uQ5mF/wR8gKzLMTFsHKk5IabcjDQlyN0JYKw+T/fXpQMGEYV0Xqae+CdX014PENo29v9swJiAz5G&cssminify=yes' type='text/css' media='all' />
+<script type="text/javascript" id="wpcom-actionbar-placeholder-js-extra">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"15007624","postID":"0","siteURL":"https://chandesperansonline.com","xhrURL":"https://chandesperansonline.com/wp-admin/admin-ajax.php","nonce":"517de47012","isLoggedIn":"","statusMessage":"","subsEmailDefault":"instantly","proxyScriptUrl":"https://s0.wp.com/wp-content/js/wpcom-proxy-request.js?m=1513050504i&amp;ver=20211021","i18n":{"followedText":"New posts from this site will now appear in your \u003Ca href=\"https://wordpress.com/reader\"\u003EReader\u003C/a\u003E","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","shortLinkCopied":"Shortlink copied to clipboard."}};
+//# sourceURL=wpcom-actionbar-placeholder-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" id="jetpack-mu-wpcom-settings-js-before">
+/* <![CDATA[ */
+var JETPACK_MU_WPCOM_SETTINGS = {"assetsUrl":"https://s0.wp.com/wp-content/mu-plugins/jetpack-mu-wpcom-plugin/moon/jetpack_vendor/automattic/jetpack-mu-wpcom/src/build/"};
+//# sourceURL=jetpack-mu-wpcom-settings-js-before
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/_static/??-eJx9jMEOwiAQRH/IdaMmRQ/Gb2kBCQTYDQul/r2tHjQx8TQzmXmDnUFTrjZXDIIlVuBCy2MfZIdfXWrAsTmfBaVNoovn6mlNd4qR+p9598bZKtv728LUEsPs7Q81RXIfjooZjYCOo4h98ToxzsdNIFMGZ7isF7d0PajTWQ2DuqjwBIN6TR8='></script>
+<script type="text/javascript" id="rlt-proxy-js-after">
+/* <![CDATA[ */
+	rltInitialize( {"token":null,"iframeOrigins":["https:\/\/widgets.wp.com"]} );
+//# sourceURL=rlt-proxy-js-after
+/* ]]> */
+</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://chandesperansonline.wordpress.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress.com" />
+<link rel='shortlink' href='https://wp.me/10Yas' />
+
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online" />
+<meta property="og:description" content="ChandesperansOnline.com: Chants d&#039;Espérance Haïtiens Français Online, Haitian Chants of Hope" />
+<meta property="og:url" content="https://chandesperansonline.com/" />
+<meta property="og:site_name" content="Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online" />
+<meta property="og:image" content="https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=200&#038;ts=1769331778" />
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta property="og:image:alt" content="" />
+<meta property="og:locale" content="en_US" />
+
+<!-- End Jetpack Open Graph Tags -->
+<link rel="shortcut icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=32" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=32" sizes="16x16" />
+<link rel="apple-touch-icon" href="https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=114" />
+<link rel='openid.server' href='https://chandesperansonline.com/?openidserver=1' />
+<link rel='openid.delegate' href='https://chandesperansonline.com/' />
+<link rel="search" type="application/opensearchdescription+xml" href="https://chandesperansonline.com/osd.xml" title="Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online" />
+<link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com" />
+<meta name="description" content="ChandesperansOnline.com: Chants d&#039;Espérance Haïtiens Français Online, Haitian Chants of Hope" />
+<script type="text/javascript">
+/* <![CDATA[ */
+var wa_client = {}; wa_client.cmd = []; wa_client.config = { 'blog_id': 15007624, 'blog_language': 'en', 'is_wordads': true, 'hosting_type': 1, 'afp_account_id': 'pub-9129636367903219', 'afp_host_id': 5038568878849053, 'theme': 'pub/springloaded', '_': { 'title': 'Advertisement', 'privacy_settings': 'Privacy Settings' }, 'formats': [ 'belowpost', 'bottom_sticky', 'sidebar_sticky_right', 'sidebar', 'top', 'shortcode', 'gutenberg_rectangle', 'gutenberg_leaderboard', 'gutenberg_mobile_leaderboard', 'gutenberg_skyscraper' ] };
+/* ]]> */
+</script>
+		<script type="text/javascript">
+
+			window.doNotSellCallback = function() {
+
+				var linkElements = [
+					'a[href="https://wordpress.com/?ref=footer_blog"]',
+					'a[href="https://wordpress.com/?ref=footer_website"]',
+					'a[href="https://wordpress.com/?ref=vertical_footer"]',
+					'a[href^="https://wordpress.com/?ref=footer_segment_"]',
+				].join(',');
+
+				var dnsLink = document.createElement( 'a' );
+				dnsLink.href = 'https://wordpress.com/advertising-program-optout/';
+				dnsLink.classList.add( 'do-not-sell-link' );
+				dnsLink.rel = 'nofollow';
+				dnsLink.style.marginLeft = '0.5em';
+				dnsLink.textContent = 'Do Not Sell or Share My Personal Information';
+
+				var creditLinks = document.querySelectorAll( linkElements );
+
+				if ( 0 === creditLinks.length ) {
+					return false;
+				}
+
+				Array.prototype.forEach.call( creditLinks, function( el ) {
+					el.insertAdjacentElement( 'afterend', dnsLink );
+				});
+
+				return true;
+			};
+
+		</script>
+		<script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script>
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_gat._anonymizeIp']);
+	_gaq.push(['_setDomainName', 'none']);
+	_gaq.push(['_setAllowLinker', true]);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script>
+<link crossorigin='anonymous' rel='stylesheet' id='all-css-0-3' href='/_static/??-eJydj9sKwkAMRH/INtSixQfxU6TNhpI2u1k2u5T+vYoX8EXUxzMMZxhYYoUaMoUMvlRRysjBYKIce5wfDF41wJkDwiCKs4EtHCnVaLaB7w1eXREywD5pMZJX6Rn8K8ws5KqxF6G0fqJfB+6fC4sDK4Nh4phZr+U3qj2Hm/nkj023aw/dvm220wU4noNk&cssminify=yes' type='text/css' media='all' />
+</head>
+<body class="home blog wp-theme-pubspringloaded customizer-styles-applied jetpack-reblog-enabled">
+
+<div id="header">
+	<div class="sleeve">
+	<h1><a href="https://chandesperansonline.com/">Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online</a> <span>ChandesperansOnline.com: Chants d&#039;Espérance Haïtiens Français Online, Haitian Chants of Hope</span></h1>
+
+	<div class="search-bar">
+		<form method="get" id="searchform" action="https://chandesperansonline.com/">
+			<p><input type="text" name="s" onblur="this.value=(this.value=='' ) ? 'Search this Blog' : this.value;" onfocus="this.value=(this.value=='Search this Blog' ) ? '' : this.value;" value="Search this Blog" id="s" />
+			<button type="submit" id="top-search-submit"><img src="https://s0.wp.com/wp-content/themes/pub/springloaded/images/search-btn.gif?m=1230136840i" alt="Search" /></button></p>
+		</form>
+	</div>
+	</div>
+</div><!-- /header -->
+
+
+<div id="wrapper">
+<div id="main">
+
+<ul id="navigation" class="menu"><li id="menu-item-387" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-387"><a href="https://chandesperansonline.com/best-chants-desperance-haitian-hymns/">Best Chants D&#8217;Espérance Haitian Hymns</a></li>
+<li id="menu-item-388" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-388"><a href="https://chandesperansonline.com/haitian-creole-music/">Haitian Creole Music</a></li>
+<li id="menu-item-389" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-389"><a href="https://chandesperansonline.com/chants-desperance-creoles-haitiens/">Chants d&#8217;esperance Creoles Haitiens</a></li>
+<li id="menu-item-390" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-390"><a href="https://chandesperansonline.com/chants-desperance-francais/">Chants d&#8217;Esperance Francais</a></li>
+<li id="menu-item-391" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-391"><a href="https://chandesperansonline.com/haitian-creole-french-books/">Haitian Creole + French Books for Sale</a></li>
+<li id="menu-item-392" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-392"><a href="https://chandesperansonline.com/favorite-haitian-hymns/">Favorite Haitian Hymns</a></li>
+<li id="menu-item-393" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-393"><a href="https://chandesperansonline.com/singing-for-hope/">Singing for Hope</a></li>
+<li id="menu-item-394" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-394"><a href="https://chandesperansonline.com/about/">About Chants D&#8217;esperance Online</a></li>
+<li id="menu-item-395" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-395"><a href="http://chandesperans.blogspot.com">Chandesperans Kreyol</a></li>
+<li id="menu-item-396" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-396"><a href="http://chantsdesperance.blogspot.com">Sing with Chants d&#8217;Esperance</a></li>
+<li id="menu-item-397" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-397"><a href="http://haitianchantsofhope.blogspot.com">Give Glory to God with HaitianChantsofHope</a></li>
+</ul>
+<div id="content">
+
+
+	
+		
+<div class="post-595 post type-post status-publish format-standard hentry category-a-cappella-francais category-a-cappella-french category-adoration-et-louange category-all-ebooks category-chandesperansonline-com-2 category-chandesperansonlineministry category-chansons-desperance-haitiennes category-chansons-de-foi category-chant-desperance-francais-cdf category-chant-desperance-francais-cdf-2 category-chants-desperance-book category-chants-desperance-book-lyrics category-chants-desperance-creoles category-chants-desperance-francais category-chants-desperance-haitiens-alleluia-haitian-songs category-chants-francais category-french-blogs-francophonie" id="post-595">
+	<p class="post-date" title="2025/07/26 at 8:29 pm">
+		<span class="date-day">26</span>
+		<span class="date-month">Jul</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2025/07/26/26-a-la-fin-de-mon-voyage/" rel="bookmark">26 &#8211; A la fin de mon&nbsp;voyage</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/a-cappella-francais/" rel="category tag">A Cappella Francais</a>, <a href="https://chandesperansonline.com/category/a-cappella-french/" rel="category tag">A Cappella French</a>, <a href="https://chandesperansonline.com/category/adoration-et-louange/" rel="category tag">adoration et louange</a>, <a href="https://chandesperansonline.com/category/all-ebooks/" rel="category tag">all ebooks</a>, <a href="https://chandesperansonline.com/category/chandesperansonline-com-2/" rel="category tag">ChandesperansOnline.com</a>, <a href="https://chandesperansonline.com/category/chandesperansonline/chandesperansonlineministry/" rel="category tag">ChandesperansOnlineMinistry</a>, <a href="https://chandesperansonline.com/category/chansons-desperance-haitiennes/" rel="category tag">Chansons d'esperance Haitiennes</a>, <a href="https://chandesperansonline.com/category/chansons-de-foi/" rel="category tag">Chansons de foi</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf/" rel="category tag">Chant D’Espérance Français (CDF)</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf-2/" rel="category tag">Chant D’Espérance Français - CDF</a>, <a href="https://chandesperansonline.com/category/chants-desperance-book/" rel="category tag">chants d'esperance book</a>, <a href="https://chandesperansonline.com/category/chants-desperance-book-lyrics/" rel="category tag">chants d'esperance book lyrics</a>, <a href="https://chandesperansonline.com/category/chants-desperance-creoles/" rel="category tag">Chants d'esperance Creoles</a>, <a href="https://chandesperansonline.com/category/chants-desperance-francais/" rel="category tag">Chants d'Esperance Francais</a>, <a href="https://chandesperansonline.com/category/alleluia-haitian-songs/chants-desperance-haitiens-alleluia-haitian-songs/" rel="category tag">Chants d'esperance Haitiens</a>, <a href="https://chandesperansonline.com/category/chants-francais/" rel="category tag">Chants Francais</a>, <a href="https://chandesperansonline.com/category/a-cappella/french-blogs-francophonie/" rel="category tag">French Blogs - Francophonie</a>.		<span class="feedback"><a href="https://chandesperansonline.com/2025/07/26/26-a-la-fin-de-mon-voyage/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		
+<p class="wp-block-paragraph">A la fin de mon voyage<br>Oui, je verrai mon Sauveur<br>Je verrai mon Sauveur, (bis)<br>A la fin de mon voyage<br>Oui, je verrai mon Sauveur,<br>Dans la cité de Dieu.<br>Quel bonheur, quel bonheur, (bis)<br>A la fin de mon voyage<br>Oui, je verrai mon Sauveur<br>Dans la cité de Dieu.</p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-592 post type-post status-publish format-standard hentry category-chan-desperans-songs category-chandesperans category-chandesperans-kreyol category-chandesperansonline category-chandesperansonline-com-2 category-chandesperansonlineministry category-chandesperans_chantsdesperance_chantsdesperanceonline category-chanson-kreyol category-chants-desperance-creoles category-chants-desperance-creoles-haitiens tag-melodies-joyeuses-jezi-se-sove-mwen" id="post-592">
+	<p class="post-date" title="2025/07/26 at 8:21 pm">
+		<span class="date-day">26</span>
+		<span class="date-month">Jul</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2025/07/26/melodies-joyeuses-jezi-se-sove-mwen-m-ape-rete-fem/" rel="bookmark">Mélodies Joyeuses &#8211; Jezi se Sovè mwen, m ape rete&nbsp;fèm</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/chan-desperans-songs/" rel="category tag">Chan desperans songs</a>, <a href="https://chandesperansonline.com/category/chandesperans/" rel="category tag">chandesperans</a>, <a href="https://chandesperansonline.com/category/chandesperans-kreyol/" rel="category tag">Chandesperans Kreyol</a>, <a href="https://chandesperansonline.com/category/chandesperansonline/" rel="category tag">chandesperansonline</a>, <a href="https://chandesperansonline.com/category/chandesperansonline-com-2/" rel="category tag">ChandesperansOnline.com</a>, <a href="https://chandesperansonline.com/category/chandesperansonline/chandesperansonlineministry/" rel="category tag">ChandesperansOnlineMinistry</a>, <a href="https://chandesperansonline.com/category/chandesperans_chantsdesperance_chantsdesperanceonline/" rel="category tag">Chandesperans_Chantsdesperance_ChantsdesperanceOnline</a>, <a href="https://chandesperansonline.com/category/chanson-kreyol/" rel="category tag">Chanson Kreyol</a>, <a href="https://chandesperansonline.com/category/chants-desperance-creoles/" rel="category tag">Chants d'esperance Creoles</a>, <a href="https://chandesperansonline.com/category/chants-desperance-creoles-haitiens/" rel="category tag">chants d'esperance creoles haitiens</a>.	Tagged: <a href="https://chandesperansonline.com/tag/melodies-joyeuses-jezi-se-sove-mwen/" rel="tag">Mélodies Joyeuses - Jezi se Sovè mwen</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2025/07/26/melodies-joyeuses-jezi-se-sove-mwen-m-ape-rete-fem/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		
+<p class="wp-block-paragraph">Jezi se Sovè mwen, m ape rete fèm<br>Mwen p ap manke anyen<br>M ape rete fèm<br>Kou yon pyebwa<br>Ki plante bò rivyè a,<br>Wi, m ape rete fèm.</p>
+
+
+
+<p class="wp-block-paragraph">Kè:<br>M ape rete, m ape rete fèm _(bis)_<br>Kon yon pyebwa<br>Ki plante bò rivyè a<br>Wi, m ape rete fèm.</p>
+
+
+
+<p class="wp-block-paragraph">2.<br>Jezi ban mwen lavi<br>M ape rete fèm<br>Kache anba zèl Li<br>M ape rete fèm<br>Kon yon pyebwa<br>Ki plante bò rivyè a,<br>Wi, m ape rete fèm.</p>
+
+
+
+<p class="wp-block-paragraph">3.<br>Ak yon lafwa vivan<br>M ape rete fèm<br>Gras Li rann mwen Pisan<br>M ape rete fèm<br>Kon yon pyebwa<br>Ki plante bò rivyè a,<br>Wi, m ape rete fèm.</p>
+
+
+
+<p class="wp-block-paragraph">4.<br>Nouri nan pawòl Li<br>M ape rete fèm,<br>Travay jouk Li vini,<br>M ape rete fèm<br>Kon yon pyebwa<br>Ki plante bò rivyè a,<br>Wi, m ape rete fèm.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+<div id="atatags-150076245-6975dc426c3da">
+		<script type="text/javascript">
+			__ATA = window.__ATA || {};
+			__ATA.cmd = window.__ATA.cmd || [];
+			__ATA.cmd.push(function() {
+				__ATA.initVideoSlot('atatags-150076245-6975dc426c3da', {
+					sectionId: '150076245',
+					format: 'inread'
+				});
+			});
+		</script>
+	</div>
+			</div>
+</div>
+
+	
+		
+<div class="post-588 post type-post status-publish format-standard hentry category-39-melodies-joyeuses category-buy-creole-books category-chandesperans-kreyol category-chandesperansonline-com-2 category-chandesperansonlineministry category-chandesperans_chantsdesperance_chantsdesperanceonline category-chanson-kreyol category-chansons-desperance-haitiennes tag-chan-desperans tag-chants-d tag-kreyol tag-melodies-joyeuses" id="post-588">
+	<p class="post-date" title="2025/07/26 at 8:14 pm">
+		<span class="date-day">26</span>
+		<span class="date-month">Jul</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2025/07/26/melodies-joyeuses-kreyol-le-la-vi-mwen-va-fini/" rel="bookmark">Melodies Joyeuses / Kreyol: Lè la vi mwen va&nbsp;fini</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/39-melodies-joyeuses/" rel="category tag">39 Melodies Joyeuses</a>, <a href="https://chandesperansonline.com/category/buy-creole-books/" rel="category tag">buy Creole books</a>, <a href="https://chandesperansonline.com/category/chandesperans-kreyol/" rel="category tag">Chandesperans Kreyol</a>, <a href="https://chandesperansonline.com/category/chandesperansonline-com-2/" rel="category tag">ChandesperansOnline.com</a>, <a href="https://chandesperansonline.com/category/chandesperansonline/chandesperansonlineministry/" rel="category tag">ChandesperansOnlineMinistry</a>, <a href="https://chandesperansonline.com/category/chandesperans_chantsdesperance_chantsdesperanceonline/" rel="category tag">Chandesperans_Chantsdesperance_ChantsdesperanceOnline</a>, <a href="https://chandesperansonline.com/category/chanson-kreyol/" rel="category tag">Chanson Kreyol</a>, <a href="https://chandesperansonline.com/category/chansons-desperance-haitiennes/" rel="category tag">Chansons d'esperance Haitiennes</a>.	Tagged: <a href="https://chandesperansonline.com/tag/chan-desperans/" rel="tag">chan desperans</a>, <a href="https://chandesperansonline.com/tag/chants-d/" rel="tag">chants d</a>, <a href="https://chandesperansonline.com/tag/kreyol/" rel="tag">Kreyol</a>, <a href="https://chandesperansonline.com/tag/melodies-joyeuses/" rel="tag">Melodies Joyeuses</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2025/07/26/melodies-joyeuses-kreyol-le-la-vi-mwen-va-fini/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		
+<p class="wp-block-paragraph">Lè la vi mwen va fini<br>E mwen janbe rivyè a,<br>Lè mwen wè briye<br>yon maten glorye<br>M ava konnen Redanmtè mwen<br>Lè m a rive nan syèl la<br>E souri Li va pou mwen yon byenveni.</p>
+
+
+
+<p class="wp-block-paragraph">Kè:<br>M ava wè Li, m a konnen Li,<br>Lè ma kanpe bò kote Jezu Kri;<br>Ma va wè Li, ma konnen Li<br>Ak mak klou yo Li genyen nan min Li.</p>
+
+
+
+<p class="wp-block-paragraph">2.<br>Ala kontan m a kontan<br>Lè m a wè Li fasafas<br>Ak tout gran amou<br>Kap briye nan je Li!<br>O! kè mwen va louwe Li<br>Pou mizerikòd ak gras!<br>Ki pare pou mwen<br>yon bèl plas nan lakay Li.</p>
+
+
+
+<p class="wp-block-paragraph">3.<br>Nan bèl peyi anwo a<br>Mwen genyen kèk byenneme,<br>Mwen sonje lè yo te di mwen orevwa<br>Ak lajwa yo va chante<br>Lè yo wè m ape rive,<br>Men mwen ta vle wè<br>Sovè mwen premyèman.</p>
+
+
+
+<p class="wp-block-paragraph">4.<br>M ape antre nan vil la<br>Ak yon ròb blan ki san tach<br>Kote p ap gen soufrans ni tristès ankò;<br>M ape chante ak zanj yo<br>Nan yon si bèl amoni<br>Men mwen ta vle wè<br>Sovè mwen premyèman.</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-585 post type-post status-publish format-standard hentry category-chandesperans-book-lyrics tag-45-echo-des-elus tag-jezi-va-roule-roch-la tag-mwen-pa-kapab-bliye" id="post-585">
+	<p class="post-date" title="2025/04/28 at 1:54 am">
+		<span class="date-day">28</span>
+		<span class="date-month">Apr</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2025/04/28/mwen-pa-kapab-bliye-ki-kote-m-te-ye/" rel="bookmark">MWEN PA KAPAB BLIYE KI KOTE M TE&nbsp;YE</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>.	Tagged: <a href="https://chandesperansonline.com/tag/45-echo-des-elus/" rel="tag">45 echo des elus</a>, <a href="https://chandesperansonline.com/tag/jezi-va-roule-roch-la/" rel="tag">jezi va roule roch la</a>, <a href="https://chandesperansonline.com/tag/mwen-pa-kapab-bliye/" rel="tag">mwen pa kapab bliye</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2025/04/28/mwen-pa-kapab-bliye-ki-kote-m-te-ye/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		
+<p class="wp-block-paragraph">45 kreol echo des élus</p>
+
+
+
+<p class="wp-block-paragraph">MWEN PA KAPAB BLIYE</p>
+
+
+
+<p class="wp-block-paragraph">Men pakab bliye ki kotem te ye<br>Lè Jezi te jwenn mwen la vi m te chanje<br>Se pou sa map chante paske li sove m<br>Si satan vle bare m ma va rele Jezi</p>
+
+
+
+<p class="wp-block-paragraph">KÈ<br>Jezi va roule roch la<br>Ki vin bare m nan mon la (3 fwa)<br>E m konnen yon jou sa va chanje</p>
+
+
+
+<p class="wp-block-paragraph">2.<br>Mwen pa jamè bliye ki jan sa te ye<br>Lespri m te boulvèse paske m te mare<br>Lè m vin jwen ak Jezi tout bagay chanje<br>Roch la te mèt bare m Jezi delivre m</p>
+
+
+
+<p class="wp-block-paragraph">3.<br>Pafwa m konn ap kriye devan problè m yo<br>Mwen desann sou jenou m map rele Jezi<br>Mwen tande vwa Jezi kap pale avèm<br>Li di mwen pran kouraj tout bagay va chanje</p>
+
+
+
+<p class="wp-block-paragraph">4.<br>si ou santi ou tris e dekouraje<br>Ou leve wap kriye ou pa gen espwa<br>Ou mèt jwenn ak Jezi la konsole w<br>Wi se li men m ki di li va roule roch la</p>
+
+
+
+<p class="wp-block-paragraph">5.<br>Ou te mèt ofelen ou pa gen sekou<br>Ou te mèt meprize ou pa gen zanmi<br>Si ou se zanmi Jezi ou gen tout bagay<br>La vi ou te mèt tou nwa yon jou sa va chanje</p>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<figure class="wp-block-embed is-type-rich is-provider-amazon wp-block-embed-amazon"><div class="wp-block-embed__wrapper">
+<div class="embed-amazon"><iframe title="HaitianChantsofHope - Chants d-Esperance Greatest Hits, Songs, and Hymns: Les Cantiques Favoris des Chants d-Esperance Francais - Favorite French Hymns of Hope" type="text/html" width="570" height="550" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?preview=inline&#038;linkCode=kpd&#038;ref_=k4w_oembed_QGwZtq6EQAdNYB&#038;asin=1519732244&#038;tag=kpembed-20"></iframe></div>
+</div></figure>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-574 post type-post status-publish format-standard hentry category-chandesperans-book-lyrics tag-211-chant-desperance tag-211-numero tag-cef tag-chandesperans tag-chandesperansonline tag-chandesperansonline-com tag-chant-desperance tag-chants-desperance tag-chants-desperance-creoles-2 tag-chants-desperance-mp3 tag-chants-desperance-songs tag-chantsdesperance-lyrics tag-haiti-chante-avec-radio-lumiere tag-haitianchantsofhope tag-radio-lumiere tag-radyo-lumye" id="post-574">
+	<p class="post-date" title="2022/05/15 at 8:02 pm">
+		<span class="date-day">15</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2022/05/15/211-chant-desperance-cef-travaillons-et-luttons-nous-sommes-au-seigneur/" rel="bookmark">211 Chant d&#8217;Espérance CEF &#8211; Travaillons et Luttons; Nous Sommes au&nbsp;Seigneur</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>.	Tagged: <a href="https://chandesperansonline.com/tag/211-chant-desperance/" rel="tag">211 Chant d&#039;Espérance</a>, <a href="https://chandesperansonline.com/tag/211-numero/" rel="tag">211 numero</a>, <a href="https://chandesperansonline.com/tag/cef/" rel="tag">CEF</a>, <a href="https://chandesperansonline.com/tag/chandesperans/" rel="tag">chandesperans</a>, <a href="https://chandesperansonline.com/tag/chandesperansonline/" rel="tag">chandesperansonline</a>, <a href="https://chandesperansonline.com/tag/chandesperansonline-com/" rel="tag">chandesperansonline.com</a>, <a href="https://chandesperansonline.com/tag/chant-desperance/" rel="tag">chant d'esperance</a>, <a href="https://chandesperansonline.com/tag/chants-desperance/" rel="tag">chants d'esperance</a>, <a href="https://chandesperansonline.com/tag/chants-desperance-creoles-2/" rel="tag">chants d'esperance creoles</a>, <a href="https://chandesperansonline.com/tag/chants-desperance-mp3/" rel="tag">chants d'esperance mp3</a>, <a href="https://chandesperansonline.com/tag/chants-desperance-songs/" rel="tag">chants d'esperance songs</a>, <a href="https://chandesperansonline.com/tag/chantsdesperance-lyrics/" rel="tag">chantsdesperance lyrics</a>, <a href="https://chandesperansonline.com/tag/haiti-chante-avec-radio-lumiere/" rel="tag">Haiti chante avec Radio Lumiere</a>, <a href="https://chandesperansonline.com/tag/haitianchantsofhope/" rel="tag">haitianchantsofhope</a>, <a href="https://chandesperansonline.com/tag/radio-lumiere/" rel="tag">Radio Lumiere</a>, <a href="https://chandesperansonline.com/tag/radyo-lumye/" rel="tag">Radyo Lumye</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2022/05/15/211-chant-desperance-cef-travaillons-et-luttons-nous-sommes-au-seigneur/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		
+<p class="wp-block-paragraph"><strong>211 CEF</strong><br></p>
+
+
+
+<p class="wp-block-paragraph">Travaillons et luttons!<br>Nous sommes au Seigneur,<br>Suivons l’étroit sentier<br>Qui conduit à la vie!<br>Jésus marche avec nous,<br>Avançons sans frayeur,<br>Il nous garde, et son bras<br>Toujours nous fortifie.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>[Refrain]</strong><br><strong>Travaillons et luttons,&nbsp;<em>(bis)</em></strong><br><strong>Soyons prêts et prions,</strong><br><strong>Bientôt le Maitre va venir!</strong></p>
+
+
+
+<p class="wp-block-paragraph"><strong>2</strong><br>Travaillons et luttons!<br>Que les cœurs affligés,<br>Les perdus loin de Dieu<br>Retrouvent l’espérance!<br>Vers la croix, dirigeons<br>Leurs regards angoissés,<br>Pressons-les d’accepter<br>Jésus, leur délivrance.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>3</strong><br>Travaillons et luttons!<br>Il nous appelle tous,<br>Le champ nous est ouvert<br>Et la moisson est grande!<br>Pour servir notre Chef,<br>Ne pensons plus à nous,<br>En avant vers le but!<br>Le Maitre le demande.</p>
+
+
+
+<p class="wp-block-paragraph"><strong>4</strong><br>Travaillons et luttons!<br>Sans jamais nous lasser,<br>De notre Rédempteur<br>Elevons la bannière<br>Fidèles jusqu’au bout<br>Sachons persévérer,<br>Le repos nous attend<br>Dans la pleine lumière!</p>
+
+
+
+<figure class="wp-block-embed is-type-rich is-provider-amazon wp-block-embed-amazon"><div class="wp-block-embed__wrapper">
+<div class="embed-amazon"><iframe title="HaitianChantsofHope - Chants d-Esperance Greatest Hits, Songs, and Hymns: Les Cantiques Favoris des Chants d-Esperance Francais - Favorite French Hymns of Hope" type="text/html" width="570" height="550" frameborder="0" allowfullscreen style="max-width:100%" src="https://read.amazon.com/kp/card?preview=inline&#038;linkCode=kpd&#038;ref_=k4w_oembed_FITYcjSMy6f9g7&#038;asin=1519732244&#038;tag=kpembed-20"></iframe></div>
+</div></figure>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-557 post type-post status-publish format-standard hentry category-133-chant-desperance-francais-cdf category-chandesperans-book-lyrics category-sois-sans-alarmes-sans-frayeur tag-133-chant-desperance-francais-cdf tag-sans-frayeur tag-sois-sans-alarmes" id="post-557">
+	<p class="post-date" title="2018/05/31 at 6:46 am">
+		<span class="date-day">31</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2018/05/31/133-chant-desperance-francais-cdf-sois-sans-alarmes-sans-frayeur/" rel="bookmark">133 Chant d’Espérance Français CDF: Sois sans alarmes, sans&nbsp;frayeur</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/133-chant-desperance-francais-cdf/" rel="category tag">133 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>, <a href="https://chandesperansonline.com/category/sois-sans-alarmes-sans-frayeur/" rel="category tag">Sois sans alarmes, sans frayeur</a>.	Tagged: <a href="https://chandesperansonline.com/tag/133-chant-desperance-francais-cdf/" rel="tag">133 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/tag/sans-frayeur/" rel="tag">sans frayeur</a>, <a href="https://chandesperansonline.com/tag/sois-sans-alarmes/" rel="tag">Sois sans alarmes</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2018/05/31/133-chant-desperance-francais-cdf-sois-sans-alarmes-sans-frayeur/#comments">3 Comments</a></span></p>
+	<div class="entry">
+		<p>Contact <a href="https://chandesperansonline.com/contact-chandesperansonline/">ChandesperansOnline:  Request your favorite hymns and praise and worship songs:  </a></p>
+<p><div class="tiled-gallery type-rectangular tiled-gallery-unresized" data-original-width="570" data-carousel-extra='{&quot;blog_id&quot;:15007624,&quot;permalink&quot;:&quot;https:\/\/chandesperansonline.com\/2018\/05\/31\/133-chant-desperance-francais-cdf-sois-sans-alarmes-sans-frayeur\/&quot;,&quot;likes_blog_id&quot;:15007624}' itemscope itemtype="http://schema.org/ImageGallery" > <div class="gallery-row" style="width: 570px; height: 399px;" data-original-width="570" data-original-height="399" > <div class="gallery-group images-1" style="width: 300px; height: 399px;" data-original-width="300" data-original-height="399" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://chandesperansonline.com/2014/08/10/on-demand-instant-online-prayer-hymn-and-song-order/97904-chandesperanspic2/" border="0" itemprop="url"> <meta itemprop="width" content="296"> <meta itemprop="height" content="395"> <img class="" data-attachment-id="431" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg" data-orig-size="1200,1600" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="97904-chandesperanspic2" data-image-description="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=225" data-large-file="https://chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=570" src="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=296&#038;h=395&#038;ssl=1" srcset="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=296&amp;h=395&amp;ssl=1 296w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=592&amp;h=789&amp;ssl=1 592w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=113&amp;h=150&amp;ssl=1 113w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/97904-chandesperanspic2.jpg?w=225&amp;h=300&amp;ssl=1 225w" width="296" height="395" loading="lazy" data-original-width="296" data-original-height="395" itemprop="http://schema.org/image" title="97904-chandesperanspic2" alt="97904-chandesperanspic2" style="width: 296px; height: 395px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 270px; height: 399px;" data-original-width="270" data-original-height="399" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://chandesperansonline.com/2014/08/10/on-demand-instant-online-prayer-hymn-and-song-order/76aee-chandesperanspic/" border="0" itemprop="url"> <meta itemprop="width" content="266"> <meta itemprop="height" content="395"> <img class="" data-attachment-id="432" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg" data-orig-size="233,346" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="76aee-chandesperanspic" data-image-description="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=202" data-large-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=233" src="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=266&#038;h=395&#038;ssl=1" srcset="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg 233w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=101&amp;h=150&amp;ssl=1 101w" width="266" height="395" loading="lazy" data-original-width="266" data-original-height="395" itemprop="http://schema.org/image" title="76aee-chandesperanspic" alt="76aee-chandesperanspic" style="width: 266px; height: 395px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> </div></p>
+<p style="text-align:center;"><strong>133 Chant d’Espérance Français CDF: Sois sans alarmes, sans frayeur,</strong></p>
+<p style="text-align:center;"><strong>Confiance et Assurance</strong></p>
+<p style="text-align:center;">1</p>
+<p style="text-align:center;">Sois sans alarmes, sans frayeur,</p>
+<p style="text-align:center;">Dieu prendra soin de toi;</p>
+<p style="text-align:center;">Il est ton Père et ton Sauveur,</p>
+<p style="text-align:center;">Dieu prendra soin de toi.</p>
+<p style="text-align:center;">Refrain</p>
+<p style="text-align:center;">Dieu prendra soin de toi,</p>
+<p style="text-align:center;">Dans le chemin, jusqu’à la fin,</p>
+<p style="text-align:center;">Il prendra soin de toi,</p>
+<p style="text-align:center;">Tous les jours, jusqu’à la fin.</p>
+<p style="text-align:center;">2</p>
+<p style="text-align:center;">Dans les jour de l’adversité,</p>
+<p style="text-align:center;">Dieu prendra soin de toi,</p>
+<p style="text-align:center;">Lorsque pour toi, tout est danger,</p>
+<p style="text-align:center;">Dieu prendra soin de toi.</p>
+<p style="text-align:center;">3</p>
+<p style="text-align:center;">Si tu es seul, découragé,</p>
+<p style="text-align:center;">Dieu prendra soin de toi;</p>
+<p style="text-align:center;">Il est toujours ton Bon Berger,</p>
+<p style="text-align:center;">Dieu prendra soin de toi.</p>
+<p style="text-align:center;">4</p>
+<p style="text-align:center;">Ne crains donc pas le lendemain,</p>
+<p style="text-align:center;">Dieu prendra soin de toi;</p>
+<p style="text-align:center;">Pas à pas, ta main dans sa main,</p>
+<p style="text-align:center;">Dieu prendra soin de toi.</p>
+<p>&nbsp;</p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-555 post type-post status-publish format-standard hentry category-123-chant-desperance-francais-cdf category-chandesperans-book-lyrics category-chant-desperance category-chant-desperance-app category-chant-desperance-software category-chant-desperance-francais category-chant-desperance-francais-cdf category-chant-desperance-francais-cdf-2 category-chants-desperance-damour-et-de-foi category-en-christ-seul-est-mon-esperance tag-123-chant-desperance-francais-cdf tag-en-christ-seul-est-mon-esperance" id="post-555">
+	<p class="post-date" title="2018/05/31 at 6:42 am">
+		<span class="date-day">31</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2018/05/31/123-chant-desperance-francais-cdf-en-christ-seul-est-mon-esperance/" rel="bookmark">123 Chant d’Espérance Français CDF:  En Christ seul est mon&nbsp;espérance</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/123-chant-desperance-francais-cdf/" rel="category tag">123 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>, <a href="https://chandesperansonline.com/category/chant-desperance/" rel="category tag">chant d'esperance</a>, <a href="https://chandesperansonline.com/category/chant-desperance-app/" rel="category tag">Chant d'esperance app</a>, <a href="https://chandesperansonline.com/category/chant-desperance-software/" rel="category tag">chant d'esperance software</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais/" rel="category tag">Chant d’Espérance Français</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf/" rel="category tag">Chant D’Espérance Français (CDF)</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf-2/" rel="category tag">Chant D’Espérance Français - CDF</a>, <a href="https://chandesperansonline.com/category/chants-desperance-damour-et-de-foi/" rel="category tag">Chants d'esperance d'amour et de foi</a>, <a href="https://chandesperansonline.com/category/en-christ-seul-est-mon-esperance/" rel="category tag">En Christ seul est mon espérance</a>.	Tagged: <a href="https://chandesperansonline.com/tag/123-chant-desperance-francais-cdf/" rel="tag">123 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/tag/en-christ-seul-est-mon-esperance/" rel="tag">En Christ seul est mon espérance</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2018/05/31/123-chant-desperance-francais-cdf-en-christ-seul-est-mon-esperance/#comments">2 Comments</a></span></p>
+	<div class="entry">
+		<p>&nbsp;</p>
+<p><img data-attachment-id="432" data-permalink="https://chandesperansonline.com/2014/08/10/on-demand-instant-online-prayer-hymn-and-song-order/76aee-chandesperanspic/" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg" data-orig-size="233,346" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="76aee-chandesperanspic" data-image-description="" data-image-caption="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=202" data-large-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=233" class=" size-full wp-image-432 aligncenter" src="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg" alt="76aee-chandesperanspic" width="233" height="346" srcset="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg 233w, https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=101&amp;h=150 101w" sizes="(max-width: 233px) 100vw, 233px" /></p>
+<p style="text-align:center;"><strong>123 Chant d’Espérance Français CDF:  En Christ seul est mon espérance</strong></p>
+<p style="text-align:center;"><strong>Confiance et Assurance</strong></p>
+<p style="text-align:center;">1</p>
+<p style="text-align:center;">En Christ seul est mon espérance;</p>
+<p style="text-align:center;">Sa justice est mon assurance.</p>
+<p style="text-align:center;">Il est devant Dieu mon appui;</p>
+<p style="text-align:center;">Je n’en veux point d’autre que lui.</p>
+<p style="text-align:center;">Refrain</p>
+<p style="text-align:center;">Jésus est ma retraite sûre,</p>
+<p style="text-align:center;">Le Rocher en qui je m’assure. (bis)</p>
+<p style="text-align:center;">2</p>
+<p style="text-align:center;">Tout autre asile est périssable,</p>
+<p style="text-align:center;">Tout autre appui n’est que du sable.</p>
+<p style="text-align:center;">Qui n’a passé ce fondement</p>
+<p style="text-align:center;">Travaille et souffre vainement.</p>
+<p style="text-align:center;">3</p>
+<p style="text-align:center;">Lorsque sur moi s’abat l’orage,</p>
+<p style="text-align:center;">Sa croix ranime mon courage.</p>
+<p style="text-align:center;">Quand tout faiblit autour de moi,</p>
+<p style="text-align:center;">Sa presence soutient ma foi.</p>
+<p style="text-align:center;">4</p>
+<p style="text-align:center;">Et quand la dernière tempête</p>
+<p style="text-align:center;">Fondra, terrible, sur ma tête,</p>
+<p style="text-align:center;">Comme lui, vainqueur de la mort,</p>
+<p style="text-align:center;">J’entrerai radieux au port.</p>
+<p style="text-align:center;">
+<p>&nbsp;</p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-553 post type-post status-publish format-standard hentry category-5584 category-102-chant-desperance-francais-cdf category-chandesperans-book-lyrics category-chant-desperance-francais category-chant-desperance-francais-cdf category-chant-desperance-francais-cdf-christ-est-ressuscite category-chants-desperance-francais category-voir-mon-sauveur-face-a-face tag-102-chant-desperance-francais-cdf tag-voir-mon-sauveur-face-a-face" id="post-553">
+	<p class="post-date" title="2018/05/31 at 6:37 am">
+		<span class="date-day">31</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2018/05/31/102-chant-desperance-francais-cdf-voir-mon-sauveur-face-a-face/" rel="bookmark">102 Chant d’Espérance Français CDF:  Voir mon Sauveur face à&nbsp;face</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/1/" rel="category tag">1</a>, <a href="https://chandesperansonline.com/category/102-chant-desperance-francais-cdf/" rel="category tag">102 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais/" rel="category tag">Chant d’Espérance Français</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf/" rel="category tag">Chant D’Espérance Français (CDF)</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf-christ-est-ressuscite/" rel="category tag">Chant D’Espérance Français (CDF) – Christ est ressuscité</a>, <a href="https://chandesperansonline.com/category/chants-desperance-francais/" rel="category tag">Chants d'Esperance Francais</a>, <a href="https://chandesperansonline.com/category/voir-mon-sauveur-face-a-face/" rel="category tag">Voir mon Sauveur face à face</a>.	Tagged: <a href="https://chandesperansonline.com/tag/102-chant-desperance-francais-cdf/" rel="tag">102 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/tag/voir-mon-sauveur-face-a-face/" rel="tag">Voir mon Sauveur face à face</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2018/05/31/102-chant-desperance-francais-cdf-voir-mon-sauveur-face-a-face/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		<p>&nbsp;</p>
+<p><img data-attachment-id="548" data-permalink="https://chandesperansonline.com/2018/05/31/99-chant-desperance-francais-cdf-tenons-nos-lampes-pretes/chantdesperancephoto1/" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg" data-orig-size="640,853" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="chantd&amp;#8217;EsperancePhoto1" data-image-description="" data-image-caption="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=225" data-large-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=570" class=" size-full wp-image-548 aligncenter" src="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg" alt="chantd'EsperancePhoto1" width="640" height="853" srcset="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg 640w, https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=113&amp;h=150 113w, https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=225&amp;h=300 225w" sizes="(max-width: 640px) 100vw, 640px" /></p>
+<p style="text-align:center;"><strong>102 Chant d’Espérance Français CDF:  Voir mon Sauveur face à face</strong></p>
+<p style="text-align:center;"><strong>Jésus-Christ – Son Retour</strong></p>
+<p style="text-align:center;">1</p>
+<p style="text-align:center;">Voir mon Sauveur face à face,</p>
+<p style="text-align:center;">Voir Jésus dans sa beauté,</p>
+<p style="text-align:center;">O joie! Ô supreme grâce!</p>
+<p style="text-align:center;">O Bonheur! Félicité!</p>
+<p style="text-align:center;">Refrain</p>
+<p style="text-align:center;">Oui, dans ta magnificence</p>
+<p style="text-align:center;">Je te verrai, divin Roi!</p>
+<p style="text-align:center;">Pour toujours en ta presence</p>
+<p style="text-align:center;">Je serai semblable à Toi!</p>
+<p style="text-align:center;">2</p>
+<p style="text-align:center;">Ta gloire est encor voilée,</p>
+<p style="text-align:center;">Ah! d’un voile ensanglanté!&#8230;</p>
+<p style="text-align:center;">Bientôt sera révélée</p>
+<p style="text-align:center;">Ton ineffable beauté.</p>
+<p style="text-align:center;">3</p>
+<p style="text-align:center;">Oh! Quels transports d’allégresse,</p>
+<p style="text-align:center;">Quand tes yeux baissés sur moi,</p>
+<p style="text-align:center;">Me diront avec tendresse:</p>
+<p style="text-align:center;">“Je mourus aussi pour toi!”</p>
+<p>&nbsp;</p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-547 post type-post status-publish format-standard hentry category-99-chant-desperance-francais-cdf category-chandesperans-book-lyrics category-chant-desperance-francais category-tenons-nos-lampes-pretes tag-99-chant-desperance-francais-cdf tag-cdf tag-tenons-nos-lampes-pretes" id="post-547">
+	<p class="post-date" title="2018/05/31 at 6:28 am">
+		<span class="date-day">31</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2018/05/31/99-chant-desperance-francais-cdf-tenons-nos-lampes-pretes/" rel="bookmark">99 Chant d’Espérance Français CDF – Tenons nos lampes&nbsp;prêtes</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/99-chant-desperance-francais-cdf/" rel="category tag">99 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>, <a href="https://chandesperansonline.com/category/chant-desperance-francais/" rel="category tag">Chant d’Espérance Français</a>, <a href="https://chandesperansonline.com/category/tenons-nos-lampes-pretes/" rel="category tag">Tenons nos lampes prêtes,</a>.	Tagged: <a href="https://chandesperansonline.com/tag/99-chant-desperance-francais-cdf/" rel="tag">99 Chant d’Espérance Français CDF</a>, <a href="https://chandesperansonline.com/tag/cdf/" rel="tag">cdf</a>, <a href="https://chandesperansonline.com/tag/tenons-nos-lampes-pretes/" rel="tag">Tenons nos lampes prêtes,</a>.	<span class="feedback"><a href="https://chandesperansonline.com/2018/05/31/99-chant-desperance-francais-cdf-tenons-nos-lampes-pretes/#comments">2 Comments</a></span></p>
+	<div class="entry">
+		<p><div class="tiled-gallery type-rectangular tiled-gallery-unresized" data-original-width="570" data-carousel-extra='{&quot;blog_id&quot;:15007624,&quot;permalink&quot;:&quot;https:\/\/chandesperansonline.com\/2018\/05\/31\/99-chant-desperance-francais-cdf-tenons-nos-lampes-pretes\/&quot;,&quot;likes_blog_id&quot;:15007624}' itemscope itemtype="http://schema.org/ImageGallery" > <div class="gallery-row" style="width: 570px; height: 399px;" data-original-width="570" data-original-height="399" > <div class="gallery-group images-1" style="width: 300px; height: 399px;" data-original-width="300" data-original-height="399" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://chandesperansonline.com/2018/05/31/99-chant-desperance-francais-cdf-tenons-nos-lampes-pretes/chantdesperancephoto1/" border="0" itemprop="url"> <meta itemprop="width" content="296"> <meta itemprop="height" content="395"> <img class="" data-attachment-id="548" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg" data-orig-size="640,853" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="chantd&amp;#8217;EsperancePhoto1" data-image-description="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=225" data-large-file="https://chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=570" src="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=296&#038;h=395&#038;ssl=1" srcset="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=296&amp;h=395&amp;ssl=1 296w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=592&amp;h=789&amp;ssl=1 592w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=113&amp;h=150&amp;ssl=1 113w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2018/05/chantdesperancephoto1.jpg?w=225&amp;h=300&amp;ssl=1 225w" width="296" height="395" loading="lazy" data-original-width="296" data-original-height="395" itemprop="http://schema.org/image" title="chantd&#039;EsperancePhoto1" alt="chantd&#039;EsperancePhoto1" style="width: 296px; height: 395px;" /> </a> </div> </div> <!-- close group --> <div class="gallery-group images-1" style="width: 270px; height: 399px;" data-original-width="270" data-original-height="399" > <div class="tiled-gallery-item tiled-gallery-item-large" itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject"> <a href="https://chandesperansonline.com/2014/08/10/on-demand-instant-online-prayer-hymn-and-song-order/76aee-chandesperanspic/" border="0" itemprop="url"> <meta itemprop="width" content="266"> <meta itemprop="height" content="395"> <img class="" data-attachment-id="432" data-orig-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg" data-orig-size="233,346" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;,&quot;orientation&quot;:&quot;0&quot;}" data-image-title="76aee-chandesperanspic" data-image-description="" data-medium-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=202" data-large-file="https://chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=233" src="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=266&#038;h=395&#038;ssl=1" srcset="https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg 233w, https://i0.wp.com/chandesperansonline.com/wp-content/uploads/2014/08/76aee-chandesperanspic.jpg?w=101&amp;h=150&amp;ssl=1 101w" width="266" height="395" loading="lazy" data-original-width="266" data-original-height="395" itemprop="http://schema.org/image" title="76aee-chandesperanspic" alt="76aee-chandesperanspic" style="width: 266px; height: 395px;" /> </a> </div> </div> <!-- close group --> </div> <!-- close row --> </div></p>
+<p>&nbsp;</p>
+<p style="text-align:center;">99 Chant d’Espérance Français CDF – Tenons nos lampes prêtes</p>
+<p style="text-align:center;">Jésus-Christ – Son Retour</p>
+<p>&nbsp;</p>
+<p style="text-align:center;">1</p>
+<p style="text-align:center;">Tenons nos lampes prêtes,</p>
+<p style="text-align:center;">Chrétiens, préparons-nous</p>
+<p style="text-align:center;">Pour l’heure où les trompettes</p>
+<p style="text-align:center;">Annonceront l’Epoux.</p>
+<p style="text-align:center;">Refrain</p>
+<p style="text-align:center;">Qu’à répondre on s’empresse,</p>
+<p style="text-align:center;">Hosanna!  Hosanna!</p>
+<p style="text-align:center;">Et qu’avec allégresse</p>
+<p style="text-align:center;">On chante: Alléluia (bis)</p>
+<p style="text-align:center;">2</p>
+<p style="text-align:center;">Voici déjà les anges,</p>
+<p style="text-align:center;">Avec eux, les élus,</p>
+<p style="text-align:center;">Unissant leurs louanges</p>
+<p style="text-align:center;">En l’honneur de Jésus.</p>
+<p style="text-align:center;">3</p>
+<p style="text-align:center;">Voici Jésus Lui-même,</p>
+<p style="text-align:center;">Puissant, Victorieux!</p>
+<p style="text-align:center;">De son pur diadème</p>
+<p style="text-align:center;">L’éclat remplit les cieux.</p>
+<p style="text-align:center;">4</p>
+<p style="text-align:center;">Venez, bénis du père,</p>
+<p style="text-align:center;">Qui m’avez attend;</p>
+<p style="text-align:center;">Entrez dans la lumière,</p>
+<p style="text-align:center;">Le ciel vous est rendu.</p>
+<p>&nbsp;</p>
+
+			</div>
+</div>
+
+	
+		
+<div class="post-546 post type-post status-publish format-standard hentry category-chandesperans-book-lyrics" id="post-546">
+	<p class="post-date" title="2018/05/24 at 4:31 am">
+		<span class="date-day">24</span>
+		<span class="date-month">May</span>
+	</p>
+	<h2><a href="https://chandesperansonline.com/2018/05/24/du-ciel-bientot-jesus-va-revenir-2/" rel="bookmark">Du ciel bientôt, Jésus va&nbsp;revenir!</a></h2>
+	<p class="metadata">
+	Posted by FrenchandCreolePress.wordpress.com - ChandesperansOnline.com in <a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/" rel="category tag">chandesperans book lyrics</a>.		<span class="feedback"><a href="https://chandesperansonline.com/2018/05/24/du-ciel-bientot-jesus-va-revenir-2/#respond">Leave a Comment</a></span></p>
+	<div class="entry">
+		<div class="wpcom-reblog-snapshot">
+<div class="reblog-post">
+<p class="reblog-from"><img alt='FrenchandCreolePress.wordpress.com - ChandesperansOnline.com&#039;s avatar' src='https://2.gravatar.com/avatar/ecccde71c2ebf2753fabebe8739876985a8fa6455f9d34580908ff7c057ec11e?s=32&#038;d=identicon&#038;r=G' class='avatar avatar-32' height='32' width='32' /><a href="https://chandesperansonline.com/2011/06/14/du-ciel-bientot-jesus-va-revenir/">Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online</a></p>
+<div class="reblogged-content">
+<p>Du ciel bientôt, Jésus va revenir!<br />
+1<br />
+Du ciel bientôt, Jésus va revenir!<br />
+Si c’était aujourd’hui!<br />
+Tous, radieux, nous le verrons venir!<br />
+Si c’était aujourd’hui!<br />
+Alors tous les saints à sa vue,<br />
+Ses enfants sûrs de sa venue,<br />
+Iront avec Lui sur la nue,<br />
+Si c’était aujourd’hui! </p>
+<p>Refrain<br />
+Gloire! Gloire! Jésus revient bientôt!…<br />
+Gloire! Gloire! Nous le couronnerons!…<br />
+Gloire! Gloire! Et nous l’adorerons!<br />
+Gloire! Gloire! Jésus revient bientôt!… </p>
+<p>2<br />
+Dans ce beau ciel, le mal ne sera plus!<br />
+Si c’était aujourd’hui!<br />
+Plus de douleur… le regard de Jésus!<br />
+Si c’était aujourd’hui!<br />
+Notre âme après ce jour soupire…<br />
+Mais déjà la nuit se retire,<br />
+Le grand matin va bientôt luire!<br />
+Si c’était aujourd’hui! </p>
+<p>3<br />
+Oh! Que Jésus trouve en nous des coeurs droits,<br />
+S’il revient aujourd’hui!<br />
+Veillant, priant, dociles à sa voix,<br />
+S’il revient aujourd’hui !<br />
+Avons-nous tous cette assurance<br />
+D’être enlevés en sa présence,<br />
+Dans le séjour de sa puissance,</p>
+</div>
+<p class="reblog-source"><a href="https://chandesperansonline.com/2011/06/14/du-ciel-bientot-jesus-va-revenir/">View original post</a> <span class="more-words">3 more words</span></p>
+</div>
+</div>
+
+			</div>
+</div>
+
+	
+		<div class="prev-next">
+			<div class="alignleft"><a href="https://chandesperansonline.com/page/2/" >&laquo; Older Entries</a></div>
+			<div class="alignright"></div>
+		</div>
+
+
+</div><!-- /content -->
+
+</div><!-- /main -->
+
+<div id="sidebar">
+
+<div class="side-widget widget_blog-stats"><div class="side-widget-wrap"><h3>ChandesperansOnline.com&#039;s Blog Stats</h3>		<ul>
+			<li>1,496,252 hits</li>
+		</ul>
+		</div></div><div class="side-widget widget_twitter"><div class="side-widget-wrap"><h3><a href='http://twitter.com/chandesperans'>ChandesperansOnline.com</a></h3><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/chandesperans">Tweets by chandesperans</a></div></div><div class="side-widget widget_archive"><div class="side-widget-wrap"><h3>ChandesperansOnline.com Archives</h3>
+			<ul>
+					<li><a href='https://chandesperansonline.com/2025/07/'>July 2025</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2025/04/'>April 2025</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2022/05/'>May 2022</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2018/05/'>May 2018</a>&nbsp;(20)</li>
+	<li><a href='https://chandesperansonline.com/2018/04/'>April 2018</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2015/11/'>November 2015</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2014/08/'>August 2014</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2014/07/'>July 2014</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2013/12/'>December 2013</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2013/01/'>January 2013</a>&nbsp;(2)</li>
+	<li><a href='https://chandesperansonline.com/2012/12/'>December 2012</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2012/03/'>March 2012</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2011/12/'>December 2011</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2011/11/'>November 2011</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2011/09/'>September 2011</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2011/08/'>August 2011</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2011/06/'>June 2011</a>&nbsp;(8)</li>
+	<li><a href='https://chandesperansonline.com/2011/05/'>May 2011</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2011/04/'>April 2011</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2011/03/'>March 2011</a>&nbsp;(1)</li>
+	<li><a href='https://chandesperansonline.com/2011/02/'>February 2011</a>&nbsp;(3)</li>
+	<li><a href='https://chandesperansonline.com/2011/01/'>January 2011</a>&nbsp;(11)</li>
+	<li><a href='https://chandesperansonline.com/2010/10/'>October 2010</a>&nbsp;(6)</li>
+	<li><a href='https://chandesperansonline.com/2010/09/'>September 2010</a>&nbsp;(11)</li>
+	<li><a href='https://chandesperansonline.com/2010/08/'>August 2010</a>&nbsp;(6)</li>
+			</ul>
+
+			</div></div><div class="side-widget widget_blog_subscription jetpack_subscription_widget"><div class="side-widget-wrap"><h3><label for="subscribe-field">Follow Blog via Email</label></h3>
+
+			<div class="wp-block-jetpack-subscriptions__container">
+			<form
+				action="https://subscribe.wordpress.com"
+				method="post"
+				accept-charset="utf-8"
+				data-blog="15007624"
+				data-post_access_level="everybody"
+				id="subscribe-blog"
+			>
+				<p>Enter your email address to follow this blog and receive notifications of new posts by email.</p>
+				<p id="subscribe-email">
+					<label
+						id="subscribe-field-label"
+						for="subscribe-field"
+						class="screen-reader-text"
+					>
+						Email Address:					</label>
+
+					<input
+							type="email"
+							name="email"
+							autocomplete="email"
+							
+							style="width: 95%; padding: 1px 10px"
+							placeholder="Email Address"
+							value=""
+							id="subscribe-field"
+							required
+						/>				</p>
+
+				<p id="subscribe-submit"
+									>
+					<input type="hidden" name="action" value="subscribe"/>
+					<input type="hidden" name="blog_id" value="15007624"/>
+					<input type="hidden" name="source" value="https://chandesperansonline.com/"/>
+					<input type="hidden" name="sub-type" value="widget"/>
+					<input type="hidden" name="redirect_fragment" value="subscribe-blog"/>
+					<input type="hidden" id="_wpnonce" name="_wpnonce" value="91fb37de5a" />					<button type="submit"
+													class="wp-block-button__link"
+																	>
+						Follow					</button>
+				</p>
+			</form>
+							<div class="wp-block-jetpack-subscriptions__subscount">
+					Join 286 other subscribers				</div>
+						</div>
+			
+</div></div><div class="side-widget widget_categories"><div class="side-widget-wrap"><h3>ChandesperansOnline.com</h3>
+			<ul>
+					<li class="cat-item cat-item-5584"><a href="https://chandesperansonline.com/category/1/">1</a> (37)
+</li>
+	<li class="cat-item cat-item-635479389"><a href="https://chandesperansonline.com/category/102-chant-desperance-francais-cdf/">102 Chant d’Espérance Français CDF</a> (1)
+</li>
+	<li class="cat-item cat-item-635479560"><a href="https://chandesperansonline.com/category/123-chant-desperance-francais-cdf/">123 Chant d’Espérance Français CDF</a> (1)
+</li>
+	<li class="cat-item cat-item-635479813"><a href="https://chandesperansonline.com/category/133-chant-desperance-francais-cdf/">133 Chant d’Espérance Français CDF</a> (1)
+</li>
+	<li class="cat-item cat-item-134337557"><a href="https://chandesperansonline.com/category/155-chant-desperance-francais/">155 chant d&#039;esperance francais</a> (3)
+</li>
+	<li class="cat-item cat-item-58888288"><a href="https://chandesperansonline.com/category/17-chants-desperance/">17 chants d&#039;esperance</a> (6)
+</li>
+	<li class="cat-item cat-item-634998177"><a href="https://chandesperansonline.com/category/28-chant-desperance-francais-cdf/">28 Chant d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-634997899"><a href="https://chandesperansonline.com/category/35-chant-desperance-francais-cdf/">35 Chant d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-250767224"><a href="https://chandesperansonline.com/category/39-melodies-joyeuses/">39 Melodies Joyeuses</a> (2)
+</li>
+	<li class="cat-item cat-item-134335690"><a href="https://chandesperansonline.com/category/40-chant-desperance-francais/">40 chant d&#039;esperance francais</a> (1)
+</li>
+	<li class="cat-item cat-item-634996975"><a href="https://chandesperansonline.com/category/8-chant-desperance-francais-cdf/">8 Chant d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-635000776"><a href="https://chandesperansonline.com/category/80-chant-desperance-francais-cdf/">80 Chant d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-634997311"><a href="https://chandesperansonline.com/category/9-chant-desperance-francais-cdf/">9 Chant d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-635479053"><a href="https://chandesperansonline.com/category/99-chant-desperance-francais-cdf/">99 Chant d’Espérance Français CDF</a> (1)
+</li>
+	<li class="cat-item cat-item-50847"><a href="https://chandesperansonline.com/category/a-cappella/">A Cappella</a> (38)
+<ul class='children'>
+	<li class="cat-item cat-item-43070670"><a href="https://chandesperansonline.com/category/a-cappella/french-blogs-francophonie/">French Blogs &#8211; Francophonie</a> (10)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-40038463"><a href="https://chandesperansonline.com/category/a-cappella-creole/">A Cappella Creole</a> (34)
+<ul class='children'>
+	<li class="cat-item cat-item-70601593"><a href="https://chandesperansonline.com/category/a-cappella-creole/anyen-pase-san-jezu-kri-a-cappella-creole/">anyen pase san jezu-kri</a> (1)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-59010283"><a href="https://chandesperansonline.com/category/a-cappella-francais/">A Cappella Francais</a> (16)
+</li>
+	<li class="cat-item cat-item-59010282"><a href="https://chandesperansonline.com/category/a-cappella-french/">A Cappella French</a> (11)
+</li>
+	<li class="cat-item cat-item-68546513"><a href="https://chandesperansonline.com/category/adoration-et-louange/">adoration et louange</a> (4)
+</li>
+	<li class="cat-item cat-item-696289"><a href="https://chandesperansonline.com/category/all-ebooks/">all ebooks</a> (7)
+</li>
+	<li class="cat-item cat-item-41476666"><a href="https://chandesperansonline.com/category/alleluia-haitian-songs/">Alleluia Haitian Songs</a> (44)
+<ul class='children'>
+	<li class="cat-item cat-item-41671082"><a href="https://chandesperansonline.com/category/alleluia-haitian-songs/chants-desperance-haitiens-alleluia-haitian-songs/">Chants d&#039;esperance Haitiens</a> (29)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-82760270"><a href="https://chandesperansonline.com/category/alleluiahaitianchantsofhope/">AlleluiaHaitianChantsofHope</a> (6)
+</li>
+	<li class="cat-item cat-item-73315764"><a href="https://chandesperansonline.com/category/amazonkindle-chandesperansonline-com/">AmazonKindle Chandesperansonline.com</a> (3)
+</li>
+	<li class="cat-item cat-item-50898507"><a href="https://chandesperansonline.com/category/android-haitian-creole/">Android Haitian Creole</a> (3)
+</li>
+	<li class="cat-item cat-item-58889076"><a href="https://chandesperansonline.com/category/angnin-pase-san-jezu-kri/">Angnin pasé san Jézu-Kri</a> (4)
+</li>
+	<li class="cat-item cat-item-58889085"><a href="https://chandesperansonline.com/category/anyen-pase-san-jezu-kri/">Anyen pase san Jezu Kri</a> (3)
+</li>
+	<li class="cat-item cat-item-50898464"><a href="https://chandesperansonline.com/category/buy-creole-books/">buy Creole books</a> (9)
+</li>
+	<li class="cat-item cat-item-634997331"><a href="https://chandesperansonline.com/category/ce-que-sa-bouche-a-dit/">Ce que sa bouche a dit</a> (1)
+</li>
+	<li class="cat-item cat-item-43404443"><a href="https://chandesperansonline.com/category/chan-desperance-online/">chan d&#039;esperance online</a> (20)
+</li>
+	<li class="cat-item cat-item-43194433"><a href="https://chandesperansonline.com/category/chan-desperans-songs/">Chan desperans songs</a> (28)
+</li>
+	<li class="cat-item cat-item-39736827"><a href="https://chandesperansonline.com/category/chandesperans/">chandesperans</a> (9)
+</li>
+	<li class="cat-item cat-item-43404425"><a href="https://chandesperansonline.com/category/chandesperans-book-lyrics/">chandesperans book lyrics</a> (43)
+</li>
+	<li class="cat-item cat-item-40038406"><a href="https://chandesperansonline.com/category/chandesperans-kreyol/">Chandesperans Kreyol</a> (37)
+</li>
+	<li class="cat-item cat-item-40038521"><a href="https://chandesperansonline.com/category/chandesperansonline/">chandesperansonline</a> (12)
+<ul class='children'>
+	<li class="cat-item cat-item-617921909"><a href="https://chandesperansonline.com/category/chandesperansonline/chandesperansonlineministry/">ChandesperansOnlineMinistry</a> (8)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-250767361"><a href="https://chandesperansonline.com/category/chandesperansonline-com-2/">ChandesperansOnline.com</a> (8)
+</li>
+	<li class="cat-item cat-item-250767326"><a href="https://chandesperansonline.com/category/chandesperans_chantsdesperance_chantsdesperanceonline/">Chandesperans_Chantsdesperance_ChantsdesperanceOnline</a> (5)
+</li>
+	<li class="cat-item cat-item-134335748"><a href="https://chandesperansonline.com/category/chanson-de-noel-populaire/">chanson de Noël populaire</a> (2)
+</li>
+	<li class="cat-item cat-item-73315638"><a href="https://chandesperansonline.com/category/chanson-kreyol/">Chanson Kreyol</a> (4)
+</li>
+	<li class="cat-item cat-item-43404470"><a href="https://chandesperansonline.com/category/chansons-desperance-haitiennes/">Chansons d&#039;esperance Haitiennes</a> (26)
+</li>
+	<li class="cat-item cat-item-43404486"><a href="https://chandesperansonline.com/category/chansons-de-foi/">Chansons de foi</a> (21)
+</li>
+	<li class="cat-item cat-item-44109278"><a href="https://chandesperansonline.com/category/chansons-de-noel/">Chansons de Noel</a> (18)
+</li>
+	<li class="cat-item cat-item-58960414"><a href="https://chandesperansonline.com/category/chant-dadoration-et-de-louange/">chant d&#039;adoration et de louange</a> (19)
+</li>
+	<li class="cat-item cat-item-49658491"><a href="https://chandesperansonline.com/category/chant-desperance/">chant d&#039;esperance</a> (4)
+</li>
+	<li class="cat-item cat-item-134337907"><a href="https://chandesperansonline.com/category/chant-desperance-app/">Chant d&#039;esperance app</a> (5)
+</li>
+	<li class="cat-item cat-item-134337939"><a href="https://chandesperansonline.com/category/chant-desperance-software/">chant d&#039;esperance software</a> (3)
+</li>
+	<li class="cat-item cat-item-188153414"><a href="https://chandesperansonline.com/category/chant-desperance-francais/">Chant d’Espérance Français</a> (3)
+</li>
+	<li class="cat-item cat-item-633787451"><a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf/">Chant D’Espérance Français (CDF)</a> (8)
+</li>
+	<li class="cat-item cat-item-633822545"><a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf-christ-est-ressuscite/">Chant D’Espérance Français (CDF) – Christ est ressuscité</a> (3)
+</li>
+	<li class="cat-item cat-item-633822725"><a href="https://chandesperansonline.com/category/chant-desperance-francais-cdf-2/">Chant D’Espérance Français &#8211; CDF</a> (5)
+</li>
+	<li class="cat-item cat-item-43404384"><a href="https://chandesperansonline.com/category/chants-desperance-book/">chants d&#039;esperance book</a> (32)
+</li>
+	<li class="cat-item cat-item-43404399"><a href="https://chandesperansonline.com/category/chants-desperance-book-lyrics/">chants d&#039;esperance book lyrics</a> (24)
+</li>
+	<li class="cat-item cat-item-41476698"><a href="https://chandesperansonline.com/category/chants-desperance-creoles/">Chants d&#039;esperance Creoles</a> (37)
+</li>
+	<li class="cat-item cat-item-73315190"><a href="https://chandesperansonline.com/category/chants-desperance-creoles-haitiens/">chants d&#039;esperance creoles haitiens</a> (7)
+</li>
+	<li class="cat-item cat-item-73316142"><a href="https://chandesperansonline.com/category/chants-desperance-damour-et-de-foi/">Chants d&#039;esperance d&#039;amour et de foi</a> (5)
+</li>
+	<li class="cat-item cat-item-41476690"><a href="https://chandesperansonline.com/category/chants-desperance-francais/">Chants d&#039;Esperance Francais</a> (43)
+<ul class='children'>
+	<li class="cat-item cat-item-41671126"><a href="https://chandesperansonline.com/category/chants-desperance-francais/alleluia-haitian-songs-of-praise/">Alleluia Haitian Songs of Praise</a> (28)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-40038416"><a href="https://chandesperansonline.com/category/chants-desperance-haitiens/">Chants d&#039;Esperance Haitiens</a> (30)
+</li>
+	<li class="cat-item cat-item-43404385"><a href="https://chandesperansonline.com/category/chants-desperance-hymnal/">chants d&#039;esperance Hymnal</a> (21)
+</li>
+	<li class="cat-item cat-item-635000868"><a href="https://chandesperansonline.com/category/chants-desperance-francais-cdf/">Chants d’Espérance Français (CDF)</a> (1)
+</li>
+	<li class="cat-item cat-item-43070673"><a href="https://chandesperansonline.com/category/chants-francais/">Chants Francais</a> (24)
+</li>
+	<li class="cat-item cat-item-43070679"><a href="https://chandesperansonline.com/category/chants-haitiens-chants-creoles/">Chants Haitiens &#8211; Chants Creoles</a> (17)
+</li>
+	<li class="cat-item cat-item-43404981"><a href="https://chandesperansonline.com/category/chantsdesperancebook-com/">chantsdesperancebook.com</a> (17)
+</li>
+	<li class="cat-item cat-item-40102537"><a href="https://chandesperansonline.com/category/chantsdesperanceonline/">chantsdesperanceonline</a> (3)
+</li>
+	<li class="cat-item cat-item-73316190"><a href="https://chandesperansonline.com/category/chantsdesperanceonline-book/">Chantsdesperanceonline book</a> (3)
+</li>
+	<li class="cat-item cat-item-58960410"><a href="https://chandesperansonline.com/category/chantsdesperanceonline-com/">chantsdesperanceonline.com</a> (13)
+</li>
+	<li class="cat-item cat-item-51594710"><a href="https://chandesperansonline.com/category/childrenscreolebookspublisher/">ChildrensCreoleBooksPublisher</a> (5)
+</li>
+	<li class="cat-item cat-item-499982"><a href="https://chandesperansonline.com/category/christmas-songs/">Christmas Songs</a> (6)
+</li>
+	<li class="cat-item cat-item-134337581"><a href="https://chandesperansonline.com/category/consecration-et-perseverance/">Consécration et persévérance</a> (1)
+</li>
+	<li class="cat-item cat-item-40038442"><a href="https://chandesperansonline.com/category/creole-singalongs/">Creole SingAlongs</a> (18)
+</li>
+	<li class="cat-item cat-item-131331391"><a href="https://chandesperansonline.com/category/curso-de-creole-gratis/">Curso de Creole Gratis</a> (1)
+</li>
+	<li class="cat-item cat-item-43404489"><a href="https://chandesperansonline.com/category/desperance-et-de-confiance/">d&#039;esperance et de Confiance</a> (10)
+</li>
+	<li class="cat-item cat-item-634996968"><a href="https://chandesperansonline.com/category/dans-les-cieux-et-sur-la-terre/">Dans les cieux et sur la terre</a> (1)
+</li>
+	<li class="cat-item cat-item-634997316"><a href="https://chandesperansonline.com/category/du-rocher-de-jacob/">Du Rocher de Jacob</a> (1)
+</li>
+	<li class="cat-item cat-item-65451213"><a href="https://chandesperansonline.com/category/echo-des-elus/">echo des elus</a> (4)
+</li>
+	<li class="cat-item cat-item-134338268"><a href="https://chandesperansonline.com/category/echos-des-elus-2/">Echos des Elus</a> (3)
+<ul class='children'>
+	<li class="cat-item cat-item-616432861"><a href="https://chandesperansonline.com/category/echos-des-elus-2/chantez-avec-echo-des-elus/">Chantez avec Echo Des Elus</a> (2)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-635479579"><a href="https://chandesperansonline.com/category/en-christ-seul-est-mon-esperance/">En Christ seul est mon espérance</a> (1)
+</li>
+	<li class="cat-item cat-item-50898466"><a href="https://chandesperansonline.com/category/esl-creole-books/">ESL Creole Books</a> (4)
+</li>
+	<li class="cat-item cat-item-401"><a href="https://chandesperansonline.com/category/faith/">faith</a> (1)
+</li>
+	<li class="cat-item cat-item-121294"><a href="https://chandesperansonline.com/category/french-lessons/">French Lessons</a> (6)
+</li>
+	<li class="cat-item cat-item-50193072"><a href="https://chandesperansonline.com/category/frenchlessonpod/">FrenchLessonPod</a> (3)
+</li>
+	<li class="cat-item cat-item-50193071"><a href="https://chandesperansonline.com/category/frenchlessonpodcast/">FrenchLessonPodcast</a> (2)
+</li>
+	<li class="cat-item cat-item-134338148"><a href="https://chandesperansonline.com/category/gloire-a-lagneau/">Gloire a L&#039;Agneau</a> (2)
+</li>
+	<li class="cat-item cat-item-41476750"><a href="https://chandesperansonline.com/category/haiti-chante-avec-radio-lumiere/">Haiti chante avec Radio Lumiere</a> (1)
+</li>
+	<li class="cat-item cat-item-40038426"><a href="https://chandesperansonline.com/category/haitian-chants-of-hope/">Haitian Chants of Hope</a> (26)
+<ul class='children'>
+	<li class="cat-item cat-item-41671398"><a href="https://chandesperansonline.com/category/haitian-chants-of-hope/haitian-churches-sing/">Haitian Churches Sing</a> (9)
+</li>
+</ul>
+</li>
+	<li class="cat-item cat-item-43255727"><a href="https://chandesperansonline.com/category/haitian-creole-app-for-iphone/">Haitian Creole App for iPhone</a> (6)
+</li>
+	<li class="cat-item cat-item-50898497"><a href="https://chandesperansonline.com/category/haitian-creole-on-android-platform/">Haitian Creole on Android Platform</a> (1)
+</li>
+	<li class="cat-item cat-item-2142892"><a href="https://chandesperansonline.com/category/haitian-culture/">Haitian Culture</a> (4)
+</li>
+	<li class="cat-item cat-item-73316141"><a href="https://chandesperansonline.com/category/haitian-praise-and-worship-songs/">Haitian Praise and Worship Songs</a> (2)
+</li>
+	<li class="cat-item cat-item-250767284"><a href="https://chandesperansonline.com/category/haitianchantsofhope-2/">HaitianChantsofHope</a> (3)
+</li>
+	<li class="cat-item cat-item-43194393"><a href="https://chandesperansonline.com/category/haitianchantsofhopeblog/">HaitianChantsofHopeblog</a> (8)
+</li>
+	<li class="cat-item cat-item-40038460"><a href="https://chandesperansonline.com/category/haitiancreoleacappella/">HaitianCreoleacappella</a> (23)
+</li>
+	<li class="cat-item cat-item-82760269"><a href="https://chandesperansonline.com/category/haitianhymnstohopeandlife/">HaitianHymnstoHopeandLife</a> (1)
+</li>
+	<li class="cat-item cat-item-50898510"><a href="https://chandesperansonline.com/category/haitianmp3-lessons/">HaitianMP3 lessons</a> (1)
+</li>
+	<li class="cat-item cat-item-250767441"><a href="https://chandesperansonline.com/category/haitiansongsoffaith/">HaitianSongsofFaith</a> (1)
+</li>
+	<li class="cat-item cat-item-250767410"><a href="https://chandesperansonline.com/category/haitiansongsofhopeandfaith/">HaitianSongsofHopeandFaith</a> (1)
+</li>
+	<li class="cat-item cat-item-20816"><a href="https://chandesperansonline.com/category/hope/">hope</a> (1)
+</li>
+	<li class="cat-item cat-item-41476683"><a href="https://chandesperansonline.com/category/hosannahaitianshope/">HosannaHaitiansHope</a> (11)
+</li>
+	<li class="cat-item cat-item-257552896"><a href="https://chandesperansonline.com/category/hymn-and-songs/">Hymn and Songs</a> (2)
+</li>
+	<li class="cat-item cat-item-4751560"><a href="https://chandesperansonline.com/category/i-love-you-in-other-languages/">I Love You in Other languages</a> (1)
+</li>
+	<li class="cat-item cat-item-257552859"><a href="https://chandesperansonline.com/category/instant-online-order/">Instant Online Order</a> (2)
+</li>
+	<li class="cat-item cat-item-580102"><a href="https://chandesperansonline.com/category/ipad/">iPad</a> (5)
+</li>
+	<li class="cat-item cat-item-69692"><a href="https://chandesperansonline.com/category/ipods/">iPods</a> (4)
+</li>
+	<li class="cat-item cat-item-51279070"><a href="https://chandesperansonline.com/category/je-taime-in-other-languages/">Je t&#039;aime in other languages</a> (2)
+</li>
+	<li class="cat-item cat-item-73315229"><a href="https://chandesperansonline.com/category/jezu-va-roule-roch-la-2/">jezu va roule roch la</a> (1)
+</li>
+	<li class="cat-item cat-item-73315230"><a href="https://chandesperansonline.com/category/jezu-va-woule-woch-la-2/">jezu va woule woch la</a> (2)
+</li>
+	<li class="cat-item cat-item-73315639"><a href="https://chandesperansonline.com/category/kantik-kreyol/">Kantik Kreyol</a> (2)
+</li>
+	<li class="cat-item cat-item-5737506"><a href="https://chandesperansonline.com/category/kindle-ebooks/">kindle ebooks</a> (1)
+</li>
+	<li class="cat-item cat-item-43524247"><a href="https://chandesperansonline.com/category/kreyol-lessons/">Kreyol Lessons</a> (5)
+</li>
+	<li class="cat-item cat-item-634718107"><a href="https://chandesperansonline.com/category/la-fwa-ban-nou-la-viktwa/">La fwa ban nou la viktwa</a> (1)
+</li>
+	<li class="cat-item cat-item-65451212"><a href="https://chandesperansonline.com/category/la-voix-du-reveil/">La voix du reveil</a> (2)
+</li>
+	<li class="cat-item cat-item-62605804"><a href="https://chandesperansonline.com/category/le-jezu-mouri-sou-kalve-le-kris-mouri-se-te-pou-mouin/">Lè Jezu mouri sou kalvè Lè Kris mouri se te pou mouin</a> (2)
+</li>
+	<li class="cat-item cat-item-134338369"><a href="https://chandesperansonline.com/category/le-chretien-en-adoration/">Le Chretien en Adoration</a> (1)
+</li>
+	<li class="cat-item cat-item-250767144"><a href="https://chandesperansonline.com/category/le-monn-se-pa-lakay-mwen/">Le Monn Se Pa Lakay Mwen</a> (1)
+</li>
+	<li class="cat-item cat-item-250772513"><a href="https://chandesperansonline.com/category/le-monn-se-pa-lakay-mwen-lyrics/">Le Monn se Pa Lakay Mwen Lyrics</a> (1)
+</li>
+	<li class="cat-item cat-item-50193069"><a href="https://chandesperansonline.com/category/learn-french-lessons-online/">Learn French Lessons Online</a> (5)
+</li>
+	<li class="cat-item cat-item-43524246"><a href="https://chandesperansonline.com/category/learn-haitian-creole-2/">Learn haitian Creole</a> (6)
+</li>
+	<li class="cat-item cat-item-43524248"><a href="https://chandesperansonline.com/category/leson-kreyol/">Leson Kreyol</a> (3)
+</li>
+	<li class="cat-item cat-item-42002310"><a href="https://chandesperansonline.com/category/listen-to-chants-desperance-haitiens/">Listen to Chants d&#039;esperance Haitiens</a> (14)
+</li>
+	<li class="cat-item cat-item-131328888"><a href="https://chandesperansonline.com/category/los-verbos-y-las-palabras-de-creole/">Los Verbos y Las Palabras de Creole</a> (1)
+</li>
+	<li class="cat-item cat-item-73316140"><a href="https://chandesperansonline.com/category/louanges-et-adoration/">Louanges et Adoration</a> (4)
+</li>
+	<li class="cat-item cat-item-634716934"><a href="https://chandesperansonline.com/category/love-and-flashes-of-fire/">Love and Flashes of Fire</a> (1)
+</li>
+	<li class="cat-item cat-item-51279042"><a href="https://chandesperansonline.com/category/love-in-any-other-language/">Love in Any Other Language</a> (4)
+</li>
+	<li class="cat-item cat-item-18542175"><a href="https://chandesperansonline.com/category/love-is-power/">Love is Power</a> (1)
+</li>
+	<li class="cat-item cat-item-203687683"><a href="https://chandesperansonline.com/category/mandelaforgivenessandlove/">MandelaForgivenessandLove</a> (1)
+</li>
+	<li class="cat-item cat-item-633818387"><a href="https://chandesperansonline.com/category/melodies-joyeuses-francais/">Mélodies Joyeuses Français</a> (1)
+</li>
+	<li class="cat-item cat-item-41476752"><a href="https://chandesperansonline.com/category/melodies-joyeuses/">Melodies Joyeuses</a> (4)
+</li>
+	<li class="cat-item cat-item-7263363"><a href="https://chandesperansonline.com/category/mobile-prayer/">Mobile Prayer</a> (1)
+</li>
+	<li class="cat-item cat-item-634998218"><a href="https://chandesperansonline.com/category/mon-seul-appui-cest-lami-celeste/">Mon seul appui, c’est l’Ami Céleste</a> (1)
+</li>
+	<li class="cat-item cat-item-58960395"><a href="https://chandesperansonline.com/category/musique-des-chants-desperance/">Musique des chants d&#039;esperance</a> (3)
+</li>
+	<li class="cat-item cat-item-58889072"><a href="https://chandesperansonline.com/category/nothing-but-the-blood-of-jesus-christ/">Nothing but the blood of Jesus Christ</a> (6)
+</li>
+	<li class="cat-item cat-item-352252"><a href="https://chandesperansonline.com/category/oer/">oer</a> (1)
+</li>
+	<li class="cat-item cat-item-634997923"><a href="https://chandesperansonline.com/category/par-tous-les-saints-glorifie/">Par tous les saints glorifié</a> (1)
+</li>
+	<li class="cat-item cat-item-70012754"><a href="https://chandesperansonline.com/category/quel-ami-fidele-et-tendre/">Quel ami fidèle et tendre</a> (1)
+</li>
+	<li class="cat-item cat-item-134338291"><a href="https://chandesperansonline.com/category/reveillons-nous-2/">Reveillons Nous</a> (2)
+</li>
+	<li class="cat-item cat-item-134338178"><a href="https://chandesperansonline.com/category/reveillons-nous-chretiens/">Reveillons Nous Chretiens</a> (2)
+</li>
+	<li class="cat-item cat-item-634997337"><a href="https://chandesperansonline.com/category/sa-main-laccomplira/">Sa main l’accomplira,</a> (1)
+</li>
+	<li class="cat-item cat-item-58960396"><a href="https://chandesperansonline.com/category/sheet-music-of-chant-desperance/">sheet music of chant d&#039;esperance</a> (2)
+</li>
+	<li class="cat-item cat-item-635479830"><a href="https://chandesperansonline.com/category/sois-sans-alarmes-sans-frayeur/">Sois sans alarmes, sans frayeur</a> (1)
+</li>
+	<li class="cat-item cat-item-51594713"><a href="https://chandesperansonline.com/category/teaching-creole-flashcard-materials/">Teaching Creole flashcard materials</a> (3)
+</li>
+	<li class="cat-item cat-item-51594732"><a href="https://chandesperansonline.com/category/teaching-haitian-creole-flashcard-media/">Teaching Haitian Creole Flashcard Media</a> (2)
+</li>
+	<li class="cat-item cat-item-635479077"><a href="https://chandesperansonline.com/category/tenons-nos-lampes-pretes/">Tenons nos lampes prêtes,</a> (1)
+</li>
+	<li class="cat-item cat-item-54418"><a href="https://chandesperansonline.com/category/the-bible/">The Bible</a> (1)
+</li>
+	<li class="cat-item cat-item-1238904"><a href="https://chandesperansonline.com/category/the-power-of-love/">The Power of Love</a> (1)
+</li>
+	<li class="cat-item cat-item-194688224"><a href="https://chandesperansonline.com/category/truthandreconciliation/">TruthandReconciliation</a> (1)
+</li>
+	<li class="cat-item cat-item-1"><a href="https://chandesperansonline.com/category/uncategorized/">Uncategorized</a> (3)
+</li>
+	<li class="cat-item cat-item-635479403"><a href="https://chandesperansonline.com/category/voir-mon-sauveur-face-a-face/">Voir mon Sauveur face à face</a> (1)
+</li>
+	<li class="cat-item cat-item-43255730"><a href="https://chandesperansonline.com/category/zune-and-droid-phones/">Zune and Droid Phones</a> (5)
+</li>
+			</ul>
+
+			</div></div><div class="side-widget widget_calendar"><div class="side-widget-wrap"><h3>ChandesperansOnline.com&#8217;s Calendar</h3><div id="calendar_wrap" class="calendar_wrap"><table id="wp-calendar" class="wp-calendar-table">
+	<caption>January 2026</caption>
+	<thead>
+	<tr>
+		<th scope="col" aria-label="Monday">M</th>
+		<th scope="col" aria-label="Tuesday">T</th>
+		<th scope="col" aria-label="Wednesday">W</th>
+		<th scope="col" aria-label="Thursday">T</th>
+		<th scope="col" aria-label="Friday">F</th>
+		<th scope="col" aria-label="Saturday">S</th>
+		<th scope="col" aria-label="Sunday">S</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td colspan="3" class="pad">&nbsp;</td><td>1</td><td>2</td><td>3</td><td>4</td>
+	</tr>
+	<tr>
+		<td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
+	</tr>
+	<tr>
+		<td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td>
+	</tr>
+	<tr>
+		<td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td id="today">25</td>
+	</tr>
+	<tr>
+		<td>26</td><td>27</td><td>28</td><td>29</td><td>30</td><td>31</td>
+		<td class="pad" colspan="1">&nbsp;</td>
+	</tr>
+	</tbody>
+	</table><nav aria-label="Previous and next months" class="wp-calendar-nav">
+		<span class="wp-calendar-nav-prev"><a href="https://chandesperansonline.com/2025/07/">&laquo; Jul</a></span>
+		<span class="pad">&nbsp;</span>
+		<span class="wp-calendar-nav-next">&nbsp;</span>
+	</nav></div></div></div><div class="side-widget widget_twitter"><div class="side-widget-wrap"><h3><a href='http://twitter.com/chandesperans'>@chandesperans</a></h3><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/chandesperans">Tweets by chandesperans</a></div></div><div class="side-widget widget_twitter"><div class="side-widget-wrap"><h3><a href='http://twitter.com/chantdesperance'>@chantdesperance</a></h3><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/chantdesperance">Tweets by chantdesperance</a></div></div><div class="side-widget widget_twitter"><div class="side-widget-wrap"><h3><a href='http://twitter.com/tweetyourebooks'>@Tweetyourebooks</a></h3><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/tweetyourebooks">Tweets by tweetyourebooks</a></div></div><div class="side-widget widget_twitter"><div class="side-widget-wrap"><h3><a href='http://twitter.com/mcc'>@mcc</a></h3><a class="twitter-timeline" data-height="600" data-dnt="true" href="https://twitter.com/mcc">Tweets by mcc</a></div></div><div class="side-widget widget_jp_blogs_i_follow"><div class="side-widget-wrap"><h3>Blogs I Follow</h3><ul><li><a href="http://fresnostatemfa.wordpress.com" class="bump-view" data-bump-view="bif">We Grow Writers</a></li><li><a href="http://smhaitipartnership.wordpress.com" class="bump-view" data-bump-view="bif">St. Mark&#039;s School Haiti Partnership</a></li><li><a href="http://preelit.wordpress.com/" class="bump-view" data-bump-view="bif">PREE</a></li><li><a href="http://florwingam.wordpress.com" class="bump-view" data-bump-view="bif">FLORWING MAG</a></li><li><a href="http://lazyspanishgirl.wordpress.com" class="bump-view" data-bump-view="bif">Emo et Indie</a></li><li><a href="http://mathillages.wordpress.com" class="bump-view" data-bump-view="bif">MATHILLAGES.FR</a></li><li><a href="http://sliverofstonemagazinedotcom.wordpress.com" class="bump-view" data-bump-view="bif">Sliver of Stone  Magazine</a></li><li><a href="http://haitiresultorientedrelief.wordpress.com" class="bump-view" data-bump-view="bif">Haiti Result-Oriented Relief - HROR</a></li><li><a href="http://afroalice.wordpress.com" class="bump-view" data-bump-view="bif">Afro Alice</a></li><li><a href="http://opinionsdefemmes.wordpress.com" class="bump-view" data-bump-view="bif">Opinions de Femmes</a></li><li><a href="http://ebookpublishersweekly.wordpress.com" class="bump-view" data-bump-view="bif">ebookPublishersWeekly</a></li><li><a href="http://en.blog.wordpress.com" class="bump-view" data-bump-view="bif">WordPress.com News</a></li><li><a href="http://herestous.wordpress.com" class="bump-view" data-bump-view="bif">Here&#039;s To Us</a></li><li><a href="http://mudflats.wordpress.com" class="bump-view" data-bump-view="bif">Mudflats</a></li></ul></div></div><div class="side-widget widget_text"><div class="side-widget-wrap"><h3>Contact ChandesperansOnline</h3>			<div class="textwidget"><p>Chandesperansonline@Gmail.com</p>
+</div>
+		</div></div><div class="side-widget widget_block widget_text"><div class="side-widget-wrap">
+<p class="wp-block-paragraph"><a href="https://www.paypal.biz/biz2coachbiz">https://www.paypal.biz/biz2coachbiz</a></p>
+</div></div><div class="side-widget widget_block widget_text"><div class="side-widget-wrap">
+<p class="wp-block-paragraph">Donate to this Ministry</p>
+</div></div><div class="side-widget widget_block widget_text"><div class="side-widget-wrap">
+<p class="wp-block-paragraph"><a href="https://www.paypal.biz/biz2coachbiz">https://www.paypal.biz/biz2coachbiz</a></p>
+</div></div>
+</div><!-- /sidebar -->
+
+<div id="footer">
+	<p class="wpcom-credits">
+		<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a>
+			</p>
+</div><!-- /footer -->
+
+</div><!-- /wrapper -->
+
+		<script type="text/javascript">
+		var infiniteScroll = {"settings":{"id":"content","ajaxurl":"https://chandesperansonline.com/?infinity=scrolling","type":"scroll","wrapper":true,"wrapper_class":"infinite-wrap","footer":true,"click_handle":"1","text":"Older posts","totop":"Scroll back to top","currentday":"24.05.18","order":"DESC","scripts":[],"styles":[],"google_analytics":false,"offset":1,"history":{"host":"chandesperansonline.com","path":"/page/%d/","use_trailing_slashes":true,"parameters":""},"query_args":{"error":"","m":"","p":0,"post_parent":"","subpost":"","subpost_id":"","attachment":"","attachment_id":0,"name":"","pagename":"","page_id":0,"second":"","minute":"","hour":"","day":0,"monthnum":0,"year":0,"w":0,"category_name":"","tag":"","cat":"","tag_id":"","author":"","author_name":"","feed":"","tb":"","paged":0,"meta_key":"","meta_value":"","preview":"","s":"","sentence":"","title":"","fields":"all","menu_order":"","embed":"","category__in":[],"category__not_in":[],"category__and":[],"post__in":[],"post__not_in":[],"post_name__in":[],"tag__in":[],"tag__not_in":[],"tag__and":[],"tag_slug__in":[],"tag_slug__and":[],"post_parent__in":[],"post_parent__not_in":[],"author__in":[],"author__not_in":[],"search_columns":[],"lazy_load_term_meta":false,"posts_per_page":10,"ignore_sticky_posts":false,"suppress_filters":false,"cache_results":true,"update_post_term_cache":true,"update_menu_item_cache":false,"update_post_meta_cache":true,"post_type":"","nopaging":false,"comments_per_page":"50","no_found_rows":false,"order":"DESC"},"query_before":"2026-01-25 09:02:58","last_post_date":"2018-05-24 04:31:43","body_class":"infinite-scroll neverending","loading_text":"Loading new page","stats":"blog=15007624\u0026v=wpcom\u0026tz=0\u0026user_id=0\u0026arch_home=1\u0026subd=chandesperansonline\u0026x_pagetype=infinite"}};
+		</script>
+		<!--  -->
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/files/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/pub/springloaded/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<div id="wpcom-follow-bubbles-jp_blogs_i_follow-2" class="wpcom-follow-bubbles"><div id="wpcom-bubble-jp_blogs_i_follow-2-1" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://fresnostatemfa.wordpress.com" class="bump-view" data-bump-view="bif">We Grow Writers</a><p><small>The Fresno State MFA Creative Writing Program is the home for #FresnoWriters</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-2" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://smhaitipartnership.wordpress.com" class="bump-view" data-bump-view="bif">St. Mark&#039;s School Haiti Partnership</a><p></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-3" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://preelit.wordpress.com/" class="bump-view" data-bump-view="bif">PREE</a><p><small>Caribbean. Writing.</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-4" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://florwingam.wordpress.com" class="bump-view" data-bump-view="bif">FLORWING MAG</a><p><small>@florwingofficial</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-5" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://lazyspanishgirl.wordpress.com" class="bump-view" data-bump-view="bif">Emo et Indie</a><p></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-6" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://mathillages.wordpress.com" class="bump-view" data-bump-view="bif">MATHILLAGES.FR</a><p><small>Le BLOG OFFICIEL de MATHILDE</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-7" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://sliverofstonemagazinedotcom.wordpress.com" class="bump-view" data-bump-view="bif">Sliver of Stone  Magazine</a><p><small>2010-2018 ARCHIVES</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-8" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://haitiresultorientedrelief.wordpress.com" class="bump-view" data-bump-view="bif">Haiti Result-Oriented Relief - HROR</a><p><small>A Person-to-Person Haiti Rebuilding Effort focused on Getting Things Done!</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-9" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://afroalice.wordpress.com" class="bump-view" data-bump-view="bif">Afro Alice</a><p><small>Ak Cheve Natirèl, ou bèl!</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-10" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://opinionsdefemmes.wordpress.com" class="bump-view" data-bump-view="bif">Opinions de Femmes</a><p><small>Kreye lavi ke w vle a ak resous ke w genyen yo</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-11" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://ebookpublishersweekly.wordpress.com" class="bump-view" data-bump-view="bif">ebookPublishersWeekly</a><p><small>Get Daily, Weekly, and Monthly Digital ebooks You Can&#039;t Miss</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-12" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://en.blog.wordpress.com" class="bump-view" data-bump-view="bif">WordPress.com News</a><p><small>The latest news on WordPress.com and the WordPress community.</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-13" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://herestous.wordpress.com" class="bump-view" data-bump-view="bif">Here&#039;s To Us</a><p><small>Nerdiness Encouraged</small></p></div></div><div id="wpcom-bubble-jp_blogs_i_follow-2-14" class="wpcom-bubble wpcom-follow-bubble"><div class="bubble-txt"><a href="http://mudflats.wordpress.com" class="bump-view" data-bump-view="bif">Mudflats</a><p><small>Tiptoeing Through the Muck of Alaskan Politics</small></p></div></div></div><script type="text/javascript" src="//0.gravatar.com/js/hovercards/hovercards.min.js?ver=202604924dcd77a86c6f1d3698ec27fc5da92b28585ddad3ee636c0397cf312193b2a1" id="grofiles-cards-js"></script>
+<script type="text/javascript" id="wpgroho-js-extra">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+//# sourceURL=wpgroho-js-extra
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1610363240i'></script>
+
+	<script>
+		// Initialize and attach hovercards to all gravatars
+		( function() {
+			function init() {
+				if ( typeof Gravatar === 'undefined' ) {
+					return;
+				}
+
+				if ( typeof Gravatar.init !== 'function' ) {
+					return;
+				}
+
+				Gravatar.profile_cb = function ( hash, id ) {
+					WPGroHo.syncProfileData( hash, id );
+				};
+
+				Gravatar.my_hash = WPGroHo.my_hash;
+				Gravatar.init(
+					'body',
+					'#wp-admin-bar-my-account',
+					{
+						i18n: {
+							'Edit your profile →': 'Edit your profile →',
+							'View profile →': 'View profile →',
+							'Contact': 'Contact',
+							'Send money': 'Send money',
+							'Sorry, we are unable to load this Gravatar profile.': 'Sorry, we are unable to load this Gravatar profile.',
+							'Gravatar not found.': 'Gravatar not found.',
+							'Too Many Requests.': 'Too Many Requests.',
+							'Internal Server Error.': 'Internal Server Error.',
+							'Is this you?': 'Is this you?',
+							'Claim your free profile.': 'Claim your free profile.',
+							'Email': 'Email',
+							'Home Phone': 'Home Phone',
+							'Work Phone': 'Work Phone',
+							'Cell Phone': 'Cell Phone',
+							'Contact Form': 'Contact Form',
+							'Calendar': 'Calendar',
+						},
+					}
+				);
+			}
+
+			if ( document.readyState !== 'loading' ) {
+				init();
+			} else {
+				document.addEventListener( 'DOMContentLoaded', init );
+			}
+		} )();
+	</script>
+
+		<div style="display:none">
+	<div class="grofile-hash-map-419796163fa2eb389f795bdf05ef3311">
+	</div>
+	</div>
+		<div id="infinite-footer">
+			<div class="container">
+				<div class="blog-info">
+					<a id="infinity-blog-title" href="https://chandesperansonline.com/" rel="home">
+						Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online					</a>
+				</div>
+				<div class="blog-credits">
+					<a href="https://wordpress.com/?ref=footer_blog" rel="nofollow">Blog at WordPress.com.</a> 				</div>
+			</div>
+		</div><!-- #infinite-footer -->
+				<!-- CCPA [start] -->
+		<script type="text/javascript">
+			( function () {
+
+				var setupPrivacy = function() {
+
+					// Minimal Mozilla Cookie library
+					// https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie/Simple_document.cookie_framework
+					var cookieLib = window.cookieLib = {getItem:function(e){return e&&decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*"+encodeURIComponent(e).replace(/[\-\.\+\*]/g,"\\$&")+"\\s*\\=\\s*([^;]*).*$)|^.*$"),"$1"))||null},setItem:function(e,o,n,t,r,i){if(!e||/^(?:expires|max\-age|path|domain|secure)$/i.test(e))return!1;var c="";if(n)switch(n.constructor){case Number:c=n===1/0?"; expires=Fri, 31 Dec 9999 23:59:59 GMT":"; max-age="+n;break;case String:c="; expires="+n;break;case Date:c="; expires="+n.toUTCString()}return"rootDomain"!==r&&".rootDomain"!==r||(r=(".rootDomain"===r?".":"")+document.location.hostname.split(".").slice(-2).join(".")),document.cookie=encodeURIComponent(e)+"="+encodeURIComponent(o)+c+(r?"; domain="+r:"")+(t?"; path="+t:"")+(i?"; secure":""),!0}};
+
+					// Implement IAB USP API.
+					window.__uspapi = function( command, version, callback ) {
+
+						// Validate callback.
+						if ( typeof callback !== 'function' ) {
+							return;
+						}
+
+						// Validate the given command.
+						if ( command !== 'getUSPData' || version !== 1 ) {
+							callback( null, false );
+							return;
+						}
+
+						// Check for GPC. If set, override any stored cookie.
+						if ( navigator.globalPrivacyControl ) {
+							callback( { version: 1, uspString: '1YYN' }, true );
+							return;
+						}
+
+						// Check for cookie.
+						var consent = cookieLib.getItem( 'usprivacy' );
+
+						// Invalid cookie.
+						if ( null === consent ) {
+							callback( null, false );
+							return;
+						}
+
+						// Everything checks out. Fire the provided callback with the consent data.
+						callback( { version: 1, uspString: consent }, true );
+					};
+
+					// Initialization.
+					document.addEventListener( 'DOMContentLoaded', function() {
+
+						// Internal functions.
+						var setDefaultOptInCookie = function() {
+							var value = '1YNN';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 365 * 24 * 60 * 60, '/', domain );
+						};
+
+						var setDefaultOptOutCookie = function() {
+							var value = '1YYN';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 24 * 60 * 60, '/', domain );
+						};
+
+						var setDefaultNotApplicableCookie = function() {
+							var value = '1---';
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'usprivacy', value, 24 * 60 * 60, '/', domain );
+						};
+
+						var setCcpaAppliesCookie = function( applies ) {
+							var domain = '.wordpress.com' === location.hostname.slice( -14 ) ? '.rootDomain' : location.hostname;
+							cookieLib.setItem( 'ccpa_applies', applies, 24 * 60 * 60, '/', domain );
+						}
+
+						var maybeCallDoNotSellCallback = function() {
+							if ( 'function' === typeof window.doNotSellCallback ) {
+								return window.doNotSellCallback();
+							}
+
+							return false;
+						}
+
+						// Look for usprivacy cookie first.
+						var usprivacyCookie = cookieLib.getItem( 'usprivacy' );
+
+						// Found a usprivacy cookie.
+						if ( null !== usprivacyCookie ) {
+
+							// If the cookie indicates that CCPA does not apply, then bail.
+							if ( '1---' === usprivacyCookie ) {
+								return;
+							}
+
+							// CCPA applies, so call our callback to add Do Not Sell link to the page.
+							maybeCallDoNotSellCallback();
+
+							// We're all done, no more processing needed.
+							return;
+						}
+
+						// We don't have a usprivacy cookie, so check to see if we have a CCPA applies cookie.
+						var ccpaCookie = cookieLib.getItem( 'ccpa_applies' );
+
+						// No CCPA applies cookie found, so we'll need to geolocate if this visitor is from California.
+						// This needs to happen client side because we do not have region geo data in our $SERVER headers,
+						// only country data -- therefore we can't vary cache on the region.
+						if ( null === ccpaCookie ) {
+
+							var request = new XMLHttpRequest();
+							request.open( 'GET', 'https://public-api.wordpress.com/geo/', true );
+
+							request.onreadystatechange = function () {
+								if ( 4 === this.readyState ) {
+									if ( 200 === this.status ) {
+
+										// Got a geo response. Parse out the region data.
+										var data = JSON.parse( this.response );
+										var region      = data.region ? data.region.toLowerCase() : '';
+										var ccpa_applies = ['california', 'colorado', 'connecticut', 'delaware', 'indiana', 'iowa', 'montana', 'new jersey', 'oregon', 'tennessee', 'texas', 'utah', 'virginia'].indexOf( region ) > -1;
+										// Set CCPA applies cookie. This keeps us from having to make a geo request too frequently.
+										setCcpaAppliesCookie( ccpa_applies );
+
+										// Check if CCPA applies to set the proper usprivacy cookie.
+										if ( ccpa_applies ) {
+											if ( maybeCallDoNotSellCallback() ) {
+												// Do Not Sell link added, so set default opt-in.
+												setDefaultOptInCookie();
+											} else {
+												// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+												setDefaultOptOutCookie();
+											}
+										} else {
+											// CCPA does not apply.
+											setDefaultNotApplicableCookie();
+										}
+									} else {
+										// Could not geo, so let's assume for now that CCPA applies to be safe.
+										setCcpaAppliesCookie( true );
+										if ( maybeCallDoNotSellCallback() ) {
+											// Do Not Sell link added, so set default opt-in.
+											setDefaultOptInCookie();
+										} else {
+											// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+											setDefaultOptOutCookie();
+										}
+									}
+								}
+							};
+
+							// Send the geo request.
+							request.send();
+						} else {
+							// We found a CCPA applies cookie.
+							if ( ccpaCookie === 'true' ) {
+								if ( maybeCallDoNotSellCallback() ) {
+									// Do Not Sell link added, so set default opt-in.
+									setDefaultOptInCookie();
+								} else {
+									// Failed showing Do Not Sell link as required, so default to opt-OUT just to be safe.
+									setDefaultOptOutCookie();
+								}
+							} else {
+								// CCPA does not apply.
+								setDefaultNotApplicableCookie();
+							}
+						}
+					} );
+				};
+
+				// Kickoff initialization.
+				if ( window.defQueue && defQueue.isLOHP && defQueue.isLOHP === 2020 ) {
+					defQueue.items.push( setupPrivacy );
+				} else {
+					setupPrivacy();
+				}
+
+			} )();
+		</script>
+
+		<!-- CCPA [end] -->
+		<div class="widget widget_eu_cookie_law_widget">
+<div
+	class="hide-on-button ads-active"
+	data-hide-timeout="30"
+	data-consent-expiration="180"
+	id="eu-cookie-law"
+	style="display: none"
+>
+	<form method="post">
+		<input type="submit" value="Close and accept" class="accept" />
+
+		Privacy &amp; Cookies: This site uses cookies. By continuing to use this website, you agree to their use. <br />
+To find out more, including how to control cookies, see here:
+				<a href="https://automattic.com/cookies/" rel="nofollow">
+			Cookie Policy		</a>
+ </form>
+</div>
+</div>		<div id="actionbar" dir="ltr" style="display: none;"
+			class="actnbr-pub-springloaded actnbr-has-follow actnbr-has-actions">
+		<ul>
+								<li class="actnbr-btn actnbr-hidden">
+								<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+							<div class="actnbr-popover tip tip-top-left actnbr-notice" id="follow-bubble">
+							<div class="tip-arrow"></div>
+							<div class="tip-inner actnbr-follow-bubble">
+															<ul>
+											<li class="actnbr-sitename">
+			<a href="https://chandesperansonline.com">
+				<img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' />				Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online			</a>
+		</li>
+										<div class="actnbr-message no-display"></div>
+									<form method="post" action="https://subscribe.wordpress.com" accept-charset="utf-8" style="display: none;">
+																						<div class="actnbr-follow-count">Join 85 other subscribers</div>
+																					<div>
+										<input type="email" name="email" placeholder="Enter your email address" class="actnbr-email-field" aria-label="Enter your email address" />
+										</div>
+										<input type="hidden" name="action" value="subscribe" />
+										<input type="hidden" name="blog_id" value="15007624" />
+										<input type="hidden" name="source" value="https://chandesperansonline.com/" />
+										<input type="hidden" name="sub-type" value="actionbar-follow" />
+										<input type="hidden" id="_wpnonce" name="_wpnonce" value="91fb37de5a" />										<div class="actnbr-button-wrap">
+											<button type="submit" value="Sign me up">
+												Sign me up											</button>
+										</div>
+									</form>
+									<li class="actnbr-login-nudge">
+										<div>
+											Already have a WordPress.com account? <a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fchandesperansonline.com%252F2025%252F07%252F26%252F26-a-la-fin-de-mon-voyage%252F">Log in now.</a>										</div>
+									</li>
+								</ul>
+															</div>
+						</div>
+					</li>
+							<li class="actnbr-ellipsis actnbr-hidden">
+				<svg class="gridicon gridicons-ellipsis" height="24" width="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><path d="M7 12c0 1.104-.896 2-2 2s-2-.896-2-2 .896-2 2-2 2 .896 2 2zm12-2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-7 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z"/></g></svg>				<div class="actnbr-popover tip tip-top-left actnbr-more">
+					<div class="tip-arrow"></div>
+					<div class="tip-inner">
+						<ul>
+								<li class="actnbr-sitename">
+			<a href="https://chandesperansonline.com">
+				<img loading='lazy' alt='' src='https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png' srcset='https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=50&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=75&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 1.5x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=100&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 2x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=150&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 3x, https://secure.gravatar.com/blavatar/93a29dca8bce7b07b91603daa0bef1f63db7185cb0c9a74c01e0c5e3776be4e8?s=200&#038;d=https%3A%2F%2Fs0.wp.com%2Fi%2Flogo%2Fwpcom-gray-white.png 4x' class='avatar avatar-50' height='50' width='50' />				Welcome to Chandesperansonline.com! Chants d&#039;Espérance Online, Chants Haïtiens Français et Créoles Online			</a>
+		</li>
+								<li class="actnbr-folded-follow">
+										<a class="actnbr-action actnbr-actn-follow " href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path clip-rule="evenodd" d="m4 4.5h12v6.5h1.5v-6.5-1.5h-1.5-12-1.5v1.5 10.5c0 1.1046.89543 2 2 2h7v-1.5h-7c-.27614 0-.5-.2239-.5-.5zm10.5 2h-9v1.5h9zm-5 3h-4v1.5h4zm3.5 1.5h-1v1h1zm-1-1.5h-1.5v1.5 1 1.5h1.5 1 1.5v-1.5-1-1.5h-1.5zm-2.5 2.5h-4v1.5h4zm6.5 1.25h1.5v2.25h2.25v1.5h-2.25v2.25h-1.5v-2.25h-2.25v-1.5h2.25z"  fill-rule="evenodd"></path></svg>
+			<span>Subscribe</span>
+		</a>
+		<a class="actnbr-action actnbr-actn-following  no-display" href="">
+			<svg class="gridicon" height="20" width="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 4.5H4V15C4 15.2761 4.22386 15.5 4.5 15.5H11.5V17H4.5C3.39543 17 2.5 16.1046 2.5 15V4.5V3H4H16H17.5V4.5V12.5H16V4.5ZM5.5 6.5H14.5V8H5.5V6.5ZM5.5 9.5H9.5V11H5.5V9.5ZM12 11H13V12H12V11ZM10.5 9.5H12H13H14.5V11V12V13.5H13H12H10.5V12V11V9.5ZM5.5 12H9.5V13.5H5.5V12Z" fill="#008A20"></path><path class="following-icon-tick" d="M13.5 16L15.5 18L19 14.5" stroke="#008A20" stroke-width="1.5"></path></svg>
+			<span>Subscribed</span>
+		</a>
+								</li>
+														<li class="actnbr-signup"><a href="https://wordpress.com/start/">Sign up</a></li>
+							<li class="actnbr-login"><a href="https://wordpress.com/log-in?redirect_to=https%3A%2F%2Fr-login.wordpress.com%2Fremote-login.php%3Faction%3Dlink%26back%3Dhttps%253A%252F%252Fchandesperansonline.com%252F2025%252F07%252F26%252F26-a-la-fin-de-mon-voyage%252F">Log in</a></li>
+															<li class="flb-report">
+									<a href="https://wordpress.com/abuse/?report_url=https://chandesperansonline.com" target="_blank" rel="noopener noreferrer">
+										Report this content									</a>
+								</li>
+															<li class="actnbr-reader">
+									<a href="https://wordpress.com/reader/feeds/52000432">
+										View site in Reader									</a>
+								</li>
+															<li class="actnbr-subs">
+									<a href="https://subscribe.wordpress.com/">Manage subscriptions</a>
+								</li>
+																<li class="actnbr-fold"><a href="">Collapse this bar</a></li>
+														</ul>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+<script>
+window.addEventListener( "DOMContentLoaded", function( event ) {
+	var link = document.createElement( "link" );
+	link.href = "/wp-content/mu-plugins/actionbar/actionbar.css?v=20250116";
+	link.type = "text/css";
+	link.rel = "stylesheet";
+	document.head.appendChild( link );
+
+	var script = document.createElement( "script" );
+	script.src = "/wp-content/mu-plugins/actionbar/actionbar.js?v=20250204";
+	document.body.appendChild( script );
+} );
+</script>
+
+			<div id="jp-carousel-loading-overlay">
+			<div id="jp-carousel-loading-wrapper">
+				<span id="jp-carousel-library-loading">&nbsp;</span>
+			</div>
+		</div>
+		<div class="jp-carousel-overlay" style="display: none;">
+
+		<div class="jp-carousel-container">
+			<!-- The Carousel Swiper -->
+			<div
+				class="jp-carousel-wrap swiper jp-carousel-swiper-container jp-carousel-transitions"
+				itemscope
+				itemtype="https://schema.org/ImageGallery">
+				<div class="jp-carousel swiper-wrapper"></div>
+				<div class="jp-swiper-button-prev swiper-button-prev">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskPrev" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="9" height="12">
+							<path d="M16.2072 16.59L11.6496 12L16.2072 7.41L14.8041 6L8.8335 12L14.8041 18L16.2072 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskPrev)">
+							<rect x="0.579102" width="23.8823" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+				<div class="jp-swiper-button-next swiper-button-next">
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<mask id="maskNext" mask-type="alpha" maskUnits="userSpaceOnUse" x="8" y="6" width="8" height="12">
+							<path d="M8.59814 16.59L13.1557 12L8.59814 7.41L10.0012 6L15.9718 12L10.0012 18L8.59814 16.59Z" fill="white"/>
+						</mask>
+						<g mask="url(#maskNext)">
+							<rect x="0.34375" width="23.8822" height="24" fill="#FFFFFF"/>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<!-- The main close buton -->
+			<div class="jp-carousel-close-hint">
+				<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<mask id="maskClose" mask-type="alpha" maskUnits="userSpaceOnUse" x="5" y="5" width="15" height="14">
+						<path d="M19.3166 6.41L17.9135 5L12.3509 10.59L6.78834 5L5.38525 6.41L10.9478 12L5.38525 17.59L6.78834 19L12.3509 13.41L17.9135 19L19.3166 17.59L13.754 12L19.3166 6.41Z" fill="white"/>
+					</mask>
+					<g mask="url(#maskClose)">
+						<rect x="0.409668" width="23.8823" height="24" fill="#FFFFFF"/>
+					</g>
+				</svg>
+			</div>
+			<!-- Image info, comments and meta -->
+			<div class="jp-carousel-info">
+				<div class="jp-carousel-info-footer">
+					<div class="jp-carousel-pagination-container">
+						<div class="jp-swiper-pagination swiper-pagination"></div>
+						<div class="jp-carousel-pagination"></div>
+					</div>
+					<div class="jp-carousel-photo-title-container">
+						<h2 class="jp-carousel-photo-caption"></h2>
+					</div>
+					<div class="jp-carousel-photo-icons-container">
+						<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-info" aria-label="Toggle photo metadata visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskInfo" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M12.7537 2C7.26076 2 2.80273 6.48 2.80273 12C2.80273 17.52 7.26076 22 12.7537 22C18.2466 22 22.7046 17.52 22.7046 12C22.7046 6.48 18.2466 2 12.7537 2ZM11.7586 7V9H13.7488V7H11.7586ZM11.7586 11V17H13.7488V11H11.7586ZM4.79292 12C4.79292 16.41 8.36531 20 12.7537 20C17.142 20 20.7144 16.41 20.7144 12C20.7144 7.59 17.142 4 12.7537 4C8.36531 4 4.79292 7.59 4.79292 12Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskInfo)">
+										<rect x="0.8125" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+							</span>
+						</a>
+												<a href="#" class="jp-carousel-icon-btn jp-carousel-icon-comments" aria-label="Toggle photo comments visibility">
+							<span class="jp-carousel-icon">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="maskComments" mask-type="alpha" maskUnits="userSpaceOnUse" x="2" y="2" width="21" height="20">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M4.3271 2H20.2486C21.3432 2 22.2388 2.9 22.2388 4V16C22.2388 17.1 21.3432 18 20.2486 18H6.31729L2.33691 22V4C2.33691 2.9 3.2325 2 4.3271 2ZM6.31729 16H20.2486V4H4.3271V18L6.31729 16Z" fill="white"/>
+									</mask>
+									<g mask="url(#maskComments)">
+										<rect x="0.34668" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+
+								<span class="jp-carousel-has-comments-indicator" aria-label="This image has comments."></span>
+							</span>
+						</a>
+											</div>
+				</div>
+				<div class="jp-carousel-info-extra">
+					<div class="jp-carousel-info-content-wrapper">
+						<div class="jp-carousel-photo-title-container">
+							<h2 class="jp-carousel-photo-title"></h2>
+						</div>
+						<div class="jp-carousel-comments-wrapper">
+															<div id="jp-carousel-comments-loading">
+									<span>Loading Comments...</span>
+								</div>
+								<div class="jp-carousel-comments"></div>
+								<div id="jp-carousel-comment-form-container">
+									<span id="jp-carousel-comment-form-spinner">&nbsp;</span>
+									<div id="jp-carousel-comment-post-results"></div>
+																														<form id="jp-carousel-comment-form">
+												<label for="jp-carousel-comment-form-comment-field" class="screen-reader-text">Write a Comment...</label>
+												<textarea
+													name="comment"
+													class="jp-carousel-comment-form-field jp-carousel-comment-form-textarea"
+													id="jp-carousel-comment-form-comment-field"
+													placeholder="Write a Comment..."
+												></textarea>
+												<div id="jp-carousel-comment-form-submit-and-info-wrapper">
+													<div id="jp-carousel-comment-form-commenting-as">
+																													<fieldset>
+																<label for="jp-carousel-comment-form-email-field">Email (Required)</label>
+																<input type="text" name="email" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-email-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-author-field">Name (Required)</label>
+																<input type="text" name="author" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-author-field" />
+															</fieldset>
+															<fieldset>
+																<label for="jp-carousel-comment-form-url-field">Website</label>
+																<input type="text" name="url" class="jp-carousel-comment-form-field jp-carousel-comment-form-text-field" id="jp-carousel-comment-form-url-field" />
+															</fieldset>
+																											</div>
+													<input
+														type="submit"
+														name="submit"
+														class="jp-carousel-comment-form-button"
+														id="jp-carousel-comment-form-button-submit"
+														value="Post Comment" />
+												</div>
+											</form>
+																											</div>
+													</div>
+						<div class="jp-carousel-image-meta">
+							<div class="jp-carousel-title-and-caption">
+								<div class="jp-carousel-photo-info">
+									<h3 class="jp-carousel-caption" itemprop="caption description"></h3>
+								</div>
+
+								<div class="jp-carousel-photo-description"></div>
+							</div>
+							<ul class="jp-carousel-image-exif" style="display: none;"></ul>
+							<a class="jp-carousel-image-download" href="#" target="_blank" style="display: none;">
+								<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="3" y="3" width="19" height="18">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M5.84615 5V19H19.7775V12H21.7677V19C21.7677 20.1 20.8721 21 19.7775 21H5.84615C4.74159 21 3.85596 20.1 3.85596 19V5C3.85596 3.9 4.74159 3 5.84615 3H12.8118V5H5.84615ZM14.802 5V3H21.7677V10H19.7775V6.41L9.99569 16.24L8.59261 14.83L18.3744 5H14.802Z" fill="white"/>
+									</mask>
+									<g mask="url(#mask0)">
+										<rect x="0.870605" width="23.8823" height="24" fill="#FFFFFF"/>
+									</g>
+								</svg>
+								<span class="jp-carousel-download-text"></span>
+							</a>
+							<div class="jp-carousel-image-map" style="display: none;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		</div>
+		
+	<script type="text/javascript">
+		(function () {
+			var wpcom_reblog = {
+				source: 'toolbar',
+
+				toggle_reblog_box_flair: function (obj_id, post_id) {
+
+					// Go to site selector. This will redirect to their blog if they only have one.
+					const postEndpoint = `https://wordpress.com/post`;
+
+					// Ideally we would use the permalink here, but fortunately this will be replaced with the 
+					// post permalink in the editor.
+					const originalURL = `${ document.location.href }?page_id=${ post_id }`; 
+					
+					const url =
+						postEndpoint +
+						'?url=' +
+						encodeURIComponent( originalURL ) +
+						'&is_post_share=true' +
+						'&v=5';
+
+					const redirect = function () {
+						if (
+							! window.open( url, '_blank' )
+						) {
+							location.href = url;
+						}
+					};
+
+					if ( /Firefox/.test( navigator.userAgent ) ) {
+						setTimeout( redirect, 0 );
+					} else {
+						redirect();
+					}
+				},
+			};
+
+			window.wpcom_reblog = wpcom_reblog;
+		})();
+	</script>
+<script type="text/javascript" id="jetpack-carousel-js-extra">
+/* <![CDATA[ */
+var jetpackSwiperLibraryPath = {"url":"/wp-content/mu-plugins/jetpack-plugin/moon/_inc/blocks/swiper.js"};
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https://chandesperansonline.com/wp-admin/admin-ajax.php","nonce":"e94c23d968","display_exif":"1","display_comments":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","image_label":"Open image in full-screen.","download_original":"View full size \u003Cspan class=\"photo-size\"\u003E{0}\u003Cspan class=\"photo-size-times\"\u003E\u00d7\u003C/span\u003E{1}\u003C/span\u003E","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","copyright":"Copyright","comment_registration":"0","require_name_email":"1","login_url":"https://chandesperansonline.wordpress.com/wp-login.php?redirect_to=https%3A%2F%2Fchandesperansonline.com%2F2018%2F05%2F31%2F133-chant-desperance-francais-cdf-sois-sans-alarmes-sans-frayeur%2F","blog_id":"15007624","meta_data":["camera","aperture","shutter_speed","focal_length","copyright"],"stats_query_args":"blog=15007624&v=wpcom&tz=0&user_id=0&arch_home=1&subd=chandesperansonline","is_public":"1"};
+//# sourceURL=jetpack-carousel-js-extra
+/* ]]> */
+</script>
+<script crossorigin='anonymous' type='text/javascript'  src='/_static/??-eJydj9EOgjAMRX/IWfEBeTF+ihlbIYVuJXST+PdiAmp4MMbHe9rT3MI0GCcxYUxQs7Rm4NxSVJhk9NarcWxVUaGbkU1sbsd9pzv40EJ+S+RbTAqY56n0hIbtBAnDwDbhhn+502EarOuXDEEkwpWigzoTe6DYUKSERt0ozGu+7wPFH9o9/1RDppldmTbx/1bOjpIV+bW3gqXWJZyLU1lU1aEoq+4B9GeMqg=='></script>
+<script type="text/javascript" src="/wp-content/mu-plugins/jetpack-plugin/moon/_inc/build/tiled-gallery/tiled-gallery/tiled-gallery.min.js?m=1755006225i&amp;ver=15.5-a.4" id="tiled-gallery-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" src="https://platform.twitter.com/widgets.js?ver=20111117" id="twitter-widgets-js"></script>
+<script crossorigin='anonymous' type='text/javascript'  src='/wp-content/mu-plugins/carousel-wpcom/carousel-wpcom.js?m=1761899756i'></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/72x72/","ext":".png","svgUrl":"https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?m=1764078722i&ver=6.9-RC2-61304"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+		<script type="text/javascript">
+			(function() {
+				var extend = function(out) {
+					out = out || {};
+
+					for (var i = 1; i < arguments.length; i++) {
+						if (!arguments[i])
+						continue;
+
+						for (var key in arguments[i]) {
+						if (arguments[i].hasOwnProperty(key))
+							out[key] = arguments[i][key];
+						}
+					}
+
+					return out;
+				};
+				extend( window.infiniteScroll.settings.scripts, ["jetpack-mu-wpcom-settings","rlt-proxy","follow_js","widget-bump-view","cmp-script-stub","wpcom-actionbar-placeholder","grofiles-cards","wpgroho","wordads-client","eu-cookie-law-script","the-neverending-homepage","jp-widget-follow-blogs","jetpack-carousel","tiled-gallery","twitter-widgets","carousel-wpcom"] );
+				extend( window.infiniteScroll.settings.styles, ["eu-cookie-law-style","the-neverending-homepage","springloaded-infinite-scroll","wp-block-library","coblocks-frontend","wpcom-core-compat-playlist-styles","wpcom-text-widget-styles","wpcom-bbpress2-staff-css","springloaded","follow_css","hover-bubbles","reblogging","geo-location-flair","a8c-global-print","h4-global","widget-grid-and-list","blogs-i-follow-widget","wp-emoji-styles","classic-theme-styles","jetpack-global-styles-frontend-style","wp-block-embed","wp-block-paragraph","global-styles","core-block-supports-duotone","jetpack-swiper-library","jetpack-carousel","tiled-gallery","jetpack-subscriptions"] );
+			})();
+		</script>
+				<span id="infinite-aria" aria-live="polite"></span>
+		<script src="//stats.wp.com/w.js?68" defer></script> <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'15007624','blog_tz':'0','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+		// Prevent sending pageview tracking from WP-Admin pages.
+		_stq.push(['view', {'blog':'15007624','v':'wpcom','tz':'0','user_id':'0','arch_home':'1','subd':'chandesperansonline'}]);
+		_stq.push(['extra', {'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdWtpP0NsWnVkPS9sL0ViLndld3BuVT01Uj14Ti1yYTBnX3xuYUQ3Qz1oblZbVHV3MTZ6aj0wcy01aFV6Y1RhRDhuPzkwMncsNm1ad0EldTZtNXh1JSxyYW44MzAxMFBndmg2Wy16eVsyMS1CX1JPeE5xLm1FfmIxR2p3VXRLaWZ8OXV2MFBXZm5HVkl2OTRHLUpmVD1PYSxoOFpOZFZzPWZtQj1ndXJFdkFUPW5+KzJjJjdvYVNkaEdYSWpaSlpUPXY/bGkmMUxlaVNWOGpbTStXQ1smJmhUfmI2Rk02UGV1aklTJV83a000dkRuSkRIaWUtN01oTnRfJl9PN2ladG1+TWM9UV9acDl6Nk1lfl1LRXxrQWQwNThZMzEsQ29Ndi9MckNwcnpITlJYZzhkTU9qak5zQXR0SnlhTl89MlE4Q0V0YVBlM1B1LG00VmR5eEp8RVJCX0Y2WVd3NU5OUHJyVQ=='}]);
+_stq.push([ 'clickTrackerInit', '15007624', '0' ]);
+</script>
+<noscript><img src="https://pixel.wp.com/b.gif?v=noscript" style="height:1px;width:1px;overflow:hidden;position:absolute;bottom:1px;" alt="" /></noscript>
+<meta id="bilmur" property="bilmur:data" content="" data-provider="wordpress.com" data-service="simple" data-site-tz="Etc/GMT-0" data-custom-props="{&quot;logged_in&quot;:&quot;0&quot;,&quot;wptheme&quot;:&quot;pub\/springloaded&quot;,&quot;wptheme_is_block&quot;:&quot;0&quot;}"  >
+		<script defer src="/wp-content/js/bilmur.min.js?i=17&amp;m=202604"></script> 	</body>
+</html>

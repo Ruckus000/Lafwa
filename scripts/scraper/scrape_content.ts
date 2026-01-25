@@ -95,6 +95,19 @@ function parseTitle(html: string): string | null {
   return title || null;
 }
 
+// Boilerplate text to filter out (site header, not lyrics)
+const BOILERPLATE_PATTERNS = [
+  /koleksyon\s*chan/i,                    // Partial match  
+  /collection\s+of\s+christian/i,
+  /^chant\s*d[''']?esp/i,                 // Chant d'Esperance header
+  /kantik\s+kretyen/i,                    // Christian hymns
+];
+
+function isBoilerplate(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  return BOILERPLATE_PATTERNS.some(pattern => pattern.test(normalized));
+}
+
 function parseSections(html: string): Array<{ type: 'verse' | 'refrain'; number: number | null; text: string }> {
   const $ = cheerio.load(html);
   const sections: Array<{ type: 'verse' | 'refrain'; number: number | null; text: string }> = [];
@@ -124,6 +137,11 @@ function parseSections(html: string): Array<{ type: 'verse' | 'refrain'; number:
     if (lines.length === 0) return;
 
     const text = lines.join('\n');
+
+    // Skip boilerplate content (site header, not actual lyrics)
+    if (isBoilerplate(text)) {
+      return; // Skip this section
+    }
 
     // Determine section type
     if (/^refr/i.test(header) || /^chorus/i.test(header) || /^refrèn/i.test(header)) {
