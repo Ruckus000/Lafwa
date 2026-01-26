@@ -27,13 +27,49 @@ export default function RootLayout() {
     return null;
   }
 
+  // Centralized screen titles
+  const screenTitles = {
+    bookmarks: { ht: 'Makè', fr: 'Signets', en: 'Bookmarks' }[language],
+    highlights: { ht: 'Sikle', fr: 'Surlignages', en: 'Highlights' }[language],
+    favorites: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
+    history: { ht: 'Istwa', fr: 'Historique', en: 'History' }[language],
+    about: { ht: 'Konsènan Lafwa', fr: 'À propos de Lafwa', en: 'About Lafwa' }[language],
+    feedback: { ht: 'Voye Fidbak', fr: 'Envoyer des commentaires', en: 'Send Feedback' }[language],
+  };
+
+  const backTitle = { ht: 'Retounen', fr: 'Retour', en: 'Back' }[language];
+
+  // Shared header style for push screens
+  const pushScreenOptions = {
+    headerShown: true,
+    headerStyle: { backgroundColor: colors.bg },
+    headerTintColor: colors.text,
+    headerShadowVisible: false,
+    headerBackTitle: backTitle,
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Library screens */}
-        <Stack.Screen name="library" options={{ headerShown: false }} />
+        {/* Library screens - now at root level with proper back navigation */}
+        <Stack.Screen
+          name="bookmarks"
+          options={{ ...pushScreenOptions, title: screenTitles.bookmarks }}
+        />
+        <Stack.Screen
+          name="highlights"
+          options={{ ...pushScreenOptions, title: screenTitles.highlights }}
+        />
+        <Stack.Screen
+          name="favorites"
+          options={{ ...pushScreenOptions, title: screenTitles.favorites }}
+        />
+        <Stack.Screen
+          name="history"
+          options={{ ...pushScreenOptions, title: screenTitles.history }}
+        />
 
         {/* Modal screens */}
         <Stack.Screen
@@ -44,26 +80,14 @@ export default function RootLayout() {
           }}
         />
 
-        {/* Standard push screens */}
+        {/* Info screens */}
         <Stack.Screen
           name="about"
-          options={{
-            headerShown: true,
-            title: language === 'ht' ? 'Konsènan Lafwa' : 'À propos de Lafwa',
-            headerStyle: { backgroundColor: colors.bg },
-            headerTintColor: colors.text,
-            headerShadowVisible: false,
-          }}
+          options={{ ...pushScreenOptions, title: screenTitles.about }}
         />
         <Stack.Screen
           name="feedback"
-          options={{
-            headerShown: true,
-            title: language === 'ht' ? 'Voye Fidbak' : 'Envoyer des commentaires',
-            headerStyle: { backgroundColor: colors.bg },
-            headerTintColor: colors.text,
-            headerShadowVisible: false,
-          }}
+          options={{ ...pushScreenOptions, title: screenTitles.feedback }}
         />
       </Stack>
       <StatusBar style="auto" />

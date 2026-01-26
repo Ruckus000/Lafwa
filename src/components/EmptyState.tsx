@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../hooks/useTheme';
 
@@ -12,9 +12,13 @@ interface EmptyStateProps {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
   hint?: string;
+  action?: {
+    label: string;
+    onPress: () => void;
+  };
 }
 
-export function EmptyState({ icon, title, hint }: EmptyStateProps) {
+export function EmptyState({ icon, title, hint, action }: EmptyStateProps) {
   const { colors } = useTheme();
 
   return (
@@ -24,6 +28,16 @@ export function EmptyState({ icon, title, hint }: EmptyStateProps) {
       </View>
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {hint && <Text style={[styles.hint, { color: colors.textTertiary }]}>{hint}</Text>}
+      {action && (
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.primary }]}
+          onPress={action.onPress}
+          accessibilityLabel={action.label}
+          accessibilityRole="button"
+        >
+          <Text style={styles.actionText}>{action.label}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -54,5 +68,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+  actionButton: {
+    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  actionText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

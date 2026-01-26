@@ -20,6 +20,17 @@ import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore, FontSizeSetting } from '../../src/stores/settingsStore';
 import { useLibrary } from '../../src/hooks/useLibrary';
 
+// Type definitions for library navigation
+type LibraryRoute = '/bookmarks' | '/highlights' | '/favorites' | '/history';
+type LibraryIcon = 'bookmark' | 'brush' | 'heart' | 'time';
+
+interface LibraryItem {
+  icon: LibraryIcon;
+  label: string;
+  count: number | null;
+  route: LibraryRoute;
+}
+
 export default function SettingsScreen() {
   const router = useRouter();
   const { colors, shadows, isDark } = useTheme();
@@ -55,11 +66,11 @@ export default function SettingsScreen() {
     system: { ht: 'Sistèm', fr: 'Système', en: 'System' }[language],
   };
 
-  const libraryItems = [
-    { icon: 'bookmark', label: labels.bookmarks, count: counts.bookmarks, route: '/library/bookmarks' },
-    { icon: 'brush', label: labels.highlights, count: counts.highlights, route: '/library/highlights' },
-    { icon: 'heart', label: labels.favorites, count: counts.favorites, route: '/library/favorites' },
-    { icon: 'time', label: labels.history, count: null, route: '/library/history' },
+  const libraryItems: LibraryItem[] = [
+    { icon: 'bookmark', label: labels.bookmarks, count: counts.bookmarks, route: '/bookmarks' },
+    { icon: 'brush', label: labels.highlights, count: counts.highlights, route: '/highlights' },
+    { icon: 'heart', label: labels.favorites, count: counts.favorites, route: '/favorites' },
+    { icon: 'time', label: labels.history, count: null, route: '/history' },
   ];
 
   const fontSizeOptions: FontSizeSetting[] = ['XS', 'S', 'M', 'L', 'XL'];
@@ -99,9 +110,9 @@ export default function SettingsScreen() {
                   },
                 ]}
                 activeOpacity={0.7}
-                onPress={() => router.push(item.route as any)}
+                onPress={() => router.push(item.route as Href)}
               >
-                <Ionicons name={item.icon as any} size={20} color={colors.primary} />
+                <Ionicons name={item.icon} size={20} color={colors.primary} />
                 <Text style={[styles.listLabel, { color: colors.text }]}>{item.label}</Text>
                 {item.count !== null && (
                   <Text style={[styles.listCount, { color: colors.textTertiary }]}>
