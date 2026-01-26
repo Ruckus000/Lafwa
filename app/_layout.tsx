@@ -31,6 +31,7 @@ export default function RootLayout() {
   const screenTitles = {
     bookmarks: { ht: 'Makè', fr: 'Signets', en: 'Bookmarks' }[language],
     highlights: { ht: 'Sikle', fr: 'Surlignages', en: 'Highlights' }[language],
+    notes: { ht: 'Nòt', fr: 'Notes', en: 'Notes' }[language],
     favorites: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
     history: { ht: 'Istwa', fr: 'Historique', en: 'History' }[language],
     about: { ht: 'Konsènan Lafwa', fr: 'À propos de Lafwa', en: 'About Lafwa' }[language],
@@ -61,6 +62,10 @@ export default function RootLayout() {
         <Stack.Screen
           name="highlights"
           options={{ ...pushScreenOptions, title: screenTitles.highlights }}
+        />
+        <Stack.Screen
+          name="notes"
+          options={{ ...pushScreenOptions, title: screenTitles.notes }}
         />
         <Stack.Screen
           name="favorites"

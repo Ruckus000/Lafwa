@@ -21,8 +21,8 @@ import { useSettingsStore, FontSizeSetting, LineSpacingSetting } from '../../src
 import { useLibrary } from '../../src/hooks/useLibrary';
 
 // Type definitions for library navigation
-type LibraryRoute = '/bookmarks' | '/highlights' | '/favorites' | '/history';
-type LibraryIcon = 'bookmark' | 'brush' | 'heart' | 'time';
+type LibraryRoute = '/bookmarks' | '/highlights' | '/favorites' | '/history' | '/notes';
+type LibraryIcon = 'bookmark' | 'brush' | 'heart' | 'time' | 'document-text';
 
 interface LibraryItem {
   icon: LibraryIcon;
@@ -51,6 +51,7 @@ export default function SettingsScreen() {
     library: { ht: 'BIBLIYOTÈK', fr: 'BIBLIOTHÈQUE', en: 'LIBRARY' }[language],
     bookmarks: { ht: 'Makè', fr: 'Signets', en: 'Bookmarks' }[language],
     highlights: { ht: 'Sikle', fr: 'Surlignages', en: 'Highlights' }[language],
+    notes: { ht: 'Nòt', fr: 'Notes', en: 'Notes' }[language],
     favorites: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
     history: { ht: 'Istwa', fr: 'Historique', en: 'History' }[language],
     settings: { ht: 'PARAMÈT', fr: 'PARAMÈTRES', en: 'SETTINGS' }[language],
@@ -81,6 +82,7 @@ export default function SettingsScreen() {
   const libraryItems: LibraryItem[] = [
     { icon: 'bookmark', label: labels.bookmarks, count: counts.bookmarks, route: '/bookmarks' },
     { icon: 'brush', label: labels.highlights, count: counts.highlights, route: '/highlights' },
+    { icon: 'document-text', label: labels.notes, count: counts.notes, route: '/notes' },
     { icon: 'heart', label: labels.favorites, count: counts.favorites, route: '/favorites' },
     { icon: 'time', label: labels.history, count: null, route: '/history' },
   ];

@@ -12,7 +12,9 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  Share,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../hooks/useTheme';
@@ -113,6 +115,36 @@ export default function HymnReader({ hymnNumber, onPresentationMode }: HymnReade
     return hymn.title_ht || hymn.title_fr || '';
   };
 
+  const handleCopy = useCallback(async () => {
+    if (!hymn) return;
+    try {
+      const title = getTitle();
+      const sectionsText = hymn.sections
+        .map((s) => `${getSectionLabel(s)}\n${getSectionText(s)}`)
+        .join('\n\n');
+      const fullText = `${title}\nChant d'Espérance #${hymn.number}\n\n${sectionsText}`;
+      await Clipboard.setStringAsync(fullText);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Copy failed:', error);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  }, [hymn, getTitle, getSectionLabel, getSectionText]);
+
+  const handleShare = useCallback(async () => {
+    if (!hymn) return;
+    try {
+      const title = getTitle();
+      const sectionsText = hymn.sections.map((s) => getSectionText(s)).join('\n\n');
+      const shareText = `${title}\nChant d'Espérance #${hymn.number}\n\n${sectionsText}\n\n— Lafwa`;
+      await Share.share({ message: shareText });
+    } catch (error) {
+      if ((error as Error).message !== 'User did not share') {
+        console.error('Share failed:', error);
+      }
+    }
+  }, [hymn, getTitle, getSectionText]);
+
   if (loading) {
     return (
       <View style={[styles.center, { backgroundColor: colors.bg }]}>
@@ -158,7 +190,7 @@ export default function HymnReader({ hymnNumber, onPresentationMode }: HymnReade
             ]}
           >
             {/* Section Label */}
-            <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>
+            <Text style={[styles.sectionLabel, { color: section.section_type === 'refrain' ? colors.primary : colors.textTertiary }]}>
               {getSectionLabel(section)}
             </Text>
 
@@ -213,6 +245,7 @@ export default function HymnReader({ hymnNumber, onPresentationMode }: HymnReade
 
         <TouchableOpacity
           style={styles.actionButton}
+          onPress={handleShare}
           accessibilityLabel="Share hymn"
         >
           <Ionicons name="share-outline" size={24} color={colors.textSecondary} />
@@ -220,6 +253,7 @@ export default function HymnReader({ hymnNumber, onPresentationMode }: HymnReade
 
         <TouchableOpacity
           style={styles.actionButton}
+          onPress={handleCopy}
           accessibilityLabel="Copy hymn"
         >
           <Ionicons name="copy-outline" size={24} color={colors.textSecondary} />

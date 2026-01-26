@@ -217,7 +217,7 @@ function formatVerseReference(
 export async function getLibraryCounts(): Promise<LibraryCounts> {
   const db = await openDatabase();
 
-  const [bookmarksResult, highlightsResult, favoritesResult] = await Promise.all([
+  const [bookmarksResult, highlightsResult, favoritesResult, notesResult] = await Promise.all([
     db.getFirstAsync<{ count: number }>(
       'SELECT COUNT(*) as count FROM bookmarks WHERE type = ?',
       ['bible']
@@ -227,12 +227,14 @@ export async function getLibraryCounts(): Promise<LibraryCounts> {
       'SELECT COUNT(*) as count FROM bookmarks WHERE type = ?',
       ['hymn']
     ),
+    db.getFirstAsync<{ count: number }>('SELECT COUNT(*) as count FROM notes'),
   ]);
 
   return {
     bookmarks: bookmarksResult?.count ?? 0,
     highlights: highlightsResult?.count ?? 0,
     favorites: favoritesResult?.count ?? 0,
+    notes: notesResult?.count ?? 0,
   };
 }
 

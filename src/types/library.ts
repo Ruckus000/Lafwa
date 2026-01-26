@@ -59,4 +59,5 @@ export interface LibraryCounts {
   bookmarks: number;
   highlights: number;
   favorites: number;
+  notes: number;
 }

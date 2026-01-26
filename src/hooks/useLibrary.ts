@@ -19,6 +19,7 @@ export function useLibrary(): UseLibraryResult {
     bookmarks: 0,
     highlights: 0,
     favorites: 0,
+    notes: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

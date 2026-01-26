@@ -15,6 +15,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
+import * as Haptics from 'expo-haptics';
 import { HymnSection } from '../db/queries';
 import { useSettingsStore } from '../stores/settingsStore';
 
@@ -65,18 +66,21 @@ export default function PresentationMode({
 
         // Swipe down to exit
         if (dy > SWIPE_THRESHOLD && Math.abs(dx) < SWIPE_THRESHOLD) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onExit();
           return;
         }
 
         // Swipe left (next)
         if (dx < -SWIPE_THRESHOLD && currentIndex < sections.length - 1) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setCurrentIndex((prev) => prev + 1);
           return;
         }
 
         // Swipe right (previous)
         if (dx > SWIPE_THRESHOLD && currentIndex > 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setCurrentIndex((prev) => prev - 1);
         }
       },
@@ -89,10 +93,12 @@ export default function PresentationMode({
 
     // Tap on right side = next
     if (tapX > SCREEN_WIDTH * 0.6 && currentIndex < sections.length - 1) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setCurrentIndex((prev) => prev + 1);
     }
     // Tap on left side = previous
     else if (tapX < SCREEN_WIDTH * 0.4 && currentIndex > 0) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setCurrentIndex((prev) => prev - 1);
     }
   };

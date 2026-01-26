@@ -32,6 +32,14 @@ import NoteEditor from './NoteEditor';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
+// Base height estimate for getItemLayout
+// Actual heights vary by font size and text length, but this gets us close enough
+// for initial scroll, then onScrollToIndexFailed handles edge cases
+const getBaseVerseHeight = (fontSize: string): number => {
+  const heights: Record<string, number> = { XS: 48, S: 54, M: 60, L: 68, XL: 84 };
+  return heights[fontSize] || 60;
+};
+
 type Verse = {
   id: number;
   book: string;
@@ -410,6 +418,20 @@ export default function BibleReader({
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          getItemLayout={(_, index) => ({
+            length: getBaseVerseHeight(fontSize),
+            offset: getBaseVerseHeight(fontSize) * index,
+            index,
+          })}
+          onScrollToIndexFailed={(info) => {
+            const wait = new Promise((resolve) => setTimeout(resolve, 100));
+            wait.then(() => {
+              if (listRef.current && info.index < verses.length) {
+                const offset = info.averageItemLength * info.index;
+                listRef.current.scrollToOffset({ offset, animated: true });
+              }
+            });
+          }}
           renderItem={({ item }) => {
             const isSelected = selectedVerse?.id === item.id;
             const isInSelection = selectedVerseIds.has(item.id);

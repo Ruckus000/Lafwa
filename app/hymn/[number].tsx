@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore } from '../../src/stores/settingsStore';
-import { getHymnWithSections, HymnWithSections, isHymnFavorite, toggleFavoriteHymn } from '../../src/db/queries';
+import { getHymnWithSections, HymnWithSections, isHymnFavorite, toggleFavoriteHymn, recordReading } from '../../src/db/queries';
 import HymnReader from '../../src/components/HymnReader';
 import PresentationMode from '../../src/components/PresentationMode';
 
@@ -39,6 +39,13 @@ export default function HymnDetailScreen() {
   useEffect(() => {
     loadHymn();
   }, [hymnNumber]);
+
+  // Record to reading history when hymn is successfully loaded
+  useEffect(() => {
+    if (hymn && !loading) {
+      recordReading('hymn', `Hymn ${hymn.number}`, { hymnNumber: hymn.number });
+    }
+  }, [hymn?.id, loading]);
 
   const loadHymn = async () => {
     setLoading(true);
