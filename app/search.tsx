@@ -16,6 +16,14 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useSearch } from '../src/hooks/useSearch';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { navigateToBible, navigateToHymn } from '../src/utils/navigation';
+import {
+  SearchResultItem,
+  BibleSearchResult,
+  HymnSearchResult,
+  isBibleResult,
+  isHymnResult,
+} from '../src/types/search';
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -27,17 +35,14 @@ export default function SearchScreen() {
   const { results, loading } = useSearch(query, bibleVersion);
 
   const labels = {
-    placeholder:
-      language === 'ht'
-        ? 'Chèche nan Bib la ak Kantik yo...'
-        : 'Rechercher dans la Bible et les Cantiques...',
-    cancel: language === 'ht' ? 'Anile' : 'Annuler',
-    noResults: language === 'ht' ? 'Pa gen rezilta' : 'Aucun résultat',
-    noResultsHint: language === 'ht' ? 'Eseye lòt mo' : "Essayez d'autres mots",
-    bible: language === 'ht' ? 'Bib la' : 'Bible',
-    hymns: language === 'ht' ? 'Kantik' : 'Cantiques',
-    minChars: language === 'ht' ? 'Tape omwen 3 lèt' : 'Tapez au moins 3 lettres',
-    searching: language === 'ht' ? 'Ap chèche...' : 'Recherche...',
+    placeholder: { ht: 'Chèche nan Bib la ak Kantik yo...', fr: 'Rechercher dans la Bible et les Cantiques...', en: 'Search Bible and Hymns...' }[language],
+    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
+    noResults: { ht: 'Pa gen rezilta', fr: 'Aucun résultat', en: 'No results' }[language],
+    noResultsHint: { ht: 'Eseye lòt mo', fr: "Essayez d'autres mots", en: 'Try different words' }[language],
+    bible: { ht: 'Bib la', fr: 'Bible', en: 'Bible' }[language],
+    hymns: { ht: 'Kantik', fr: 'Cantiques', en: 'Hymns' }[language],
+    minChars: { ht: 'Tape omwen 3 lèt', fr: 'Tapez au moins 3 lettres', en: 'Type at least 3 characters' }[language],
+    searching: { ht: 'Ap chèche...', fr: 'Recherche...', en: 'Searching...' }[language],
   };
 
   // Auto-focus on mount
@@ -45,20 +50,43 @@ export default function SearchScreen() {
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
-  const bibleResults = results.filter((r: any) => r.type === 'bible');
-  const hymnResults = results.filter((r: any) => r.type === 'hymn');
+  const bibleResults = results.filter((r): r is SearchResultItem & { type: 'bible'; data: BibleSearchResult } => r.type === 'bible');
+  const hymnResults = results.filter((r): r is SearchResultItem & { type: 'hymn'; data: HymnSearchResult } => r.type === 'hymn');
 
-  const renderResult = ({ item }: { item: any }) => {
-    const isBible = item.type === 'bible';
+  const handleResultPress = (item: SearchResultItem) => {
+    router.back();
+    if (isBibleResult(item)) {
+      navigateToBible(router, {
+        book: item.data.book,
+        chapter: item.data.chapter,
+        verse: item.data.verse,
+      });
+    } else if (isHymnResult(item)) {
+      navigateToHymn(router, {
+        number: item.data.number,
+      });
+    }
+  };
+
+  const renderResult = ({ item }: { item: SearchResultItem }) => {
+    const isBible = isBibleResult(item);
     const data = item.data;
+
+    const title = isBible
+      ? `${(data as BibleSearchResult).book} ${(data as BibleSearchResult).chapter}:${(data as BibleSearchResult).verse}`
+      : `#${(data as HymnSearchResult).number} - ${(data as HymnSearchResult).title_ht || (data as HymnSearchResult).title_fr}`;
+
+    const snippet = isBible
+      ? (data as BibleSearchResult).text
+      : (data as HymnSearchResult).title_ht || (data as HymnSearchResult).title_fr || '';
 
     return (
       <TouchableOpacity
         style={[styles.resultItem, { borderColor: colors.border }]}
-        onPress={() => {
-          router.back();
-          router.push(isBible ? '/bible' : '/hymns');
-        }}
+        onPress={() => handleResultPress(item)}
+        accessibilityLabel={title}
+        accessibilityHint={isBible ? labels.bible : labels.hymns}
+        accessibilityRole="button"
       >
         <Ionicons
           name={isBible ? 'book-outline' : 'musical-notes-outline'}
@@ -67,12 +95,10 @@ export default function SearchScreen() {
         />
         <View style={styles.resultContent}>
           <Text style={[styles.resultTitle, { color: colors.text }]}>
-            {isBible
-              ? `${data.book} ${data.chapter}:${data.verse}`
-              : `#${data.number} - ${data.title_ht || data.title_fr}`}
+            {title}
           </Text>
           <Text style={[styles.resultSnippet, { color: colors.textTertiary }]} numberOfLines={2}>
-            {data.text || data.title_ht || data.title_fr}
+            {snippet}
           </Text>
         </View>
       </TouchableOpacity>
@@ -88,13 +114,16 @@ export default function SearchScreen() {
     </View>
   );
 
-  const combinedData = [
+  type HeaderItem = { type: 'header'; title: string; count: number };
+  type ListItem = SearchResultItem | HeaderItem;
+
+  const combinedData: ListItem[] = [
     ...(bibleResults.length > 0
-      ? [{ type: 'header', title: labels.bible, count: bibleResults.length }]
+      ? [{ type: 'header' as const, title: labels.bible || '', count: bibleResults.length }]
       : []),
     ...bibleResults,
     ...(hymnResults.length > 0
-      ? [{ type: 'header', title: labels.hymns, count: hymnResults.length }]
+      ? [{ type: 'header' as const, title: labels.hymns || '', count: hymnResults.length }]
       : []),
     ...hymnResults,
   ];
@@ -149,13 +178,15 @@ export default function SearchScreen() {
         ) : (
           <FlatList
             data={combinedData}
-            renderItem={({ item }: { item: any }) =>
+            renderItem={({ item }: { item: ListItem }) =>
               item.type === 'header'
                 ? renderSectionHeader(item.title, item.count)
                 : renderResult({ item })
             }
-            keyExtractor={(item: any, index) =>
-              item.type === 'header' ? `header-${index}` : `${item.type}-${item.data?.id || index}`
+            keyExtractor={(item: ListItem, index) =>
+              item.type === 'header'
+                ? `header-${index}`
+                : `${item.type}-${item.data.id || index}`
             }
             contentContainerStyle={styles.results}
             keyboardShouldPersistTaps="handled"

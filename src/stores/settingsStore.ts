@@ -12,7 +12,7 @@ import { FontSizeSetting } from '../theme/typography';
 export type { FontSizeSetting };
 
 export type ThemeSetting = 'light' | 'dark' | 'system';
-export type LanguageSetting = 'ht' | 'fr';
+export type LanguageSetting = 'ht' | 'fr' | 'en';
 
 interface SettingsState {
   // Display

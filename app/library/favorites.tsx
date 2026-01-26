@@ -8,6 +8,7 @@ import { useFavorites } from '../../src/hooks/useFavorites';
 import { useSettingsStore } from '../../src/stores/settingsStore';
 import { EmptyState } from '../../src/components/EmptyState';
 import { Bookmark } from '../../src/types/library';
+import { navigateToHymn } from '../../src/utils/navigation';
 
 export default function FavoritesScreen() {
   const router = useRouter();
@@ -16,13 +17,10 @@ export default function FavoritesScreen() {
   const { favorites, isLoading, removeFavorite, refresh } = useFavorites();
 
   const labels = {
-    empty: language === 'ht' ? 'Ou poko gen kantik favori' : 'Aucun cantique favori',
-    emptyHint:
-      language === 'ht'
-        ? 'Tape kè a sou yon kantik'
-        : "Appuyez sur le cœur d'un cantique",
-    delete: language === 'ht' ? 'Efase' : 'Supprimer',
-    cancel: language === 'ht' ? 'Anile' : 'Annuler',
+    empty: { ht: 'Ou poko gen kantik favori', fr: 'Aucun cantique favori', en: 'No favorite hymns yet' }[language],
+    emptyHint: { ht: 'Tape kè a sou yon kantik', fr: "Appuyez sur le cœur d'un cantique", en: 'Tap the heart on a hymn' }[language],
+    delete: { ht: 'Efase', fr: 'Supprimer', en: 'Delete' }[language],
+    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
   };
 
   const handleDelete = (item: Bookmark) => {
@@ -36,10 +34,18 @@ export default function FavoritesScreen() {
     ]);
   };
 
+  const handlePress = (item: Bookmark) => {
+    if (item.number) {
+      navigateToHymn(router, { number: item.number });
+    } else {
+      router.push('/hymns');
+    }
+  };
+
   const renderItem = ({ item }: { item: Bookmark }) => (
     <TouchableOpacity
       style={[styles.item, { backgroundColor: colors.surface, borderColor: colors.border }]}
-      onPress={() => router.push('/hymns')}
+      onPress={() => handlePress(item)}
       onLongPress={() => handleDelete(item)}
     >
       <View style={[styles.numberBadge, { backgroundColor: colors.primary }]}>
@@ -57,7 +63,7 @@ export default function FavoritesScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['bottom']}>
         <View style={styles.loading}>
           <Text style={{ color: colors.textTertiary }}>
-            {language === 'ht' ? 'Ap chaje...' : 'Chargement...'}
+            {{ ht: 'Ap chaje...', fr: 'Chargement...', en: 'Loading...' }[language]}
           </Text>
         </View>
       </SafeAreaView>

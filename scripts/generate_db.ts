@@ -73,7 +73,8 @@ async function main() {
     console.log('Inserting Bible Data...');
     const bibleSources = [
         { file: 'haitian_bible.json', version: 'ht' },
-        { file: 'french_bible.json', version: 'fr' }
+        { file: 'french_bible.json', version: 'fr' },
+        { file: 'english_bible.json', version: 'en' }
     ];
 
     const insertBible = db.prepare('INSERT OR IGNORE INTO bible_verses (book, chapter, verse, text, version) VALUES (?, ?, ?, ?, ?)');

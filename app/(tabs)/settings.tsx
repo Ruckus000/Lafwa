@@ -34,26 +34,25 @@ export default function SettingsScreen() {
   const { counts } = useLibrary();
 
   const labels = {
-    title: language === 'ht' ? 'Plis' : 'Plus',
-    search: language === 'ht' ? 'Chèche nan Bib la ak Kantik yo...' : 'Rechercher dans la Bible et les Cantiques...',
-    library: language === 'ht' ? 'BIBLIYOTÈK' : 'BIBLIOTHÈQUE',
-    bookmarks: language === 'ht' ? 'Makè' : 'Signets',
-    highlights: language === 'ht' ? 'Sikle' : 'Surlignages',
-    favorites: language === 'ht' ? 'Favori' : 'Favoris',
-    history: language === 'ht' ? 'Istwa' : 'Historique',
-    settings: language === 'ht' ? 'PARAMÈT' : 'PARAMÈTRES',
-    languageLabel: language === 'ht' ? 'Lang' : 'Langue',
-    fontSizeLabel: language === 'ht' ? 'Gwosè Tèks' : 'Taille du texte',
-    themeLabel: language === 'ht' ? 'Tèm' : 'Thème',
-    info: language === 'ht' ? 'ENFÒMASYON' : 'INFORMATIONS',
-    about: language === 'ht' ? 'Konsènan Lafwa' : 'À propos de Lafwa',
-    feedback: language === 'ht' ? 'Voye Fidbak' : 'Envoyer des commentaires',
+    title: { ht: 'Plis', fr: 'Plus', en: 'More' }[language],
+    library: { ht: 'BIBLIYOTÈK', fr: 'BIBLIOTHÈQUE', en: 'LIBRARY' }[language],
+    bookmarks: { ht: 'Makè', fr: 'Signets', en: 'Bookmarks' }[language],
+    highlights: { ht: 'Sikle', fr: 'Surlignages', en: 'Highlights' }[language],
+    favorites: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
+    history: { ht: 'Istwa', fr: 'Historique', en: 'History' }[language],
+    settings: { ht: 'PARAMÈT', fr: 'PARAMÈTRES', en: 'SETTINGS' }[language],
+    languageLabel: { ht: 'Lang', fr: 'Langue', en: 'Language' }[language],
+    fontSizeLabel: { ht: 'Gwosè Tèks', fr: 'Taille du texte', en: 'Font Size' }[language],
+    themeLabel: { ht: 'Tèm', fr: 'Thème', en: 'Theme' }[language],
+    info: { ht: 'ENFÒMASYON', fr: 'INFORMATIONS', en: 'INFORMATION' }[language],
+    about: { ht: 'Konsènan Lafwa', fr: 'À propos de Lafwa', en: 'About Lafwa' }[language],
+    feedback: { ht: 'Voye Fidbak', fr: 'Envoyer des commentaires', en: 'Send Feedback' }[language],
   };
 
   const themeLabels = {
-    light: language === 'ht' ? 'Limyè' : 'Clair',
-    dark: language === 'ht' ? 'Fènwa' : 'Sombre',
-    system: language === 'ht' ? 'Sistèm' : 'Système',
+    light: { ht: 'Limyè', fr: 'Clair', en: 'Light' }[language],
+    dark: { ht: 'Fènwa', fr: 'Sombre', en: 'Dark' }[language],
+    system: { ht: 'Sistèm', fr: 'Système', en: 'System' }[language],
   };
 
   const libraryItems = [
@@ -76,18 +75,6 @@ export default function SettingsScreen() {
       >
         {/* Header */}
         <Text style={[styles.title, { color: colors.text }]}>{labels.title}</Text>
-
-        {/* Search Bar */}
-        <TouchableOpacity
-          style={[styles.searchBar, { backgroundColor: colors.surfaceHover }]}
-          activeOpacity={0.7}
-          onPress={() => router.push('/search' as Href)}
-        >
-          <Ionicons name="search" size={20} color={colors.textTertiary} />
-          <Text style={[styles.searchPlaceholder, { color: colors.textTertiary }]}>
-            {labels.search}
-          </Text>
-        </TouchableOpacity>
 
         {/* Library Section */}
         <View style={styles.section}>
@@ -148,7 +135,7 @@ export default function SettingsScreen() {
                 </Text>
               </View>
               <View style={[styles.segmentedControl, { backgroundColor: colors.surfaceHover }]}>
-                {(['ht', 'fr'] as const).map((lang) => (
+                {(['ht', 'fr', 'en'] as const).map((lang) => (
                   <TouchableOpacity
                     key={lang}
                     style={[
@@ -167,7 +154,7 @@ export default function SettingsScreen() {
                         { color: language === lang ? colors.text : colors.textTertiary },
                       ]}
                     >
-                      {lang === 'ht' ? 'Kreyòl' : 'Français'}
+                      {lang === 'ht' ? 'Kreyòl' : lang === 'fr' ? 'Français' : 'English'}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -304,18 +291,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 20,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 24,
-    marginBottom: 28,
-  },
-  searchPlaceholder: {
-    fontSize: 15,
   },
   section: {
     marginBottom: 28,

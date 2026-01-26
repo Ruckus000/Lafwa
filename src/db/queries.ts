@@ -9,7 +9,7 @@ import {
   HighlightColor,
 } from '../types/library';
 
-export const searchBible = async (query: string, version: 'ht' | 'fr' = 'ht') => {
+export const searchBible = async (query: string, version: 'ht' | 'fr' | 'en' = 'ht') => {
   const db = await openDatabase();
   // Using FTS5 match
   const sanitized = query.replace(/"/g, '""');
@@ -26,7 +26,7 @@ export const searchBible = async (query: string, version: 'ht' | 'fr' = 'ht') =>
 
 // ... existing imports
 
-export const getChapter = async (book: string, chapter: number, version: 'ht' | 'fr' = 'ht') => {
+export const getChapter = async (book: string, chapter: number, version: 'ht' | 'fr' | 'en' = 'ht') => {
   const db = await openDatabase();
   return await db.getAllAsync(
     'SELECT * FROM bible_verses WHERE book = ? AND chapter = ? AND version = ? ORDER BY verse ASC',
@@ -126,12 +126,12 @@ interface DailyVerseRow {
 /**
  * Retrieves the daily verse for today (or a specific day).
  *
- * @param version - Bible version ('ht' or 'fr')
+ * @param version - Bible version ('ht', 'fr', or 'en')
  * @param dayOverride - Optional day of year override (for testing)
  * @returns The daily verse with full text, or null if not found
  */
 export const getDailyVerse = async (
-  version: 'ht' | 'fr' = 'ht',
+  version: 'ht' | 'fr' | 'en' = 'ht',
   dayOverride?: number
 ): Promise<DailyVerse | null> => {
   const db = await openDatabase();
@@ -189,20 +189,23 @@ export const getDailyVerse = async (
 
 /**
  * Formats a verse reference string with localized book name.
- * The database stores French book names, so we translate to Haitian when needed.
+ * The database stores French book names, so we translate based on version.
  */
 function formatVerseReference(
   book: string,
   chapter: number,
   verseStart: number,
   verseEnd: number | null,
-  version: 'ht' | 'fr'
+  version: 'ht' | 'fr' | 'en'
 ): string {
   const bookData = getBookByName(book);
-  // Database has French names; translate to Haitian if needed
-  const localizedBook = bookData
-    ? (version === 'ht' ? bookData.nameHt : bookData.nameFr)
-    : book;
+  // Database has French names; translate based on version
+  let localizedBook = book;
+  if (bookData) {
+    if (version === 'ht') localizedBook = bookData.nameHt;
+    else if (version === 'en') localizedBook = bookData.nameEn;
+    else localizedBook = bookData.nameFr;
+  }
   const verseRange = verseEnd ? `${verseStart}-${verseEnd}` : `${verseStart}`;
   return `${localizedBook} ${chapter}:${verseRange}`;
 }
@@ -237,7 +240,7 @@ export async function getLibraryCounts(): Promise<LibraryCounts> {
 // HIGHLIGHT QUERIES
 // ============================================
 
-export async function getAllHighlights(version: 'ht' | 'fr' = 'ht'): Promise<Highlight[]> {
+export async function getAllHighlights(version: 'ht' | 'fr' | 'en' = 'ht'): Promise<Highlight[]> {
   const db = await openDatabase();
 
   return await db.getAllAsync<Highlight>(

@@ -25,15 +25,17 @@ const CARD_WIDTH = (width - 40 - COLUMN_GAP) / 2; // 20px padding each side
 interface BookPickerProps {
   onSelectBook: (book: BibleBook) => void;
   onClose: () => void;
+  onSearch?: () => void;
 }
 
-export default function BookPicker({ onSelectBook, onClose }: BookPickerProps) {
+export default function BookPicker({ onSelectBook, onClose, onSearch }: BookPickerProps) {
   const { colors, typography, spacing, layout, shadows } = useTheme();
   const language = useSettingsStore((state) => state.language);
   const [testament, setTestament] = useState<'OT' | 'NT'>('NT');
 
   const books = getBooksByTestament(testament);
-  const getBookName = (book: BibleBook) => language === 'ht' ? book.nameHt : book.nameFr;
+  const getBookName = (book: BibleBook) =>
+    language === 'ht' ? book.nameHt : language === 'en' ? book.nameEn : book.nameFr;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
@@ -44,9 +46,20 @@ export default function BookPicker({ onSelectBook, onClose }: BookPickerProps) {
             <Ionicons name="close" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.title, { color: colors.text }]}>
-            {language === 'ht' ? 'Chwazi Liv' : 'Choisir un Livre'}
+            {{ ht: 'Chwazi Liv', fr: 'Choisir un Livre', en: 'Choose Book' }[language]}
           </Text>
-          <View style={styles.placeholder} />
+          {onSearch ? (
+            <TouchableOpacity
+              onPress={onSearch}
+              style={[styles.searchButton, { backgroundColor: colors.surfaceHover }]}
+              accessibilityLabel={{ ht: 'Chèche nan Bib la', fr: 'Rechercher dans la Bible', en: 'Search the Bible' }[language]}
+              accessibilityRole="button"
+            >
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.placeholder} />
+          )}
         </View>
 
         {/* Testament Toggle */}
@@ -64,7 +77,7 @@ export default function BookPicker({ onSelectBook, onClose }: BookPickerProps) {
                 { color: testament === 'OT' ? colors.text : colors.textTertiary },
               ]}
             >
-              {language === 'ht' ? 'Ansyen' : 'Ancien'}
+              {{ ht: 'Ansyen', fr: 'Ancien', en: 'Old' }[language]}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -80,7 +93,7 @@ export default function BookPicker({ onSelectBook, onClose }: BookPickerProps) {
                 { color: testament === 'NT' ? colors.text : colors.textTertiary },
               ]}
             >
-              {language === 'ht' ? 'Nouvo' : 'Nouveau'}
+              {{ ht: 'Nouvo', fr: 'Nouveau', en: 'New' }[language]}
             </Text>
           </TouchableOpacity>
         </View>
@@ -112,7 +125,7 @@ export default function BookPicker({ onSelectBook, onClose }: BookPickerProps) {
                 {getBookName(book)}
               </Text>
               <Text style={[styles.chapterCount, { color: colors.textTertiary }]}>
-                {book.chapters} {language === 'ht' ? 'chapit' : 'chapitres'}
+                {book.chapters} {{ ht: 'chapit', fr: 'chapitres', en: 'chapters' }[language]}
               </Text>
             </TouchableOpacity>
           ))}
@@ -151,6 +164,13 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
+  },
+  searchButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   toggleContainer: {
     flexDirection: 'row',

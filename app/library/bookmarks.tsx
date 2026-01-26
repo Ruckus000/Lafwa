@@ -8,6 +8,7 @@ import { useBookmarks } from '../../src/hooks/useBookmarks';
 import { useSettingsStore } from '../../src/stores/settingsStore';
 import { EmptyState } from '../../src/components/EmptyState';
 import { Bookmark } from '../../src/types/library';
+import { navigateToBible, navigateToHymn } from '../../src/utils/navigation';
 
 export default function BookmarksScreen() {
   const router = useRouter();
@@ -16,13 +17,10 @@ export default function BookmarksScreen() {
   const { bookmarks, isLoading, removeBookmark, refresh } = useBookmarks();
 
   const labels = {
-    empty: language === 'ht' ? 'Ou poko gen makè' : 'Aucun signet',
-    emptyHint:
-      language === 'ht'
-        ? 'Peze sou yon vèsè pou ajoute makè'
-        : 'Appuyez sur un verset pour ajouter un signet',
-    delete: language === 'ht' ? 'Efase' : 'Supprimer',
-    cancel: language === 'ht' ? 'Anile' : 'Annuler',
+    empty: { ht: 'Ou poko gen makè', fr: 'Aucun signet', en: 'No bookmarks yet' }[language],
+    emptyHint: { ht: 'Peze sou yon vèsè pou ajoute makè', fr: 'Appuyez sur un verset pour ajouter un signet', en: 'Tap on a verse to add a bookmark' }[language],
+    delete: { ht: 'Efase', fr: 'Supprimer', en: 'Delete' }[language],
+    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
   };
 
   const handleDelete = (item: Bookmark) => {
@@ -37,10 +35,19 @@ export default function BookmarksScreen() {
   };
 
   const handlePress = (item: Bookmark) => {
-    if (item.type === 'bible') {
-      router.push('/bible');
+    if (item.type === 'bible' && item.book && item.chapter) {
+      navigateToBible(router, {
+        book: item.book,
+        chapter: item.chapter,
+        verse: item.verse,
+      });
+    } else if (item.type === 'hymn' && item.number) {
+      navigateToHymn(router, {
+        number: item.number,
+      });
     } else {
-      router.push('/hymns');
+      // Fallback if data is incomplete
+      router.push(item.type === 'bible' ? '/bible' : '/hymns');
     }
   };
 
@@ -76,7 +83,7 @@ export default function BookmarksScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['bottom']}>
         <View style={styles.loading}>
           <Text style={{ color: colors.textTertiary }}>
-            {language === 'ht' ? 'Ap chaje...' : 'Chargement...'}
+            {{ ht: 'Ap chaje...', fr: 'Chargement...', en: 'Loading...' }[language]}
           </Text>
         </View>
       </SafeAreaView>

@@ -9,22 +9,12 @@ export default function AboutScreen() {
   const { language } = useSettingsStore();
 
   const content = {
-    tagline:
-      language === 'ht' ? 'Lafwa soti nan tande' : "La foi vient de ce qu'on entend",
-    mission:
-      language === 'ht'
-        ? "Lafwa se yon aplikasyon gratis ki pèmèt Ayisyen yo gen aksè a Bib la ak Chant d'Espérance san entènèt."
-        : "Lafwa est une application gratuite permettant aux Haïtiens d'accéder à la Bible et aux Chants d'Espérance hors ligne.",
+    tagline: { ht: 'Lafwa soti nan tande', fr: "La foi vient de ce qu'on entend", en: 'Faith comes from hearing' }[language],
+    mission: { ht: "Lafwa se yon aplikasyon gratis ki pèmèt Ayisyen yo gen aksè a Bib la ak Chant d'Espérance san entènèt.", fr: "Lafwa est une application gratuite permettant aux Haïtiens d'accéder à la Bible et aux Chants d'Espérance hors ligne.", en: "Lafwa is a free app enabling Haitians to access the Bible and Chants d'Espérance offline." }[language],
     version: 'Version 1.0.0',
-    credits: language === 'ht' ? 'Rekonesans' : 'Remerciements',
-    bibleCredit:
-      language === 'ht'
-        ? 'Tèks Bib la disponib grasa jenerozite tradiktè yo.'
-        : 'Le texte biblique est disponible grâce à la générosité des traducteurs.',
-    hymnCredit:
-      language === 'ht'
-        ? "Chant d'Espérance disponib avèk pèmisyon."
-        : "Chants d'Espérance disponibles avec permission.",
+    credits: { ht: 'Rekonesans', fr: 'Remerciements', en: 'Acknowledgments' }[language],
+    bibleCredit: { ht: 'Tèks Bib la disponib grasa jenerozite tradiktè yo.', fr: 'Le texte biblique est disponible grâce à la générosité des traducteurs.', en: 'Bible text available thanks to the generosity of translators.' }[language],
+    hymnCredit: { ht: "Chant d'Espérance disponib avèk pèmisyon.", fr: "Chants d'Espérance disponibles avec permission.", en: "Chants d'Espérance available with permission." }[language],
   };
 
   return (

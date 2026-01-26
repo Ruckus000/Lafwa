@@ -22,13 +22,10 @@ export default function HighlightsScreen() {
   const { highlights, isLoading, unhighlight, refresh } = useHighlights();
 
   const labels = {
-    empty: language === 'ht' ? 'Ou poko sikle anyen' : 'Aucun surlignage',
-    emptyHint:
-      language === 'ht'
-        ? 'Peze sou yon vèsè pou sikle li'
-        : 'Appuyez sur un verset pour le surligner',
-    delete: language === 'ht' ? 'Efase' : 'Supprimer',
-    cancel: language === 'ht' ? 'Anile' : 'Annuler',
+    empty: { ht: 'Ou poko sikle anyen', fr: 'Aucun surlignage', en: 'No highlights yet' }[language],
+    emptyHint: { ht: 'Peze sou yon vèsè pou sikle li', fr: 'Appuyez sur un verset pour le surligner', en: 'Tap on a verse to highlight it' }[language],
+    delete: { ht: 'Efase', fr: 'Supprimer', en: 'Delete' }[language],
+    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
   };
 
   const handleDelete = (item: Highlight) => {
@@ -65,7 +62,7 @@ export default function HighlightsScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['bottom']}>
         <View style={styles.loading}>
           <Text style={{ color: colors.textTertiary }}>
-            {language === 'ht' ? 'Ap chaje...' : 'Chargement...'}
+            {{ ht: 'Ap chaje...', fr: 'Chargement...', en: 'Loading...' }[language]}
           </Text>
         </View>
       </SafeAreaView>

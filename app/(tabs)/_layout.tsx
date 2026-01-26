@@ -2,10 +2,19 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useResponsive } from '../../src/hooks/useResponsive';
+import { useSettingsStore } from '../../src/stores/settingsStore';
 
 export default function TabLayout() {
   const { colors } = useTheme();
   const { rs, safeAreaInsets } = useResponsive();
+  const { language } = useSettingsStore();
+
+  const tabLabels = {
+    home: { ht: 'Lakay', fr: 'Accueil', en: 'Home' }[language],
+    bible: { ht: 'Bib la', fr: 'Bible', en: 'Bible' }[language],
+    hymns: { ht: 'Kantik', fr: 'Cantiques', en: 'Hymns' }[language],
+    more: { ht: 'Plis', fr: 'Plus', en: 'More' }[language],
+  };
 
   return (
     <Tabs
@@ -31,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Lakay',
+          title: tabLabels.home,
           tabBarIcon: ({ color }) => (
             <Ionicons name="home" size={24} color={color} />
           ),
@@ -40,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="bible"
         options={{
-          title: 'Bib la',
+          title: tabLabels.bible,
           tabBarIcon: ({ color }) => (
             <Ionicons name="book" size={24} color={color} />
           ),
@@ -49,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hymns"
         options={{
-          title: 'Kantik',
+          title: tabLabels.hymns,
           tabBarIcon: ({ color }) => (
             <Ionicons name="musical-notes" size={24} color={color} />
           ),
@@ -58,7 +67,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Plis',
+          title: tabLabels.more,
           tabBarIcon: ({ color }) => (
             <Ionicons name="ellipsis-horizontal" size={24} color={color} />
           ),

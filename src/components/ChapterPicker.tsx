@@ -40,7 +40,7 @@ export default function ChapterPicker({
   const { colors, spacing, shadows } = useTheme();
   const language = useSettingsStore((state) => state.language);
 
-  const bookName = language === 'ht' ? book.nameHt : book.nameFr;
+  const bookName = language === 'ht' ? book.nameHt : language === 'en' ? book.nameEn : book.nameFr;
   const chapters = Array.from({ length: book.chapters }, (_, i) => i + 1);
 
   return (

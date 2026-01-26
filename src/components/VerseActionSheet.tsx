@@ -83,10 +83,10 @@ export default function VerseActionSheet({
   };
 
   const labels = {
-    highlight: language === 'ht' ? 'Sikle' : 'Surligner',
-    bookmark: language === 'ht' ? 'Makè' : 'Marquer',
-    copy: language === 'ht' ? 'Kopye' : 'Copier',
-    share: language === 'ht' ? 'Pataje' : 'Partager',
+    highlight: { ht: 'Sikle', fr: 'Surligner', en: 'Highlight' }[language],
+    bookmark: { ht: 'Makè', fr: 'Marquer', en: 'Bookmark' }[language],
+    copy: { ht: 'Kopye', fr: 'Copier', en: 'Copy' }[language],
+    share: { ht: 'Pataje', fr: 'Partager', en: 'Share' }[language],
   };
 
   return (

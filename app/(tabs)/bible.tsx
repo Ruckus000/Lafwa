@@ -12,7 +12,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore } from '../../src/stores/settingsStore';
@@ -24,6 +24,7 @@ import BibleReader from '../../src/components/BibleReader';
 type Screen = 'bookPicker' | 'chapterPicker' | 'reader';
 
 export default function BibleScreen() {
+  const router = useRouter();
   const { colors, isDark } = useTheme();
   const {
     bibleVersion,
@@ -107,6 +108,7 @@ export default function BibleScreen() {
               setScreen('reader');
             }
           }}
+          onSearch={() => router.push('/search')}
         />
       </SafeAreaView>
     );
@@ -182,6 +184,7 @@ export default function BibleScreen() {
       <BookPicker
         onSelectBook={handleSelectBook}
         onClose={() => {}}
+        onSearch={() => router.push('/search')}
       />
     </SafeAreaView>
   );

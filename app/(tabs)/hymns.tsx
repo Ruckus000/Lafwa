@@ -7,15 +7,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TouchableOpacity, 
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
   FlatList,
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useSettingsStore } from '../../src/stores/settingsStore';
@@ -33,9 +34,25 @@ const placeholderHymns = [
 ];
 
 export default function HymnsScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ number?: string }>();
   const { colors, shadows, isDark } = useTheme();
   const language = useSettingsStore((state) => state.language);
   const [favorites, setFavorites] = useState<Set<number>>(new Set([2, 42, 200]));
+  const [selectedHymnNumber, setSelectedHymnNumber] = useState<number | null>(null);
+
+  // Handle deep link params (from search, bookmarks, favorites, history)
+  useEffect(() => {
+    if (params.number) {
+      const num = parseInt(params.number, 10);
+      if (!isNaN(num) && num > 0) {
+        setSelectedHymnNumber(num);
+        // TODO: Navigate to hymn detail view when implemented
+        // For now, we just store the number for future use
+        console.log(`[HymnsScreen] Deep link to hymn #${num}`);
+      }
+    }
+  }, [params.number]);
 
   const toggleFavorite = (hymnId: number) => {
     setFavorites(prev => {
@@ -90,8 +107,11 @@ export default function HymnsScreen() {
         <Text style={[styles.pageTitle, { color: colors.text }]}>
           Chant d'Espérance
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.searchButton, { backgroundColor: colors.surfaceHover }]}
+          onPress={() => router.push('/search')}
+          accessibilityLabel={{ ht: 'Chèche kantik', fr: 'Rechercher des cantiques', en: 'Search hymns' }[language]}
+          accessibilityRole="button"
         >
           <Ionicons name="search" size={18} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -104,10 +124,10 @@ export default function HymnsScreen() {
         <Text style={styles.quickJumpEmoji}>🎹</Text>
         <View style={styles.quickJumpContent}>
           <Text style={[styles.quickJumpTitle, { color: colors.text }]}>
-            {language === 'ht' ? 'Antre nimewo kantik la' : 'Entrez le numéro du cantique'}
+            {{ ht: 'Antre nimewo kantik la', fr: 'Entrez le numéro du cantique', en: 'Enter hymn number' }[language]}
           </Text>
           <Text style={[styles.quickJumpSubtitle, { color: colors.textTertiary }]}>
-            {language === 'ht' ? 'Tape nenpòt nimewo pou ale dirèk' : 'Tapez un numéro pour y aller'}
+            {{ ht: 'Tape nenpòt nimewo pou ale dirèk', fr: 'Tapez un numéro pour y aller', en: 'Type any number to jump directly' }[language]}
           </Text>
         </View>
       </TouchableOpacity>
@@ -123,9 +143,7 @@ export default function HymnsScreen() {
           <View style={styles.footer}>
             <Ionicons name="information-circle-outline" size={20} color={colors.textTertiary} />
             <Text style={[styles.footerText, { color: colors.textTertiary }]}>
-              {language === 'ht' 
-                ? 'Kontni kantik yo ap vini byento...'
-                : 'Le contenu des cantiques arrive bientôt...'}
+              {{ ht: 'Kontni kantik yo ap vini byento...', fr: 'Le contenu des cantiques arrive bientôt...', en: 'Hymn content coming soon...' }[language]}
             </Text>
           </View>
         }

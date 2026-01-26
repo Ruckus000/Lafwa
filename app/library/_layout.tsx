@@ -7,10 +7,10 @@ export default function LibraryLayout() {
   const { language } = useSettingsStore();
 
   const titles = {
-    bookmarks: language === 'ht' ? 'Makè' : 'Signets',
-    highlights: language === 'ht' ? 'Sikle' : 'Surlignages',
-    favorites: language === 'ht' ? 'Favori' : 'Favoris',
-    history: language === 'ht' ? 'Istwa' : 'Historique',
+    bookmarks: { ht: 'Makè', fr: 'Signets', en: 'Bookmarks' }[language],
+    highlights: { ht: 'Sikle', fr: 'Surlignages', en: 'Highlights' }[language],
+    favorites: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
+    history: { ht: 'Istwa', fr: 'Historique', en: 'History' }[language],
   };
 
   return (
@@ -19,7 +19,7 @@ export default function LibraryLayout() {
         headerStyle: { backgroundColor: colors.bg },
         headerTintColor: colors.text,
         headerShadowVisible: false,
-        headerBackTitle: language === 'ht' ? 'Retounen' : 'Retour',
+        headerBackTitle: { ht: 'Retounen', fr: 'Retour', en: 'Back' }[language],
       }}
     >
       <Stack.Screen name="bookmarks" options={{ title: titles.bookmarks }} />

@@ -10,16 +10,10 @@ export default function FeedbackScreen() {
   const { language } = useSettingsStore();
 
   const labels = {
-    description:
-      language === 'ht'
-        ? 'Nou ta renmen tande ou! Pataje ide w oswa rapòte pwoblèm.'
-        : 'Nous aimerions vous entendre! Partagez vos idées ou signalez des problèmes.',
-    emailButton: language === 'ht' ? 'Voye Imèl' : 'Envoyer un email',
-    error: language === 'ht' ? 'Erè' : 'Erreur',
-    errorMessage:
-      language === 'ht'
-        ? 'Pa kapab ouvri aplikasyon imèl'
-        : "Impossible d'ouvrir l'application email",
+    description: { ht: 'Nou ta renmen tande ou! Pataje ide w oswa rapòte pwoblèm.', fr: 'Nous aimerions vous entendre! Partagez vos idées ou signalez des problèmes.', en: "We'd love to hear from you! Share ideas or report issues." }[language],
+    emailButton: { ht: 'Voye Imèl', fr: 'Envoyer un email', en: 'Send Email' }[language],
+    error: { ht: 'Erè', fr: 'Erreur', en: 'Error' }[language],
+    errorMessage: { ht: 'Pa kapab ouvri aplikasyon imèl', fr: "Impossible d'ouvrir l'application email", en: 'Unable to open email app' }[language],
   };
 
   const sendEmail = async () => {

@@ -26,19 +26,19 @@ import { useDailyVerse } from '../../src/hooks/useDailyVerse';
 import { VerseCardSkeleton } from '../../src/components/VerseCardSkeleton';
 
 // Time-based greetings
-const getGreeting = (language: 'ht' | 'fr') => {
+const getGreeting = (language: 'ht' | 'fr' | 'en') => {
   const hour = new Date().getHours();
-  
+
   if (hour >= 5 && hour < 12) {
-    return { text: language === 'ht' ? 'Bonjou!' : 'Bonjour!', emoji: '☀️' };
+    return { text: { ht: 'Bonjou!', fr: 'Bonjour!', en: 'Good morning!' }[language], emoji: '☀️' };
   }
   if (hour >= 12 && hour < 18) {
-    return { text: language === 'ht' ? 'Bon aprè-midi!' : 'Bon après-midi!', emoji: '🌤' };
+    return { text: { ht: 'Bon aprè-midi!', fr: 'Bon après-midi!', en: 'Good afternoon!' }[language], emoji: '🌤' };
   }
   if (hour >= 18 && hour < 22) {
-    return { text: language === 'ht' ? 'Bonswa!' : 'Bonsoir!', emoji: '🌅' };
+    return { text: { ht: 'Bonswa!', fr: 'Bonsoir!', en: 'Good evening!' }[language], emoji: '🌅' };
   }
-  return { text: language === 'ht' ? 'Bòn nwit!' : 'Bonne nuit!', emoji: '🌙' };
+  return { text: { ht: 'Bòn nwit!', fr: 'Bonne nuit!', en: 'Good night!' }[language], emoji: '🌙' };
 };
 
 
@@ -183,27 +183,27 @@ export default function HomeScreen() {
   const quickActions = [
     {
       icon: 'book',
-      label: language === 'ht' ? 'Bib la' : 'Bible',
-      desc: '66 liv',
+      label: { ht: 'Bib la', fr: 'Bible', en: 'Bible' }[language],
+      desc: { ht: '66 liv', fr: '66 livres', en: '66 books' }[language],
       onPress: () => router.push('/bible'),
     },
     {
       icon: 'musical-notes',
-      label: language === 'ht' ? 'Kantik' : 'Cantiques',
-      desc: '800+ chante',
+      label: { ht: 'Kantik', fr: 'Cantiques', en: 'Hymns' }[language],
+      desc: { ht: '800+ chante', fr: '800+ chants', en: '800+ hymns' }[language],
       onPress: () => router.push('/hymns'),
     },
     {
       icon: 'search',
-      label: language === 'ht' ? 'Chèche' : 'Rechercher',
-      desc: language === 'ht' ? 'Bib & Kantik' : 'Bible & Cantiques',
-      onPress: () => router.push('/settings'),
+      label: { ht: 'Chèche', fr: 'Rechercher', en: 'Search' }[language],
+      desc: { ht: 'Bib & Kantik', fr: 'Bible & Cantiques', en: 'Bible & Hymns' }[language],
+      onPress: () => router.push('/search'),
     },
     {
       icon: 'heart',
-      label: language === 'ht' ? 'Favori' : 'Favoris',
-      desc: language === 'ht' ? 'Makè yo' : 'Signets',
-      onPress: () => router.push('/settings'),
+      label: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
+      desc: { ht: 'Makè yo', fr: 'Signets', en: 'Bookmarks' }[language],
+      onPress: () => router.push('/library/favorites'),
     },
   ];
 
@@ -276,7 +276,7 @@ export default function HomeScreen() {
           >
             <View style={styles.verseHeader}>
               <Text style={[styles.verseLabel, dynamicStyles.verseLabel, { color: colors.primary }]}>
-                {language === 'ht' ? 'Vèsè Jounen An' : 'Verset du Jour'}
+                {{ ht: 'Vèsè Jounen An', fr: 'Verset du Jour', en: 'Verse of the Day' }[language]}
               </Text>
             </View>
 
@@ -319,7 +319,7 @@ export default function HomeScreen() {
         {lastReadBible && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { color: colors.textTertiary }]}>
-              {language === 'ht' ? 'KONTINYE' : 'CONTINUER'}
+              {{ ht: 'KONTINYE', fr: 'CONTINUER', en: 'CONTINUE' }[language]}
             </Text>
             <TouchableOpacity
               style={[
@@ -342,7 +342,7 @@ export default function HomeScreen() {
                   {lastReadBible.book} {lastReadBible.chapter}
                 </Text>
                 <Text style={[styles.continueSubtitle, dynamicStyles.continueSubtitle, { color: colors.textTertiary }]}>
-                  {language === 'ht' ? 'Kontinye li' : 'Continuer la lecture'}
+                  {{ ht: 'Kontinye li', fr: 'Continuer la lecture', en: 'Continue reading' }[language]}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={rs(22)} color={colors.textTertiary} />
@@ -353,7 +353,7 @@ export default function HomeScreen() {
         {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle, { color: colors.textTertiary }]}>
-            {language === 'ht' ? 'AKSYON RAPID' : 'ACCÈS RAPIDE'}
+            {{ ht: 'AKSYON RAPID', fr: 'ACCÈS RAPIDE', en: 'QUICK ACCESS' }[language]}
           </Text>
           <View style={[styles.actionsGrid, dynamicStyles.actionsGrid]}>
             {quickActions.map((action) => (

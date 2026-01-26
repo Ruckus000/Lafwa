@@ -41,7 +41,7 @@ type Verse = {
 interface BibleReaderProps {
   book: BibleBook;
   chapter: number;
-  version: 'ht' | 'fr';
+  version: 'ht' | 'fr' | 'en';
   onChapterChange: (chapter: number) => void;
 }
 
@@ -63,7 +63,7 @@ export default function BibleReader({
   const listRef = useRef<FlatList>(null);
 
   // Get book name based on version
-  const bookName = version === 'ht' ? book.nameHt : book.nameFr;
+  const bookName = version === 'ht' ? book.nameHt : version === 'en' ? book.nameEn : book.nameFr;
 
   // Load chapter content
   useEffect(() => {
@@ -224,9 +224,11 @@ export default function BibleReader({
     return (
       <View style={[styles.center, { backgroundColor: colors.bg }]}>
         <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
-          {language === 'ht' 
-            ? 'Pa gen tèks disponib pou chapit sa a.' 
-            : 'Aucun texte disponible pour ce chapitre.'}
+          {{
+            ht: 'Pa gen tèks disponib pou chapit sa a.',
+            fr: 'Aucun texte disponible pour ce chapitre.',
+            en: 'No text available for this chapter.'
+          }[language]}
         </Text>
       </View>
     );
