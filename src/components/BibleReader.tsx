@@ -73,8 +73,8 @@ export default function BibleReader({
   const loadContent = async () => {
     setLoading(true);
     try {
-      // Query uses the Haitian name as stored in DB
-      const data = await getChapter(book.nameHt, chapter, version);
+      // Query uses the French name as stored in DB
+      const data = await getChapter(book.nameFr, chapter, version);
       
       // Enrich with bookmark status
       const enriched = await Promise.all(
