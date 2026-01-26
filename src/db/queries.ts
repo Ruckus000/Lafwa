@@ -353,3 +353,145 @@ export async function toggleFavoriteHymn(hymnId: number): Promise<boolean> {
 export async function isHymnFavorite(hymnId: number): Promise<boolean> {
   return isBookmarked('hymn', hymnId);
 }
+
+// ============================================
+// HYMN WITH SECTIONS QUERIES
+// ============================================
+
+export interface HymnSection {
+  id: number;
+  section_type: 'verse' | 'refrain';
+  section_number: number | null;
+  display_order: number;
+  text_fr: string | null;
+  text_ht: string | null;
+}
+
+export interface HymnWithSections {
+  id: number;
+  number: number;
+  title_fr: string | null;
+  title_ht: string | null;
+  sections: HymnSection[];
+}
+
+export async function getHymnWithSections(hymnNumber: number): Promise<HymnWithSections | null> {
+  const db = await openDatabase();
+
+  const hymn = await db.getFirstAsync<{
+    id: number;
+    number: number;
+    title_fr: string | null;
+    title_ht: string | null;
+  }>('SELECT id, number, title_fr, title_ht FROM hymns WHERE number = ?', [hymnNumber]);
+
+  if (!hymn) return null;
+
+  const sections = await db.getAllAsync<HymnSection>(
+    'SELECT id, section_type, section_number, display_order, text_fr, text_ht FROM hymn_sections WHERE hymn_id = ? ORDER BY display_order',
+    [hymn.id]
+  );
+
+  return { ...hymn, sections };
+}
+
+export interface HymnListItem {
+  id: number;
+  number: number;
+  title_fr: string | null;
+  title_ht: string | null;
+}
+
+export async function getAllHymns(): Promise<HymnListItem[]> {
+  const db = await openDatabase();
+  return await db.getAllAsync<HymnListItem>(
+    'SELECT id, number, title_fr, title_ht FROM hymns ORDER BY number'
+  );
+}
+
+// ============================================
+// NOTES QUERIES
+// ============================================
+
+export interface NoteWithVerse {
+  id: number;
+  verse_id: number;
+  text: string;
+  book: string;
+  chapter: number;
+  verse: number;
+  verseText: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getNoteForVerse(verseId: number): Promise<string | null> {
+  const db = await openDatabase();
+  const result = await db.getFirstAsync<{ text: string }>(
+    'SELECT text FROM notes WHERE verse_id = ?',
+    [verseId]
+  );
+  return result?.text ?? null;
+}
+
+export async function saveNote(verseId: number, text: string): Promise<void> {
+  const db = await openDatabase();
+
+  if (text.trim() === '') {
+    // Delete note if text is empty
+    await db.runAsync('DELETE FROM notes WHERE verse_id = ?', [verseId]);
+    return;
+  }
+
+  // Upsert: insert or update
+  await db.runAsync(
+    `
+    INSERT INTO notes (verse_id, text) VALUES (?, ?)
+    ON CONFLICT(verse_id) DO UPDATE SET
+      text = excluded.text,
+      updated_at = CURRENT_TIMESTAMP
+    `,
+    [verseId, text.trim()]
+  );
+}
+
+export async function deleteNote(verseId: number): Promise<void> {
+  const db = await openDatabase();
+  await db.runAsync('DELETE FROM notes WHERE verse_id = ?', [verseId]);
+}
+
+export async function getAllNotes(
+  version: 'ht' | 'fr' | 'en' = 'ht'
+): Promise<NoteWithVerse[]> {
+  const db = await openDatabase();
+
+  return await db.getAllAsync<NoteWithVerse>(
+    `
+    SELECT
+      n.id,
+      n.verse_id,
+      n.text,
+      v.book,
+      v.chapter,
+      v.verse,
+      v.text as verseText,
+      n.created_at,
+      n.updated_at
+    FROM notes n
+    JOIN bible_verses v ON n.verse_id = v.id
+    WHERE v.version = ?
+    ORDER BY n.updated_at DESC
+    LIMIT 100
+    `,
+    [version]
+  );
+}
+
+export async function hasNoteForVerse(verseId: number): Promise<boolean> {
+  const db = await openDatabase();
+  const result = await db.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM notes WHERE verse_id = ?',
+    [verseId]
+  );
+  return (result?.count ?? 0) > 0;
+}

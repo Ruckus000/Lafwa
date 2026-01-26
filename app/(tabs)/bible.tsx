@@ -45,18 +45,26 @@ export default function BibleScreen() {
   const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
 
-  // Handle deep linking from daily verse
+  // Handle deep linking from daily verse or restore last read position
   useEffect(() => {
     if (params.book && params.chapter) {
+      // Deep link takes priority
       const bookData = getBookByName(params.book);
       if (bookData) {
         setSelectedBook(bookData);
         setSelectedChapter(parseInt(params.chapter, 10));
         setScreen('reader');
-        setLastReadBible(bookData.nameHt, parseInt(params.chapter, 10));
+      }
+    } else if (lastReadBible && !selectedBook) {
+      // Restore last reading position on initial load
+      const bookData = getBookByName(lastReadBible.book);
+      if (bookData) {
+        setSelectedBook(bookData);
+        setSelectedChapter(lastReadBible.chapter);
+        setScreen('reader');
       }
     }
-  }, [params.book, params.chapter, setLastReadBible]);
+  }, [params.book, params.chapter, lastReadBible]);
 
   // Handle book selection
   const handleSelectBook = useCallback((book: BibleBook) => {

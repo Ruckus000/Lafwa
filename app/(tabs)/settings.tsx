@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/hooks/useTheme';
-import { useSettingsStore, FontSizeSetting } from '../../src/stores/settingsStore';
+import { useSettingsStore, FontSizeSetting, LineSpacingSetting } from '../../src/stores/settingsStore';
 import { useLibrary } from '../../src/hooks/useLibrary';
 
 // Type definitions for library navigation
@@ -39,6 +39,8 @@ export default function SettingsScreen() {
     setLanguage,
     fontSize,
     setFontSize,
+    lineSpacing,
+    setLineSpacing,
     theme,
     setTheme,
   } = useSettingsStore();
@@ -54,6 +56,7 @@ export default function SettingsScreen() {
     settings: { ht: 'PARAMÈT', fr: 'PARAMÈTRES', en: 'SETTINGS' }[language],
     languageLabel: { ht: 'Lang', fr: 'Langue', en: 'Language' }[language],
     fontSizeLabel: { ht: 'Gwosè Tèks', fr: 'Taille du texte', en: 'Font Size' }[language],
+    lineSpacingLabel: { ht: 'Espas Liy', fr: 'Espacement des lignes', en: 'Line Spacing' }[language],
     themeLabel: { ht: 'Tèm', fr: 'Thème', en: 'Theme' }[language],
     info: { ht: 'ENFÒMASYON', fr: 'INFORMATIONS', en: 'INFORMATION' }[language],
     about: { ht: 'Konsènan Lafwa', fr: 'À propos de Lafwa', en: 'About Lafwa' }[language],
@@ -63,8 +66,17 @@ export default function SettingsScreen() {
   const themeLabels = {
     light: { ht: 'Limyè', fr: 'Clair', en: 'Light' }[language],
     dark: { ht: 'Fènwa', fr: 'Sombre', en: 'Dark' }[language],
+    sepia: { ht: 'Sepya', fr: 'Sépia', en: 'Sepia' }[language],
     system: { ht: 'Sistèm', fr: 'Système', en: 'System' }[language],
   };
+
+  const lineSpacingLabels = {
+    compact: { ht: 'Sere', fr: 'Compact', en: 'Compact' }[language],
+    normal: { ht: 'Nòmal', fr: 'Normal', en: 'Normal' }[language],
+    relaxed: { ht: 'Laj', fr: 'Aéré', en: 'Relaxed' }[language],
+  };
+
+  const lineSpacingOptions: LineSpacingSetting[] = ['compact', 'normal', 'relaxed'];
 
   const libraryItems: LibraryItem[] = [
     { icon: 'bookmark', label: labels.bookmarks, count: counts.bookmarks, route: '/bookmarks' },
@@ -206,6 +218,41 @@ export default function SettingsScreen() {
               </View>
             </View>
 
+            {/* Line Spacing */}
+            <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
+              <View style={styles.settingLabel}>
+                <Ionicons name="reorder-three" size={20} color={colors.primary} />
+                <Text style={[styles.listLabel, { color: colors.text }]}>
+                  {labels.lineSpacingLabel}
+                </Text>
+              </View>
+              <View style={[styles.segmentedControl, { backgroundColor: colors.surfaceHover }]}>
+                {lineSpacingOptions.map((spacing) => (
+                  <TouchableOpacity
+                    key={spacing}
+                    style={[
+                      styles.segment,
+                      lineSpacing === spacing && [
+                        styles.segmentActive,
+                        { backgroundColor: colors.surface },
+                        shadows.card,
+                      ],
+                    ]}
+                    onPress={() => setLineSpacing(spacing)}
+                  >
+                    <Text
+                      style={[
+                        styles.segmentText,
+                        { color: lineSpacing === spacing ? colors.text : colors.textTertiary },
+                      ]}
+                    >
+                      {lineSpacingLabels[spacing]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
             {/* Theme */}
             <View style={styles.settingItemLast}>
               <View style={styles.settingLabel}>
@@ -214,15 +261,14 @@ export default function SettingsScreen() {
                   {labels.themeLabel}
                 </Text>
               </View>
-              <View style={[styles.segmentedControl, { backgroundColor: colors.surfaceHover }]}>
-                {(['light', 'dark', 'system'] as const).map((t) => (
+              <View style={[styles.themeControl, { backgroundColor: colors.surfaceHover }]}>
+                {(['light', 'sepia', 'dark', 'system'] as const).map((t) => (
                   <TouchableOpacity
                     key={t}
                     style={[
-                      styles.segment,
-                      styles.segmentSmall,
+                      styles.themeOption,
                       theme === t && [
-                        styles.segmentActive,
+                        styles.themeOptionActive,
                         { backgroundColor: colors.surface },
                         shadows.card,
                       ],
@@ -231,8 +277,7 @@ export default function SettingsScreen() {
                   >
                     <Text
                       style={[
-                        styles.segmentText,
-                        styles.segmentTextSmall,
+                        styles.themeOptionText,
                         { color: theme === t ? colors.text : colors.textTertiary },
                       ]}
                     >
@@ -386,6 +431,25 @@ const styles = StyleSheet.create({
   fontSizeText: {
     fontSize: 12,
     fontWeight: '700',
+  },
+  themeControl: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 4,
+    borderRadius: 10,
+    marginLeft: 34,
+    gap: 4,
+  },
+  themeOption: {
+    flexBasis: '48%',
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  themeOptionActive: {},
+  themeOptionText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   version: {
     fontSize: 12,

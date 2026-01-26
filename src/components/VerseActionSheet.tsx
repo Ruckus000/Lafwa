@@ -25,21 +25,26 @@ const { height } = Dimensions.get('window');
 
 export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink';
 
+type VerseData = {
+  id: number;
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+};
+
 interface VerseActionSheetProps {
   visible: boolean;
-  verse: {
-    id: number;
-    book: string;
-    chapter: number;
-    verse: number;
-    text: string;
-  } | null;
+  verse: VerseData | null;
+  verses?: VerseData[]; // For multi-verse selection
   isBookmarked: boolean;
+  hasNote?: boolean;
   highlightColor?: HighlightColor | null;
   onClose: () => void;
   onHighlight: (color: HighlightColor) => void;
   onRemoveHighlight: () => void;
   onToggleBookmark: () => void;
+  onNote?: () => void;
   onCopy: () => void;
   onShare: () => void;
 }
@@ -47,12 +52,15 @@ interface VerseActionSheetProps {
 export default function VerseActionSheet({
   visible,
   verse,
+  verses,
   isBookmarked,
+  hasNote,
   highlightColor,
   onClose,
   onHighlight,
   onRemoveHighlight,
   onToggleBookmark,
+  onNote,
   onCopy,
   onShare,
 }: VerseActionSheetProps) {
@@ -63,18 +71,49 @@ export default function VerseActionSheet({
 
   const highlightColors: HighlightColor[] = ['yellow', 'green', 'blue', 'pink'];
 
+  // Use verses array for multi-verse, or single verse
+  const selectedVerses = verses && verses.length > 0 ? verses : [verse];
+  const isMultiVerse = selectedVerses.length > 1;
+
+  // Build reference string for multi-verse
+  const getReference = () => {
+    if (isMultiVerse) {
+      const sorted = [...selectedVerses].sort((a, b) => a.verse - b.verse);
+      const first = sorted[0];
+      const last = sorted[sorted.length - 1];
+      // Check if consecutive
+      const isConsecutive = sorted.every((v, i) =>
+        i === 0 || v.verse === sorted[i - 1].verse + 1
+      );
+      if (isConsecutive) {
+        return `${first.book} ${first.chapter}:${first.verse}-${last.verse}`;
+      }
+      return `${first.book} ${first.chapter}:${sorted.map((v) => v.verse).join(',')}`;
+    }
+    return `${verse.book} ${verse.chapter}:${verse.verse}`;
+  };
+
+  // Build combined text for multi-verse
+  const getCombinedText = () => {
+    if (isMultiVerse) {
+      const sorted = [...selectedVerses].sort((a, b) => a.verse - b.verse);
+      return sorted.map((v) => `${v.verse} ${v.text}`).join(' ');
+    }
+    return verse.text;
+  };
+
   const handleCopy = async () => {
-    const reference = `${verse.book} ${verse.chapter}:${verse.verse}`;
-    const textToCopy = `${verse.text}\n— ${reference}`;
+    const reference = getReference();
+    const textToCopy = `${getCombinedText()}\n— ${reference}`;
     await Clipboard.setStringAsync(textToCopy);
     onCopy();
   };
 
   const handleShare = async () => {
-    const reference = `${verse.book} ${verse.chapter}:${verse.verse}`;
+    const reference = getReference();
     try {
       await Share.share({
-        message: `"${verse.text}"\n— ${reference}\n\nvia Lafwa`,
+        message: `"${getCombinedText()}"\n— ${reference}\n\nvia Lafwa`,
       });
       onShare();
     } catch (error) {
@@ -85,6 +124,7 @@ export default function VerseActionSheet({
   const labels = {
     highlight: { ht: 'Sikle', fr: 'Surligner', en: 'Highlight' }[language],
     bookmark: { ht: 'Makè', fr: 'Marquer', en: 'Bookmark' }[language],
+    note: { ht: 'Nòt', fr: 'Note', en: 'Note' }[language],
     copy: { ht: 'Kopye', fr: 'Copier', en: 'Copy' }[language],
     share: { ht: 'Pataje', fr: 'Partager', en: 'Share' }[language],
   };
@@ -157,6 +197,21 @@ export default function VerseActionSheet({
                 {labels.bookmark}
               </Text>
             </TouchableOpacity>
+
+            {onNote && (
+              <TouchableOpacity style={styles.actionButton} onPress={onNote}>
+                <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
+                  <Ionicons
+                    name={hasNote ? 'document-text' : 'document-text-outline'}
+                    size={20}
+                    color={colors.primary}
+                  />
+                </View>
+                <Text style={[styles.actionLabel, { color: colors.textSecondary }]}>
+                  {labels.note}
+                </Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.actionButton} onPress={handleCopy}>
               <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>

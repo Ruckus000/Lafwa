@@ -16,7 +16,7 @@ import {
   AccessibilityInfo,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../src/hooks/useTheme';
@@ -203,7 +203,7 @@ export default function HomeScreen() {
       icon: 'heart',
       label: { ht: 'Favori', fr: 'Favoris', en: 'Favorites' }[language],
       desc: { ht: 'Makè yo', fr: 'Signets', en: 'Bookmarks' }[language],
-      onPress: () => router.push('/library/favorites'),
+      onPress: () => router.push('/favorites' as Href),
     },
   ];
 

@@ -39,6 +39,20 @@ export const colors = {
     textMuted: '#475569',
   },
 
+  // Sepia Mode Colors (reading comfort)
+  sepia: {
+    bg: '#f5f0e1',
+    bgSecondary: '#ebe4d3',
+    surface: '#f5f0e1',
+    surfaceHover: '#e5dece',
+    border: '#d4cdc0',
+    borderStrong: 'rgba(91, 70, 54, 0.15)',
+    text: '#5b4636',
+    textSecondary: '#7a6b5d',
+    textTertiary: '#998b7d',
+    textMuted: '#b8a99a',
+  },
+
   // Highlight Colors (Verse Marking)
   highlights: {
     yellow: { bg: '#fef08a', border: '#fde047' },
@@ -62,25 +76,29 @@ export const colors = {
 } as const;
 
 // Theme helper type
-export type ColorScheme = 'light' | 'dark';
+export type ColorScheme = 'light' | 'dark' | 'sepia';
 
 // Get theme colors based on color scheme
 export const getThemeColors = (scheme: ColorScheme) => {
   const isDark = scheme === 'dark';
+  const isSepia = scheme === 'sepia';
+
+  const themeColors = isSepia ? colors.sepia : (isDark ? colors.dark : colors.light);
+
   return {
-    bg: isDark ? colors.dark.bg : colors.light.bg,
-    bgSecondary: isDark ? colors.dark.bgSecondary : colors.light.bgSecondary,
-    surface: isDark ? colors.dark.surface : colors.light.surface,
-    surfaceHover: isDark ? colors.dark.surfaceHover : colors.light.surfaceHover,
-    border: isDark ? colors.dark.border : colors.light.border,
-    borderStrong: isDark ? colors.dark.borderStrong : colors.light.borderStrong,
-    text: isDark ? colors.dark.text : colors.light.text,
-    textSecondary: isDark ? colors.dark.textSecondary : colors.light.textSecondary,
-    textTertiary: isDark ? colors.dark.textTertiary : colors.light.textTertiary,
-    textMuted: isDark ? colors.dark.textMuted : colors.light.textMuted,
-    // Primary always accessible
-    primary: colors.primary.ocean,
-    primaryDark: colors.primary.oceanDark,
-    primaryLight: isDark ? '#1e3a5f' : colors.primary.oceanLight,
+    bg: themeColors.bg,
+    bgSecondary: themeColors.bgSecondary,
+    surface: themeColors.surface,
+    surfaceHover: themeColors.surfaceHover,
+    border: themeColors.border,
+    borderStrong: themeColors.borderStrong,
+    text: themeColors.text,
+    textSecondary: themeColors.textSecondary,
+    textTertiary: themeColors.textTertiary,
+    textMuted: themeColors.textMuted,
+    // Primary colors - adjusted for sepia
+    primary: isSepia ? '#8b6914' : colors.primary.ocean,
+    primaryDark: isSepia ? '#6b4f0f' : colors.primary.oceanDark,
+    primaryLight: isSepia ? '#e8dfc9' : (isDark ? '#1e3a5f' : colors.primary.oceanLight),
   };
 };

@@ -5,7 +5,7 @@
 
 import { SQLiteDatabase } from 'expo-sqlite';
 
-const CURRENT_SCHEMA_VERSION = 2;
+const CURRENT_SCHEMA_VERSION = 3;
 
 interface MigrationResult {
   previousVersion: number;
@@ -81,6 +81,27 @@ const migrations: Record<number, (db: SQLiteDatabase) => Promise<void>> = {
 
       CREATE INDEX IF NOT EXISTS idx_reading_history_type ON reading_history(type);
       CREATE INDEX IF NOT EXISTS idx_reading_history_last_read ON reading_history(last_read_at DESC);
+    `);
+  },
+
+  // Migration to v3: Add notes table for personal verse notes
+  3: async (db: SQLiteDatabase) => {
+    console.log('Running migration v3: Adding notes table');
+
+    await db.execAsync(`
+      -- Notes table for personal verse notes
+      CREATE TABLE IF NOT EXISTS notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        verse_id INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(verse_id),
+        FOREIGN KEY (verse_id) REFERENCES bible_verses(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_notes_verse_id ON notes(verse_id);
+      CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated_at DESC);
     `);
   },
 };
