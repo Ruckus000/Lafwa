@@ -11,7 +11,8 @@
     "fix:boilerplate": "ts-node scripts/fix_boilerplate.ts",
     "scraper:validate": "ts-node scripts/scraper/validate.ts",
     "verify:db": "ts-node scripts/verify_db_integrity.ts",
-    "generate:db": "ts-node scripts/generate_db.ts"
+    "generate:db": "ts-node scripts/generate_db.ts",
+    "generate:logo": "ts-node scripts/generate_logo_assets.ts"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -38,10 +39,11 @@
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.35",
-    "axios": "^1.13.2",
-    "cheerio": "^1.2.0",
     "@types/node": "^25.0.10",
     "@types/react": "~19.1.0",
+    "axios": "^1.13.2",
+    "cheerio": "^1.2.0",
+    "sharp": "^0.34.5",
     "sqlite3": "^5.1.7",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.2"

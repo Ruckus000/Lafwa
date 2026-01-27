@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lafwa - Haitian Bible & Hymnal App</title>
+    <meta name="description" content="The complete Kreyòl and French Bible with Chant d'Espérance hymnal. Works 100% offline.">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/jphilistin/Lafwa/main/assets/icon.png">
+    <style>
+        :root {
+            --ocean-blue: #1a56db;
+            --ocean-dark: #1e429f;
+            --ocean-light: #e1effe;
+            --ink: #111827;
+            --charcoal: #374151;
+            --slate: #6b7280;
+            --snow: #ffffff;
+            --cloud: #f3f4f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: var(--ink);
+            line-height: 1.6;
+            background: var(--snow);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--ocean-blue) 0%, var(--ocean-dark) 100%);
+            color: white;
+            padding: 80px 24px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -2px;
+        }
+        
+        .tagline {
+            font-size: 24px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+        
+        .tagline-kreole {
+            font-size: 18px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+        
+        .hero-description {
+            max-width: 600px;
+            margin: 32px auto 0;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .badges {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        main {
+            padding: 64px 24px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-bottom: 64px;
+        }
+        
+        .feature {
+            background: var(--cloud);
+            padding: 32px;
+            border-radius: 16px;
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+        
+        .feature h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--ink);
+        }
+        
+        .feature p {
+            color: var(--charcoal);
+            font-size: 15px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 64px 24px;
+            background: var(--ocean-light);
+            border-radius: 24px;
+        }
+        
+        .cta-section h2 {
+            font-size: 32px;
+            margin-bottom: 16px;
+            color: var(--ocean-dark);
+        }
+        
+        .cta-section p {
+            color: var(--charcoal);
+            margin-bottom: 32px;
+            font-size: 18px;
+        }
+        
+        .store-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .store-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--ink);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .store-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .store-button svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        footer {
+            background: var(--ink);
+            color: white;
+            padding: 48px 24px;
+            text-align: center;
+        }
+        
+        footer nav {
+            margin-bottom: 24px;
+        }
+        
+        footer a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            margin: 0 16px;
+            font-size: 14px;
+        }
+        
+        footer a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+        }
+        
+        @media (max-width: 600px) {
+            .logo { font-size: 48px; }
+            .tagline { font-size: 20px; }
+            header { padding: 60px 24px; }
+            .features { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Lafwa</div>
+            <div class="tagline">Haitian Bible & Hymnal</div>
+            <div class="tagline-kreole">Lafwa soti nan tande — Faith comes by hearing</div>
+            <p class="hero-description">
+                The complete Kreyòl and French Bible with the entire Chant d'Espérance hymnal. 
+                Works 100% offline. Built for Haitian Christians, by Haitian Christians.
+            </p>
+            <div class="badges">
+                <span class="badge">📖 Complete Bible</span>
+                <span class="badge">🎵 336 Hymns</span>
+                <span class="badge">📴 100% Offline</span>
+                <span class="badge">🏛️ Church-Ready</span>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📖</div>
+                <h3>Complete Bible</h3>
+                <p>Full Bible in Kreyòl and French with instant language toggle. Beautiful reading experience with adjustable fonts and night mode.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎵</div>
+                <h3>Chant d'Espérance</h3>
+                <p>All 336 hymns from the beloved Haitian hymnal. Search by number, title, or lyrics. Save favorites for quick access.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🏛️</div>
+                <h3>Presentation Mode</h3>
+                <p>Display hymn lyrics in large, clear text for church services. Perfect for projecting during worship.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <h3>Instant Search</h3>
+                <p>Search the entire Bible and hymnal in milliseconds. Find any verse or song instantly, even offline.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📴</div>
+                <h3>Works Offline</h3>
+                <p>No internet required after download. Perfect for areas with limited connectivity or expensive data.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💾</div>
+                <h3>Small & Fast</h3>
+                <p>Under 50MB total. Optimized for all devices including older phones with 2GB RAM.</p>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <h2>Download Lafwa</h2>
+            <p>Available on iOS and Android</p>
+            <div class="store-buttons">
+                <a href="#" class="store-button">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    App Store
+                </a>
+                <a href="#" class="store-button">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg>
+                    Google Play
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <nav>
+            <a href="privacy">Privacy Policy</a>
+            <a href="support">Support</a>
+            <a href="https://github.com/jphilistin/Lafwa">GitHub</a>
+        </nav>
+        <p class="copyright">© 2026 Lafwa. Made with ❤️ for the Haitian community.</p>
+    </footer>
+</body>
+</html>
