@@ -4,18 +4,20 @@
  * Based on UX/UI Spec v1
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Dimensions,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   PanResponder,
   StatusBar,
 } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
 import { HymnSection } from '../db/queries';
 import { useSettingsStore } from '../stores/settingsStore';
 
@@ -40,20 +42,46 @@ export default function PresentationMode({
   const language = useSettingsStore((state) => state.language);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Get section text based on language
-  const getSectionText = (section: HymnSection): string => {
+  // Validate sections array - must have at least one valid section
+  // This prevents crashes when sections is empty, undefined, or contains malformed data
+  const validSections = useMemo(() => {
+    if (!Array.isArray(sections) || sections.length === 0) {
+      return [];
+    }
+    // Filter out any undefined or malformed sections
+    return sections.filter(
+      (s): s is HymnSection => 
+        s !== null && 
+        s !== undefined && 
+        typeof s.section_type === 'string'
+    );
+  }, [sections]);
+
+  // Calculate max valid index to prevent out-of-bounds access
+  const maxIndex = Math.max(0, validSections.length - 1);
+
+  // Get section text based on language - with null safety
+  const getSectionText = (section: HymnSection | undefined): string => {
+    if (!section) return '';
     if (language === 'ht' && section.text_ht) return section.text_ht;
     if (language === 'fr' && section.text_fr) return section.text_fr;
     return section.text_ht || section.text_fr || '';
   };
 
-  // Get section label
-  const getSectionLabel = (section: HymnSection): string => {
+  // Get section label - with null safety
+  const getSectionLabel = (section: HymnSection | undefined): string => {
+    if (!section) return '';
     if (section.section_type === 'refrain') {
-      return { ht: 'Refren', fr: 'Refrain', en: 'Refrain' }[language];
+      return { ht: 'Refren', fr: 'Refrain', en: 'Refrain' }[language] ?? 'Refrain';
     }
-    const verseWord = { ht: 'Vèsè', fr: 'Couplet', en: 'Verse' }[language];
+    const verseWord = { ht: 'Vèsè', fr: 'Couplet', en: 'Verse' }[language] ?? 'Verse';
     return section.section_number ? `${verseWord} ${section.section_number}` : verseWord;
+  };
+
+  // Handle exit with haptic feedback
+  const handleExit = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onExit();
   };
 
   // Pan responder for swipe gestures
@@ -66,48 +94,128 @@ export default function PresentationMode({
 
         // Swipe down to exit
         if (dy > SWIPE_THRESHOLD && Math.abs(dx) < SWIPE_THRESHOLD) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          onExit();
+          handleExit();
           return;
         }
 
-        // Swipe left (next)
-        if (dx < -SWIPE_THRESHOLD && currentIndex < sections.length - 1) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setCurrentIndex((prev) => prev + 1);
+        // Swipe left (next) - use functional update with bounds check
+        if (dx < -SWIPE_THRESHOLD) {
+          setCurrentIndex((prev) => {
+            const next = prev + 1;
+            if (next <= maxIndex) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              return next;
+            }
+            return prev;
+          });
           return;
         }
 
         // Swipe right (previous)
-        if (dx > SWIPE_THRESHOLD && currentIndex > 0) {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          setCurrentIndex((prev) => prev - 1);
+        if (dx > SWIPE_THRESHOLD) {
+          setCurrentIndex((prev) => {
+            if (prev > 0) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              return prev - 1;
+            }
+            return prev;
+          });
         }
       },
     })
   ).current;
 
-  // Handle tap navigation
+  // Handle tap navigation with bounds checking
   const handleTap = (event: any) => {
     const tapX = event.nativeEvent.locationX;
 
     // Tap on right side = next
-    if (tapX > SCREEN_WIDTH * 0.6 && currentIndex < sections.length - 1) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setCurrentIndex((prev) => prev + 1);
+    if (tapX > SCREEN_WIDTH * 0.6) {
+      setCurrentIndex((prev) => {
+        const next = prev + 1;
+        if (next <= maxIndex) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          return next;
+        }
+        return prev;
+      });
     }
     // Tap on left side = previous
-    else if (tapX < SCREEN_WIDTH * 0.4 && currentIndex > 0) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setCurrentIndex((prev) => prev - 1);
+    else if (tapX < SCREEN_WIDTH * 0.4) {
+      setCurrentIndex((prev) => {
+        if (prev > 0) {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          return prev - 1;
+        }
+        return prev;
+      });
     }
   };
 
-  const currentSection = sections[currentIndex];
+  // Safely get current section with bounds check
+  const safeIndex = Math.min(currentIndex, maxIndex);
+  const currentSection = validSections[safeIndex];
+
+  // Handle empty sections - show error state instead of crashing
+  if (validSections.length === 0) {
+    return (
+      <View style={styles.container}>
+        <StatusBar hidden />
+        
+        {/* Close button - always visible */}
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={handleExit}
+          accessibilityRole="button"
+          accessibilityLabel={{ ht: 'Fèmen', fr: 'Fermer', en: 'Close' }[language]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={28} color="rgba(255, 255, 255, 0.7)" />
+        </TouchableOpacity>
+
+        <View style={styles.errorContainer}>
+          <Ionicons 
+            name="alert-circle-outline" 
+            size={48} 
+            color="rgba(255, 255, 255, 0.5)" 
+            accessibilityLabel="Alert icon"
+          />
+          <Text style={styles.errorText}>
+            {{ 
+              ht: 'Pa gen pawòl pou kantik sa a',
+              fr: 'Aucun texte disponible pour ce cantique',
+              en: 'No lyrics available for this hymn'
+            }[language]}
+          </Text>
+          <TouchableOpacity 
+            onPress={handleExit}
+            style={styles.exitButton}
+            accessibilityRole="button"
+            accessibilityLabel={{ ht: 'Retounen', fr: 'Retour', en: 'Go Back' }[language]}
+          >
+            <Text style={styles.exitButtonText}>
+              {{ ht: 'Retounen', fr: 'Retour', en: 'Go Back' }[language]}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <StatusBar hidden />
+
+      {/* Close button - always visible in top-right corner */}
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={handleExit}
+        accessibilityRole="button"
+        accessibilityLabel={{ ht: 'Fèmen', fr: 'Fermer', en: 'Close' }[language]}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons name="close" size={28} color="rgba(255, 255, 255, 0.7)" />
+      </TouchableOpacity>
 
       <TouchableWithoutFeedback onPress={handleTap}>
         <View style={styles.content}>
@@ -128,20 +236,25 @@ export default function PresentationMode({
 
           {/* Progress Dots */}
           <View style={styles.progressContainer}>
-            {sections.map((_, index) => (
+            {validSections.map((_, index) => (
               <View
                 key={index}
                 style={[
                   styles.progressDot,
-                  index === currentIndex && styles.progressDotActive,
+                  index === safeIndex && styles.progressDotActive,
                 ]}
+                accessibilityLabel={`Section ${index + 1} of ${validSections.length}${index === safeIndex ? ', current' : ''}`}
               />
             ))}
           </View>
 
-          {/* Navigation Hint */}
+          {/* Navigation Hint - updated to mention X button */}
           <Text style={styles.hint}>
-            {{ ht: 'Glise anba pou sòti', fr: 'Glissez vers le bas pour quitter', en: 'Swipe down to exit' }[language]}
+            {{ 
+              ht: 'Tape X oswa glise anba pou sòti', 
+              fr: 'Appuyez sur X ou glissez vers le bas pour quitter', 
+              en: 'Tap X or swipe down to exit' 
+            }[language]}
           </Text>
         </View>
       </TouchableWithoutFeedback>
@@ -153,6 +266,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000000',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 24,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     flex: 1,
@@ -212,5 +337,32 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.3)',
     fontSize: 12,
     textAlign: 'center',
+  },
+  // Error state styles
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    gap: 16,
+  },
+  errorText: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  exitButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  exitButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
