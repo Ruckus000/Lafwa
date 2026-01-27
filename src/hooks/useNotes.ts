@@ -1,82 +1,152 @@
 /**
  * useNotes Hook
- * Focused hook for notes screen
+ * Manages notes list with optimistic updates and pagination
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { getAllNotes, deleteNote } from '../db/queries';
-import { NoteWithVerse } from '../db/queries';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Alert } from 'react-native';
+import { getAllNotes, deleteNote, getNotesCount, NoteWithVerse } from '../db/queries';
 import { useSettingsStore } from '../stores/settingsStore';
+import { useLibraryStore } from '../stores/libraryStore';
+import { getVersionFromLanguage } from '../utils/version';
+
+interface UseNotesOptions {
+  pageSize?: number;
+}
 
 interface UseNotesResult {
   notes: NoteWithVerse[];
   isLoading: boolean;
   error: Error | null;
+  totalCount: number;
+  hasMore: boolean;
   refresh: () => void;
-  removeNote: (verseId: number) => Promise<void>;
+  loadMore: () => void;
+  removeNote: (note: NoteWithVerse) => Promise<boolean>;
 }
 
-export function useNotes(): UseNotesResult {
+export function useNotes(options: UseNotesOptions = {}): UseNotesResult {
+  const { pageSize = 50 } = options;
+
   const [notes, setNotes] = useState<NoteWithVerse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [offset, setOffset] = useState(0);
+  
   const language = useSettingsStore((state) => state.language);
+  const version = getVersionFromLanguage(language);
+  const decrementCount = useLibraryStore((state) => state.decrementCount);
+  const invalidateLibrary = useLibraryStore((state) => state.invalidate);
 
-  // Map UI language to Bible version
-  const version = language === 'ht' ? 'ht' : language === 'en' ? 'en' : 'fr';
+  // Track if we're currently fetching to prevent duplicate requests
+  const isFetching = useRef(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const fetchNotes = useCallback(async (reset: boolean = false) => {
+    if (isFetching.current && !reset) return;
+    isFetching.current = true;
 
-    async function fetchNotes() {
+    if (reset) {
+      setOffset(0);
       setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await getAllNotes(version);
-        if (isMounted) {
-          setNotes(result);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err : new Error('Failed to load notes'));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
     }
 
-    fetchNotes();
+    setError(null);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [version, retryCount]);
+    try {
+      const currentOffset = reset ? 0 : offset;
+      const [fetchedNotes, count] = await Promise.all([
+        getAllNotes(version, pageSize, currentOffset),
+        reset ? getNotesCount() : Promise.resolve(totalCount),
+      ]);
+
+      if (reset) {
+        setNotes(fetchedNotes);
+        setTotalCount(count);
+      } else {
+        setNotes((prev) => [...prev, ...fetchedNotes]);
+      }
+
+      if (!reset) {
+        setOffset(currentOffset + fetchedNotes.length);
+      } else {
+        setOffset(fetchedNotes.length);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to load notes'));
+    } finally {
+      setIsLoading(false);
+      isFetching.current = false;
+    }
+  }, [version, pageSize, offset, totalCount]);
+
+  // Initial load and reload on language change
+  useEffect(() => {
+    fetchNotes(true);
+  }, [version]);
 
   const refresh = useCallback(() => {
-    setRetryCount((c) => c + 1);
-  }, []);
+    fetchNotes(true);
+  }, [fetchNotes]);
+
+  const loadMore = useCallback(() => {
+    if (!isLoading && notes.length < totalCount) {
+      fetchNotes(false);
+    }
+  }, [isLoading, notes.length, totalCount, fetchNotes]);
 
   const removeNote = useCallback(
-    async (verseId: number) => {
+    async (note: NoteWithVerse): Promise<boolean> => {
+      // Optimistic update - remove from local state immediately
+      const previousNotes = [...notes];
+      const previousCount = totalCount;
+
+      setNotes((current) => current.filter((n) => n.id !== note.id));
+      setTotalCount((count) => Math.max(0, count - 1));
+      decrementCount('notes');
+
       try {
-        await deleteNote(verseId);
-        refresh();
+        await deleteNote(note.book, note.chapter, note.verse);
+        // Invalidate library counts to ensure consistency
+        invalidateLibrary();
+        return true;
       } catch (err) {
-        console.error('Failed to remove note:', err);
+        // Rollback on error
+        setNotes(previousNotes);
+        setTotalCount(previousCount);
+        
+        // Get localized error message
+        const language = useSettingsStore.getState().language;
+        const errorLabels = {
+          title: { ht: 'Erè', fr: 'Erreur', en: 'Error' }[language],
+          message: {
+            ht: 'Pa kapab efase nòt la. Tanpri eseye ankò.',
+            fr: 'Impossible de supprimer la note. Veuillez réessayer.',
+            en: 'Unable to delete note. Please try again.',
+          }[language],
+          ok: { ht: 'OK', fr: 'OK', en: 'OK' }[language],
+        };
+
+        Alert.alert(errorLabels.title, errorLabels.message, [
+          { text: errorLabels.ok },
+        ]);
+
+        return false;
       }
     },
-    [refresh]
+    [notes, totalCount, decrementCount, invalidateLibrary]
   );
+
+  const hasMore = notes.length < totalCount;
 
   return {
     notes,
     isLoading,
     error,
+    totalCount,
+    hasMore,
     refresh,
+    loadMore,
     removeNote,
   };
 }

@@ -1,11 +1,14 @@
 /**
  * useBookmarks Hook
- * Focused hook for bookmarks screen
+ * Focused hook for bookmarks screen with library cache invalidation
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Alert } from 'react-native';
 import { getBookmarks, toggleBookmark } from '../db/queries';
 import { Bookmark } from '../types/library';
+import { useLibraryStore } from '../stores/libraryStore';
+import { useSettingsStore } from '../stores/settingsStore';
 
 interface UseBookmarksResult {
   bookmarks: Bookmark[];
@@ -66,16 +69,38 @@ export function useBookmarks(type?: 'bible' | 'hymn'): UseBookmarksResult {
     setRetryCount((c) => c + 1);
   }, []);
 
+  const decrementCount = useLibraryStore((state) => state.decrementCount);
+  const invalidateLibrary = useLibraryStore((state) => state.invalidate);
+
   const removeBookmark = useCallback(
     async (bookmarkType: 'bible' | 'hymn', refId: number) => {
+      // Optimistic update
+      const previousBookmarks = [...bookmarks];
+      setBookmarks((current) => current.filter((b) => !(b.type === bookmarkType && b.reference_id === refId)));
+      decrementCount(bookmarkType === 'bible' ? 'bookmarks' : 'favorites');
+
       try {
         await toggleBookmark(bookmarkType, refId);
-        refresh();
+        invalidateLibrary();
       } catch (err) {
-        console.error('Failed to remove bookmark:', err);
+        // Rollback on error
+        setBookmarks(previousBookmarks);
+        
+        const language = useSettingsStore.getState().language;
+        const errorLabels = {
+          title: { ht: 'Erè', fr: 'Erreur', en: 'Error' }[language],
+          message: {
+            ht: 'Pa kapab efase makè a. Tanpri eseye ankò.',
+            fr: 'Impossible de supprimer le signet. Veuillez réessayer.',
+            en: 'Unable to delete bookmark. Please try again.',
+          }[language],
+          ok: { ht: 'OK', fr: 'OK', en: 'OK' }[language],
+        };
+
+        Alert.alert(errorLabels.title, errorLabels.message, [{ text: errorLabels.ok }]);
       }
     },
-    [refresh]
+    [bookmarks, decrementCount, invalidateLibrary]
   );
 
   return {

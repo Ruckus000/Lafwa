@@ -5,7 +5,7 @@
 
 import { SQLiteDatabase } from 'expo-sqlite';
 
-const CURRENT_SCHEMA_VERSION = 3;
+const CURRENT_SCHEMA_VERSION = 4;
 
 interface MigrationResult {
   previousVersion: number;
@@ -103,6 +103,51 @@ const migrations: Record<number, (db: SQLiteDatabase) => Promise<void>> = {
       CREATE INDEX IF NOT EXISTS idx_notes_verse_id ON notes(verse_id);
       CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated_at DESC);
     `);
+  },
+
+  // Migration to v4: Make notes language-agnostic by storing book/chapter/verse
+  // instead of version-specific verse_id
+  4: async (db: SQLiteDatabase) => {
+    console.log('Running migration v4: Making notes language-agnostic');
+
+    // 1. Create new notes table with book/chapter/verse columns
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS notes_v2 (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book TEXT NOT NULL,
+        chapter INTEGER NOT NULL,
+        verse INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(book, chapter, verse)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_notes_v2_location ON notes_v2(book, chapter, verse);
+      CREATE INDEX IF NOT EXISTS idx_notes_v2_updated ON notes_v2(updated_at DESC);
+    `);
+
+    // 2. Migrate existing data from old notes table
+    // Join with bible_verses to get book/chapter/verse
+    try {
+      await db.execAsync(`
+        INSERT OR IGNORE INTO notes_v2 (book, chapter, verse, text, created_at, updated_at)
+        SELECT DISTINCT v.book, v.chapter, v.verse, n.text, n.created_at, n.updated_at
+        FROM notes n
+        JOIN bible_verses v ON n.verse_id = v.id;
+      `);
+      console.log('Migrated existing notes to v2 schema');
+    } catch (error) {
+      console.warn('No existing notes to migrate or migration failed:', error);
+    }
+
+    // 3. Drop old notes table and rename new one
+    await db.execAsync(`
+      DROP TABLE IF EXISTS notes;
+      ALTER TABLE notes_v2 RENAME TO notes;
+    `);
+
+    console.log('Notes table migration complete - now language-agnostic');
   },
 };
 

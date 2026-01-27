@@ -1,6 +1,7 @@
 /**
  * NoteEditor Component
  * Modal for writing/editing personal notes on verses
+ * Uses language-agnostic storage (book/chapter/verse)
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -14,6 +15,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -21,15 +23,16 @@ import { useTheme } from '../hooks/useTheme';
 import { useSettingsStore } from '../stores/settingsStore';
 import { getNoteForVerse, saveNote } from '../db/queries';
 
+interface VerseLocation {
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+}
+
 interface NoteEditorProps {
   visible: boolean;
-  verse: {
-    id: number;
-    book: string;
-    chapter: number;
-    verse: number;
-    text: string;
-  } | null;
+  verse: VerseLocation | null;
   onClose: () => void;
   onSave: () => void;
 }
@@ -40,61 +43,105 @@ export default function NoteEditor({
   onClose,
   onSave,
 }: NoteEditorProps) {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
   const language = useSettingsStore((state) => state.language);
   const inputRef = useRef<TextInput>(null);
 
   const [noteText, setNoteText] = useState('');
+  const [originalText, setOriginalText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const hasChanges = noteText !== originalText;
 
   // Load existing note when verse changes
   useEffect(() => {
     if (visible && verse) {
       loadNote();
     }
-  }, [visible, verse?.id]);
+  }, [visible, verse?.book, verse?.chapter, verse?.verse]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setNoteText('');
+      setOriginalText('');
+    }
+  }, [visible]);
 
   const loadNote = async () => {
     if (!verse) return;
 
     setLoading(true);
     try {
-      const existingNote = await getNoteForVerse(verse.id);
-      setNoteText(existingNote || '');
-      setHasChanges(false);
+      const existingNote = await getNoteForVerse(verse.book, verse.chapter, verse.verse);
+      const text = existingNote || '';
+      setNoteText(text);
+      setOriginalText(text);
     } catch (e) {
       console.error('Error loading note:', e);
       setNoteText('');
+      setOriginalText('');
     } finally {
       setLoading(false);
     }
   };
 
   const handleSave = async () => {
-    if (!verse) return;
+    if (!verse || saving) return;
 
+    setSaving(true);
     try {
-      await saveNote(verse.id, noteText);
+      await saveNote(verse.book, verse.chapter, verse.verse, noteText);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onSave();
       onClose();
     } catch (e) {
       console.error('Error saving note:', e);
+      
+      const errorLabels = {
+        title: { ht: 'Erè', fr: 'Erreur', en: 'Error' }[language],
+        message: {
+          ht: 'Pa kapab anrejistre nòt la. Tanpri eseye ankò.',
+          fr: 'Impossible d\'enregistrer la note. Veuillez réessayer.',
+          en: 'Unable to save note. Please try again.',
+        }[language],
+        ok: { ht: 'OK', fr: 'OK', en: 'OK' }[language],
+      };
+
+      Alert.alert(errorLabels.title, errorLabels.message, [{ text: errorLabels.ok }]);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleClose = () => {
     Keyboard.dismiss();
+
     if (hasChanges) {
-      // Could add confirmation dialog here
+      const discardLabels = {
+        title: { ht: 'Jete chanjman yo?', fr: 'Abandonner les modifications?', en: 'Discard changes?' }[language],
+        message: {
+          ht: 'Ou gen chanjman ki poko anrejistre. Ou vle jete yo?',
+          fr: 'Vous avez des modifications non enregistrées. Voulez-vous les abandonner?',
+          en: 'You have unsaved changes. Do you want to discard them?',
+        }[language],
+        discard: { ht: 'Jete', fr: 'Abandonner', en: 'Discard' }[language],
+        cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
+      };
+
+      Alert.alert(discardLabels.title, discardLabels.message, [
+        { text: discardLabels.cancel, style: 'cancel' },
+        { text: discardLabels.discard, style: 'destructive', onPress: onClose },
+      ]);
+      return;
     }
+
     onClose();
   };
 
   const handleTextChange = (text: string) => {
     setNoteText(text);
-    setHasChanges(true);
   };
 
   const labels = {
@@ -105,12 +152,13 @@ export default function NoteEditor({
       en: 'Write your note about this verse...',
     }[language],
     save: { ht: 'Anrejistre', fr: 'Enregistrer', en: 'Save' }[language],
-    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
+    saving: { ht: 'Anrejistre...', fr: 'Enregistrement...', en: 'Saving...' }[language],
   };
 
   if (!verse) return null;
 
   const reference = `${verse.book} ${verse.chapter}:${verse.verse}`;
+  const canSave = hasChanges || (noteText.trim() !== '' && originalText === '');
 
   return (
     <Modal
@@ -129,7 +177,12 @@ export default function NoteEditor({
 
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+            <TouchableOpacity 
+              onPress={handleClose} 
+              style={styles.closeButton}
+              accessibilityLabel={{ ht: 'Fèmen', fr: 'Fermer', en: 'Close' }[language]}
+              accessibilityRole="button"
+            >
               <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
 
@@ -144,10 +197,18 @@ export default function NoteEditor({
 
             <TouchableOpacity
               onPress={handleSave}
-              style={[styles.saveButton, { backgroundColor: colors.primary }]}
-              disabled={!hasChanges && noteText.trim() === ''}
+              style={[
+                styles.saveButton, 
+                { backgroundColor: canSave ? colors.primary : colors.border }
+              ]}
+              disabled={!canSave || saving}
+              accessibilityLabel={saving ? labels.saving : labels.save}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !canSave || saving }}
             >
-              <Text style={styles.saveButtonText}>{labels.save}</Text>
+              <Text style={[styles.saveButtonText, { opacity: canSave ? 1 : 0.5 }]}>
+                {saving ? labels.saving : labels.save}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -179,6 +240,8 @@ export default function NoteEditor({
             multiline
             textAlignVertical="top"
             autoFocus
+            editable={!loading && !saving}
+            accessibilityLabel={labels.placeholder}
           />
         </View>
       </KeyboardAvoidingView>
@@ -234,6 +297,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
+    minWidth: 90,
+    alignItems: 'center',
   },
   saveButtonText: {
     color: '#ffffff',

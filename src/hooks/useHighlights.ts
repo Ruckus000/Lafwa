@@ -1,9 +1,10 @@
 /**
  * useHighlights Hook
- * Focused hook for highlights screen and verse highlighting
+ * Focused hook for highlights screen and verse highlighting with library cache invalidation
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Alert } from 'react-native';
 import {
   getAllHighlights,
   addHighlight,
@@ -12,6 +13,7 @@ import {
 } from '../db/queries';
 import { Highlight, HighlightColor } from '../types/library';
 import { useSettingsStore } from '../stores/settingsStore';
+import { useLibraryStore } from '../stores/libraryStore';
 
 interface UseHighlightsResult {
   highlights: Highlight[];
@@ -64,28 +66,59 @@ export function useHighlights(): UseHighlightsResult {
     setRetryCount((c) => c + 1);
   }, []);
 
+  const decrementCount = useLibraryStore((state) => state.decrementCount);
+  const incrementCount = useLibraryStore((state) => state.incrementCount);
+  const invalidateLibrary = useLibraryStore((state) => state.invalidate);
+
   const highlightVerse = useCallback(
     async (verseId: number, color: HighlightColor) => {
+      // Check if this is a new highlight or color change
+      const existingHighlight = highlights.find((h) => h.verse_id === verseId);
+      const isNew = !existingHighlight;
+
       try {
         await addHighlight(verseId, color);
+        if (isNew) {
+          incrementCount('highlights');
+        }
+        invalidateLibrary();
         refresh();
       } catch (err) {
         console.error('Failed to highlight verse:', err);
       }
     },
-    [refresh]
+    [highlights, refresh, incrementCount, invalidateLibrary]
   );
 
   const unhighlightVerse = useCallback(
     async (verseId: number) => {
+      // Optimistic update
+      const previousHighlights = [...highlights];
+      setHighlights((current) => current.filter((h) => h.verse_id !== verseId));
+      decrementCount('highlights');
+
       try {
         await removeHighlight(verseId);
-        refresh();
+        invalidateLibrary();
       } catch (err) {
-        console.error('Failed to unhighlight verse:', err);
+        // Rollback on error
+        setHighlights(previousHighlights);
+        
+        const language = useSettingsStore.getState().language;
+        const errorLabels = {
+          title: { ht: 'Erè', fr: 'Erreur', en: 'Error' }[language],
+          message: {
+            ht: 'Pa kapab efase sikle a. Tanpri eseye ankò.',
+            fr: 'Impossible de supprimer le surlignage. Veuillez réessayer.',
+            en: 'Unable to remove highlight. Please try again.',
+          }[language],
+          ok: { ht: 'OK', fr: 'OK', en: 'OK' }[language],
+        };
+
+        Alert.alert(errorLabels.title, errorLabels.message, [{ text: errorLabels.ok }]);
       }
     },
-    [refresh]
+    [highlights, decrementCount, invalidateLibrary]
   );
 
   const getColor = useCallback(async (verseId: number): Promise<HighlightColor | null> => {

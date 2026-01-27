@@ -1,6 +1,7 @@
 /**
  * Notes Screen
  * Displays all personal notes on Bible verses
+ * Language-agnostic: notes persist across language switches
  */
 
 import React, { useCallback } from 'react';
@@ -12,9 +13,10 @@ import {
   Text,
   Alert,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../src/hooks/useTheme';
 import { useNotes } from '../src/hooks/useNotes';
@@ -22,15 +24,24 @@ import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
 import { NoteWithVerse } from '../src/db/queries';
 import { navigateToBible } from '../src/utils/navigation';
+import { truncateAtWordBoundary } from '../src/utils/version';
 
 export default function NotesScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
-  const { notes, isLoading, error, removeNote, refresh } = useNotes();
+  const { 
+    notes, 
+    isLoading, 
+    error, 
+    hasMore, 
+    totalCount,
+    refresh, 
+    loadMore, 
+    removeNote 
+  } = useNotes({ pageSize: 50 });
 
   const labels = {
-    title: { ht: 'Nòt mwen yo', fr: 'Mes notes', en: 'My Notes' }[language],
     empty: { ht: 'Ou poko gen nòt', fr: 'Aucune note', en: 'No notes yet' }[language],
     emptyHint: {
       ht: 'Peze sou yon vèsè pou ajoute nòt',
@@ -51,6 +62,12 @@ export default function NotesScreen() {
       en: 'Unable to load notes',
     }[language],
     retry: { ht: 'Eseye ankò', fr: 'Réessayer', en: 'Retry' }[language],
+    loadingMore: { ht: 'Chaje...', fr: 'Chargement...', en: 'Loading...' }[language],
+    longPressHint: {
+      ht: 'Peze lontan pou efase',
+      fr: 'Appui long pour supprimer',
+      en: 'Long press to delete',
+    }[language],
   };
 
   const handleDelete = useCallback(
@@ -62,11 +79,11 @@ export default function NotesScreen() {
         {
           text: labels.delete,
           style: 'destructive',
-          onPress: () => removeNote(item.verse_id),
+          onPress: () => removeNote(item),
         },
       ]);
     },
-    [labels.delete, labels.deleteConfirm, labels.cancel, removeNote]
+    [labels, removeNote]
   );
 
   const handlePress = useCallback(
@@ -83,8 +100,10 @@ export default function NotesScreen() {
   const renderItem = useCallback(
     ({ item }: { item: NoteWithVerse }) => {
       const reference = `${item.book} ${item.chapter}:${item.verse}`;
-      const notePreview = item.text.substring(0, 80) + (item.text.length > 80 ? '...' : '');
-      const versePreview = item.verseText.substring(0, 50) + (item.verseText.length > 50 ? '...' : '');
+      const notePreview = truncateAtWordBoundary(item.text, 100);
+      const versePreview = item.verseText 
+        ? truncateAtWordBoundary(item.verseText, 60) 
+        : '';
 
       const accessibilityLabel = `${reference}. ${notePreview}`;
 
@@ -94,6 +113,7 @@ export default function NotesScreen() {
           onPress={() => handlePress(item)}
           onLongPress={() => handleDelete(item)}
           accessibilityLabel={accessibilityLabel}
+          accessibilityHint={labels.longPressHint}
           accessibilityRole="button"
         >
           <View style={[styles.iconContainer, { backgroundColor: colors.primaryLight }]}>
@@ -104,9 +124,11 @@ export default function NotesScreen() {
             <Text style={[styles.noteText, { color: colors.textSecondary }]} numberOfLines={2}>
               {item.text}
             </Text>
-            <Text style={[styles.versePreview, { color: colors.textTertiary }]} numberOfLines={1}>
-              "{versePreview}"
-            </Text>
+            {versePreview ? (
+              <Text style={[styles.versePreview, { color: colors.textTertiary }]} numberOfLines={1}>
+                "{versePreview}"
+              </Text>
+            ) : null}
           </View>
           <TouchableOpacity
             onPress={() => handleDelete(item)}
@@ -120,19 +142,24 @@ export default function NotesScreen() {
         </TouchableOpacity>
       );
     },
-    [colors, handlePress, handleDelete, labels.delete]
+    [colors, handlePress, handleDelete, labels]
   );
 
-  if (error && !isLoading) {
+  const renderFooter = useCallback(() => {
+    if (!hasMore) return null;
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="small" color={colors.primary} />
+        <Text style={[styles.footerText, { color: colors.textTertiary }]}>
+          {labels.loadingMore}
+        </Text>
+      </View>
+    );
+  }, [hasMore, colors, labels]);
+
+  if (error && !isLoading && notes.length === 0) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['bottom']}>
-        <Stack.Screen
-          options={{
-            title: labels.title,
-            headerStyle: { backgroundColor: colors.bg },
-            headerTintColor: colors.text,
-          }}
-        />
         <EmptyState
           icon="alert-circle-outline"
           title={labels.errorTitle}
@@ -145,24 +172,22 @@ export default function NotesScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['bottom']}>
-      <Stack.Screen
-        options={{
-          title: labels.title,
-          headerStyle: { backgroundColor: colors.bg },
-          headerTintColor: colors.text,
-        }}
-      />
       <FlatList
         data={notes}
         renderItem={renderItem}
         keyExtractor={(item) => `note-${item.id}`}
         contentContainerStyle={[styles.list, notes.length === 0 && styles.emptyList]}
         ListEmptyComponent={
-          <EmptyState icon="document-text-outline" title={labels.empty} hint={labels.emptyHint} />
+          isLoading ? null : (
+            <EmptyState icon="document-text-outline" title={labels.empty} hint={labels.emptyHint} />
+          )
         }
+        ListFooterComponent={renderFooter}
         onRefresh={refresh}
-        refreshing={isLoading}
-        initialNumToRender={10}
+        refreshing={isLoading && notes.length === 0}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.3}
+        initialNumToRender={15}
         maxToRenderPerBatch={10}
         windowSize={5}
         removeClippedSubviews={Platform.OS === 'android'}
@@ -201,5 +226,15 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 4,
     marginTop: -4,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  footerText: {
+    fontSize: 14,
   },
 });

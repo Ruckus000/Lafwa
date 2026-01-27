@@ -17,14 +17,20 @@ import {
   TouchableOpacity,
   Dimensions,
   PanResponder,
-  Pressable,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../hooks/useTheme';
 import { useSettingsStore } from '../stores/settingsStore';
+import { useLibraryStore } from '../stores/libraryStore';
 import { BibleBook } from '../data/bibleBooks';
-import { getChapter, toggleBookmark, isBookmarked, addHighlight, removeHighlight, getHighlightForVerse, hasNoteForVerse } from '../db/queries';
+import { 
+  getChapterWithUserData, 
+  VerseWithUserData,
+  toggleBookmark, 
+  addHighlight, 
+  removeHighlight,
+} from '../db/queries';
 import VerseActionSheet, { HighlightColor } from './VerseActionSheet';
 import VerseJumpSheet from './VerseJumpSheet';
 import NoteEditor from './NoteEditor';
@@ -33,22 +39,9 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.25;
 
 // Base height estimate for getItemLayout
-// Actual heights vary by font size and text length, but this gets us close enough
-// for initial scroll, then onScrollToIndexFailed handles edge cases
 const getBaseVerseHeight = (fontSize: string): number => {
   const heights: Record<string, number> = { XS: 48, S: 54, M: 60, L: 68, XL: 84 };
   return heights[fontSize] || 60;
-};
-
-type Verse = {
-  id: number;
-  book: string;
-  chapter: number;
-  verse: number;
-  text: string;
-  bookmarked?: boolean;
-  highlightColor?: HighlightColor | null;
-  hasNote?: boolean;
 };
 
 interface BibleReaderProps {
@@ -64,14 +57,15 @@ export default function BibleReader({
   version,
   onChapterChange,
 }: BibleReaderProps) {
-  const { colors, typography, spacing } = useTheme();
+  const { colors } = useTheme();
   const fontSize = useSettingsStore((state) => state.fontSize);
   const language = useSettingsStore((state) => state.language);
   const lineSpacing = useSettingsStore((state) => state.lineSpacing);
+  const invalidateLibrary = useLibraryStore((state) => state.invalidate);
 
-  const [verses, setVerses] = useState<Verse[]>([]);
+  const [verses, setVerses] = useState<VerseWithUserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVerse, setSelectedVerse] = useState<Verse | null>(null);
+  const [selectedVerse, setSelectedVerse] = useState<VerseWithUserData | null>(null);
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [showVerseJump, setShowVerseJump] = useState(false);
   const [showNoteEditor, setShowNoteEditor] = useState(false);
@@ -85,7 +79,7 @@ export default function BibleReader({
   // Get book name based on version
   const bookName = version === 'ht' ? book.nameHt : version === 'en' ? book.nameEn : book.nameFr;
 
-  // Load chapter content
+  // Load chapter content - SINGLE QUERY (N+1 fix)
   useEffect(() => {
     loadContent();
   }, [book.nameHt, chapter, version]);
@@ -98,22 +92,9 @@ export default function BibleReader({
   const loadContent = async () => {
     setLoading(true);
     try {
-      // Query uses the French name as stored in DB
-      const data = await getChapter(book.nameFr, chapter, version);
-      
-      // Enrich with bookmark status, highlight color, and note status
-      const enriched = await Promise.all(
-        (data as Verse[]).map(async (v) => {
-          const [bookmarked, highlightColor, hasNote] = await Promise.all([
-            isBookmarked('bible', v.id),
-            getHighlightForVerse(v.id),
-            hasNoteForVerse(v.id),
-          ]);
-          return { ...v, bookmarked, highlightColor, hasNote };
-        })
-      );
-      
-      setVerses(enriched);
+      // Single query gets all user data (bookmarks, highlights, notes)
+      const data = await getChapterWithUserData(book.nameFr, chapter, version);
+      setVerses(data);
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     } catch (e) {
       console.error('Error loading chapter:', e);
@@ -143,7 +124,6 @@ export default function BibleReader({
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Only respond to horizontal swipes
         return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dy) < 50;
       },
       onPanResponderRelease: (_, gestureState) => {
@@ -163,15 +143,13 @@ export default function BibleReader({
   }, [book.nameHt, chapter]);
 
   // Verse selection
-  const handleVersePress = useCallback((verse: Verse) => {
+  const handleVersePress = useCallback((verse: VerseWithUserData) => {
     if (selectionMode) {
-      // In selection mode, toggle this verse
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setSelectedVerseIds((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(verse.id)) {
           newSet.delete(verse.id);
-          // Exit selection mode if no verses selected
           if (newSet.size === 0) {
             setSelectionMode(false);
           }
@@ -181,78 +159,53 @@ export default function BibleReader({
         return newSet;
       });
     } else {
-      // Normal mode: show action sheet for single verse
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setSelectedVerse(verse);
       setShowActionSheet(true);
     }
   }, [selectionMode]);
 
-  // Long press to enter selection mode
-  const handleVerseLongPress = useCallback((verse: Verse) => {
+  const handleVerseLongPress = useCallback((verse: VerseWithUserData) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSelectionMode(true);
     setSelectedVerseIds(new Set([verse.id]));
   }, []);
 
-  // Get selected verses as array
   const getSelectedVerses = useCallback(() => {
     return verses.filter((v) => selectedVerseIds.has(v.id)).sort((a, b) => a.verse - b.verse);
   }, [verses, selectedVerseIds]);
 
-  // Get selection range text
-  const getSelectionRangeText = useCallback(() => {
-    const selected = getSelectedVerses();
-    if (selected.length === 0) return '';
-    if (selected.length === 1) {
-      return `v.${selected[0].verse}`;
-    }
-    const first = selected[0].verse;
-    const last = selected[selected.length - 1].verse;
-    // Check if consecutive
-    const isConsecutive = selected.every((v, i) =>
-      i === 0 || v.verse === selected[i - 1].verse + 1
-    );
-    if (isConsecutive) {
-      return `v.${first}-${last}`;
-    }
-    return `${selected.length} {{ ht: 'vèsè', fr: 'versets', en: 'verses' }[language]}`;
-  }, [getSelectedVerses, language]);
-
-  // Clear selection
   const clearSelection = useCallback(() => {
     setSelectionMode(false);
     setSelectedVerseIds(new Set());
   }, []);
 
-  // Show action sheet for selected verses
   const showSelectionActions = useCallback(() => {
     const selected = getSelectedVerses();
     if (selected.length > 0) {
-      // Use first verse for action sheet (for single-verse actions like notes)
       setSelectedVerse(selected[0]);
       setShowActionSheet(true);
     }
   }, [getSelectedVerses]);
 
-  // Action sheet handlers
+  // Action handlers with library cache invalidation
   const handleHighlight = useCallback(async (color: HighlightColor) => {
     const idsToHighlight = selectionMode ? Array.from(selectedVerseIds) : (selectedVerse ? [selectedVerse.id] : []);
 
     if (idsToHighlight.length > 0) {
-      // Apply highlight to all selected verses
       await Promise.all(idsToHighlight.map((id) => addHighlight(id, color)));
       setVerses((current) =>
         current.map((v) =>
           idsToHighlight.includes(v.id) ? { ...v, highlightColor: color } : v
         )
       );
+      invalidateLibrary();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
     setShowActionSheet(false);
     setSelectedVerse(null);
     clearSelection();
-  }, [selectedVerse, selectionMode, selectedVerseIds, clearSelection]);
+  }, [selectedVerse, selectionMode, selectedVerseIds, clearSelection, invalidateLibrary]);
 
   const handleRemoveHighlight = useCallback(async () => {
     const idsToRemove = selectionMode ? Array.from(selectedVerseIds) : (selectedVerse ? [selectedVerse.id] : []);
@@ -264,11 +217,12 @@ export default function BibleReader({
           idsToRemove.includes(v.id) ? { ...v, highlightColor: null } : v
         )
       );
+      invalidateLibrary();
     }
     setShowActionSheet(false);
     setSelectedVerse(null);
     clearSelection();
-  }, [selectedVerse, selectionMode, selectedVerseIds, clearSelection]);
+  }, [selectedVerse, selectionMode, selectedVerseIds, clearSelection, invalidateLibrary]);
 
   const handleToggleBookmark = useCallback(async () => {
     if (selectedVerse) {
@@ -278,11 +232,12 @@ export default function BibleReader({
           v.id === selectedVerse.id ? { ...v, bookmarked: newStatus } : v
         )
       );
+      invalidateLibrary();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
     setShowActionSheet(false);
     setSelectedVerse(null);
-  }, [selectedVerse]);
+  }, [selectedVerse, invalidateLibrary]);
 
   const handleCopy = useCallback(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -303,17 +258,17 @@ export default function BibleReader({
   }, []);
 
   const handleNoteSaved = useCallback(() => {
-    // Update the verse's hasNote status
     if (selectedVerse) {
       setVerses((current) =>
         current.map((v) =>
           v.id === selectedVerse.id ? { ...v, hasNote: true } : v
         )
       );
+      invalidateLibrary();
     }
     setShowNoteEditor(false);
     setSelectedVerse(null);
-  }, [selectedVerse]);
+  }, [selectedVerse, invalidateLibrary]);
 
   const closeNoteEditor = useCallback(() => {
     setShowNoteEditor(false);
@@ -326,16 +281,15 @@ export default function BibleReader({
     clearSelection();
   }, [clearSelection]);
 
-  // Verse jump handler
   const handleVerseJump = useCallback((verse: number) => {
-    const index = verse - 1; // verses are 1-indexed
+    const index = verse - 1;
     if (index >= 0 && index < verses.length) {
       listRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.1 });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   }, [verses.length]);
 
-  // Get highlight background color
+  // Highlight colors
   const getHighlightStyle = (color: HighlightColor | null | undefined) => {
     if (!color) return {};
     const highlightColors = {
@@ -348,21 +302,11 @@ export default function BibleReader({
   };
 
   // Font size mapping
-  const fontSizes = {
-    XS: 14,
-    S: 16,
-    M: 18,
-    L: 20,
-    XL: 24,
-  };
+  const fontSizes = { XS: 14, S: 16, M: 18, L: 20, XL: 24 };
   const textSize = fontSizes[fontSize] || 18;
 
   // Line spacing multiplier
-  const lineSpacingMultipliers = {
-    compact: 1.4,
-    normal: 1.6,
-    relaxed: 1.8,
-  };
+  const lineSpacingMultipliers = { compact: 1.4, normal: 1.6, relaxed: 1.8 };
   const lineHeightMultiplier = lineSpacingMultipliers[lineSpacing] || 1.6;
 
   if (loading) {
@@ -387,11 +331,8 @@ export default function BibleReader({
     );
   }
 
-  // Selection bar labels
   const selectionLabels = {
     selected: { ht: 'seleksyone', fr: 'sélectionné', en: 'selected' }[language],
-    actions: { ht: 'Aksyon', fr: 'Actions', en: 'Actions' }[language],
-    cancel: { ht: 'Anile', fr: 'Annuler', en: 'Cancel' }[language],
   };
 
   return (
@@ -447,6 +388,8 @@ export default function BibleReader({
                   isSelected && { backgroundColor: colors.primaryLight },
                   isInSelection && { backgroundColor: colors.primaryLight },
                 ]}
+                accessibilityLabel={`${item.verse}. ${item.text}`}
+                accessibilityHint={{ ht: 'Peze lontan pou chwazi', fr: 'Appui long pour sélectionner', en: 'Long press to select' }[language]}
               >
                 <Text
                   style={[
@@ -462,12 +405,8 @@ export default function BibleReader({
                     {item.verse}{' '}
                   </Text>
                   {item.text}
-                  {item.hasNote && (
-                    <Text style={styles.noteIndicator}> 📝</Text>
-                  )}
-                  {item.bookmarked && (
-                    <Text style={styles.bookmarkIndicator}> 🔖</Text>
-                  )}
+                  {item.hasNote && <Text style={styles.noteIndicator}> 📝</Text>}
+                  {item.bookmarked && <Text style={styles.bookmarkIndicator}> 🔖</Text>}
                 </Text>
               </TouchableOpacity>
             );
@@ -531,10 +470,15 @@ export default function BibleReader({
         onClose={() => setShowVerseJump(false)}
       />
 
-      {/* Note Editor */}
+      {/* Note Editor - passes verse location instead of verse_id */}
       <NoteEditor
         visible={showNoteEditor}
-        verse={selectedVerse}
+        verse={selectedVerse ? {
+          book: selectedVerse.book,
+          chapter: selectedVerse.chapter,
+          verse: selectedVerse.verse,
+          text: selectedVerse.text,
+        } : null}
         onClose={closeNoteEditor}
         onSave={handleNoteSaved}
       />
@@ -543,70 +487,27 @@ export default function BibleReader({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  listContent: {
-    padding: 20,
-    paddingBottom: 100,
-  },
+  container: { flex: 1 },
+  content: { flex: 1 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  listContent: { padding: 20, paddingBottom: 100 },
   verseContainer: {
     paddingVertical: 2,
     paddingHorizontal: 4,
     marginHorizontal: -4,
     borderRadius: 4,
   },
-  verseText: {
-    fontFamily: 'System',
-  },
-  verseNum: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  bookmarkIndicator: {
-    fontSize: 12,
-  },
-  noteIndicator: {
-    fontSize: 12,
-  },
-  footer: {
-    paddingTop: 40,
-    paddingBottom: 20,
-    alignItems: 'center',
-  },
-  chapterLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: 'center',
-    paddingHorizontal: 40,
-  },
-  navHint: {
-    position: 'absolute',
-    top: '50%',
-    marginTop: -20,
-    opacity: 0.3,
-  },
-  navHintLeft: {
-    left: 8,
-  },
-  navHintRight: {
-    right: 8,
-  },
-  navHintText: {
-    fontSize: 24,
-    fontWeight: '300',
-  },
+  verseText: { fontFamily: 'System' },
+  verseNum: { fontSize: 12, fontWeight: '700' },
+  bookmarkIndicator: { fontSize: 12 },
+  noteIndicator: { fontSize: 12 },
+  footer: { paddingTop: 40, paddingBottom: 20, alignItems: 'center' },
+  chapterLabel: { fontSize: 14, fontWeight: '500' },
+  emptyText: { fontSize: 16, textAlign: 'center', paddingHorizontal: 40 },
+  navHint: { position: 'absolute', top: '50%', marginTop: -20, opacity: 0.3 },
+  navHintLeft: { left: 8 },
+  navHintRight: { right: 8 },
+  navHintText: { fontSize: 24, fontWeight: '300' },
   selectionBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -614,12 +515,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 12,
   },
-  selectionBarButton: {
-    padding: 8,
-  },
-  selectionBarText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  selectionBarButton: { padding: 8 },
+  selectionBarText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

@@ -1,10 +1,10 @@
 /**
  * useLibrary Hook
- * Single hook for library counts (KISS principle)
+ * Thin wrapper around libraryStore for component consumption
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { getLibraryCounts } from '../db/queries';
+import { useEffect } from 'react';
+import { useLibraryStore } from '../stores/libraryStore';
 import { LibraryCounts } from '../types/library';
 
 interface UseLibraryResult {
@@ -15,54 +15,24 @@ interface UseLibraryResult {
 }
 
 export function useLibrary(): UseLibraryResult {
-  const [counts, setCounts] = useState<LibraryCounts>({
-    bookmarks: 0,
-    highlights: 0,
-    favorites: 0,
-    notes: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const counts = useLibraryStore((state) => state.counts);
+  const isLoading = useLibraryStore((state) => state.isLoading);
+  const error = useLibraryStore((state) => state.error);
+  const fetchCounts = useLibraryStore((state) => state.fetchCounts);
+  const invalidate = useLibraryStore((state) => state.invalidate);
 
+  // Fetch on mount if needed
   useEffect(() => {
-    let isMounted = true;
-
-    async function fetchCounts() {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const result = await getLibraryCounts();
-        if (isMounted) {
-          setCounts(result);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(err instanceof Error ? err : new Error('Failed to load library counts'));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
     fetchCounts();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [retryCount]);
-
-  const refresh = useCallback(() => {
-    setRetryCount((c) => c + 1);
-  }, []);
+  }, [fetchCounts]);
 
   return {
     counts,
     isLoading,
     error,
-    refresh,
+    refresh: invalidate,
   };
 }
+
+// Re-export store for direct access when needed
+export { useLibraryStore };
