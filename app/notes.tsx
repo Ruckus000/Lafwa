@@ -22,11 +22,12 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useNotes } from '../src/hooks/useNotes';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
 import { NoteWithVerse } from '../src/db/queries';
 import { navigateToBible } from '../src/utils/navigation';
 import { truncateAtWordBoundary } from '../src/utils/version';
 
-export default function NotesScreen() {
+function NotesScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
@@ -193,6 +194,26 @@ export default function NotesScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
       />
     </SafeAreaView>
+  );
+}
+
+// Wrap with error boundary for graceful error handling
+export default function NotesScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="NotesScreen"
+      fallbackTitle={{
+        ht: 'Pa kapab chaje nòt yo',
+        fr: 'Impossible de charger les notes',
+        en: 'Unable to load notes',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <NotesScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

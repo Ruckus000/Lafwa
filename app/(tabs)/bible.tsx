@@ -20,6 +20,7 @@ import { BibleBook, getBookByName } from '../../src/data/bibleBooks';
 import BookPicker from '../../src/components/BookPicker';
 import ChapterPicker from '../../src/components/ChapterPicker';
 import BibleReader from '../../src/components/BibleReader';
+import { ScreenErrorBoundary } from '../../src/components/ScreenErrorBoundary';
 
 type Screen = 'bookPicker' | 'chapterPicker' | 'reader';
 
@@ -31,6 +32,7 @@ export default function BibleScreen() {
     setBibleVersion,
     lastReadBible,
     setLastReadBible,
+    language,
   } = useSettingsStore();
 
   // Deep linking params (from daily verse "read more")
@@ -139,7 +141,6 @@ export default function BibleScreen() {
 
   // Render Reading View
   if (screen === 'reader' && selectedBook) {
-    const language = useSettingsStore.getState().language;
     const bookName = language === 'ht' ? selectedBook.nameHt : selectedBook.nameFr;
 
     return (
@@ -175,13 +176,23 @@ export default function BibleScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Reader */}
-        <BibleReader
-          book={selectedBook}
-          chapter={selectedChapter}
-          version={bibleVersion}
-          onChapterChange={handleChapterChange}
-        />
+        {/* Reader - wrapped in error boundary for graceful degradation */}
+        <ScreenErrorBoundary
+          screenName="BibleReader"
+          fallbackTitle={{
+            ht: 'Pa kapab montre chapit sa a',
+            fr: 'Impossible d\'afficher ce chapitre',
+            en: 'Unable to display this chapter',
+          }[language]}
+          onGoBack={goToBookPicker}
+        >
+          <BibleReader
+            book={selectedBook}
+            chapter={selectedChapter}
+            version={bibleVersion}
+            onChapterChange={handleChapterChange}
+          />
+        </ScreenErrorBoundary>
       </SafeAreaView>
     );
   }

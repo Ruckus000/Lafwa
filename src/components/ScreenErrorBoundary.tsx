@@ -3,6 +3,11 @@
  * A convenience wrapper that automatically uses current theme and language.
  * Use this for wrapping screens/major components.
  * 
+ * SAFETY: This component uses defensive hook access with hardcoded fallbacks.
+ * If useSettingsStore or useColorScheme fail (e.g., during Zustand hydration
+ * race conditions or corrupt AsyncStorage), we fall back to safe defaults
+ * rather than crashing the error boundary itself.
+ * 
  * @example
  * // In a screen component:
  * <ScreenErrorBoundary screenName="BibleReader" onGoBack={() => router.back()}>
@@ -15,6 +20,11 @@ import { useColorScheme } from 'react-native';
 import { ErrorBoundary } from './ErrorBoundary';
 import { useSettingsStore } from '../stores/settingsStore';
 import { ColorScheme } from '../theme/colors';
+
+// Hardcoded fallbacks - these MUST work even if all stores/hooks fail
+const FALLBACK_LANGUAGE = 'ht' as const;
+const FALLBACK_THEME = 'light' as const;
+const FALLBACK_COLOR_SCHEME: ColorScheme = 'light';
 
 interface ScreenErrorBoundaryProps {
   children: ReactNode;
@@ -30,6 +40,20 @@ interface ScreenErrorBoundaryProps {
   onGoBack?: () => void;
 }
 
+/**
+ * Safe hook accessor - returns fallback if hook throws
+ */
+function useSafeSettingsStore<T>(selector: (state: any) => T, fallback: T): T {
+  try {
+    return useSettingsStore(selector);
+  } catch (e) {
+    if (__DEV__) {
+      console.warn('[ScreenErrorBoundary] useSettingsStore failed, using fallback:', e);
+    }
+    return fallback;
+  }
+}
+
 export function ScreenErrorBoundary({
   children,
   screenName,
@@ -38,15 +62,33 @@ export function ScreenErrorBoundary({
   onReset,
   onGoBack,
 }: ScreenErrorBoundaryProps) {
-  const systemScheme = useColorScheme();
-  const themeSetting = useSettingsStore((state) => state.theme);
-  const language = useSettingsStore((state) => state.language);
+  // Defensive hook access with fallbacks
+  let systemScheme: 'light' | 'dark' | null | undefined;
+  try {
+    systemScheme = useColorScheme();
+  } catch (e) {
+    if (__DEV__) {
+      console.warn('[ScreenErrorBoundary] useColorScheme failed:', e);
+    }
+    systemScheme = null;
+  }
 
-  // Determine effective color scheme
-  const colorScheme: ColorScheme =
-    themeSetting === 'system'
-      ? (systemScheme === 'dark' ? 'dark' : 'light')
-      : themeSetting;
+  const themeSetting = useSafeSettingsStore((state) => state.theme, FALLBACK_THEME);
+  const language = useSafeSettingsStore((state) => state.language, FALLBACK_LANGUAGE);
+
+  // Determine effective color scheme with defensive fallback
+  let colorScheme: ColorScheme;
+  try {
+    if (themeSetting === 'system') {
+      colorScheme = systemScheme === 'dark' ? 'dark' : 'light';
+    } else if (themeSetting === 'dark' || themeSetting === 'light' || themeSetting === 'sepia') {
+      colorScheme = themeSetting;
+    } else {
+      colorScheme = FALLBACK_COLOR_SCHEME;
+    }
+  } catch {
+    colorScheme = FALLBACK_COLOR_SCHEME;
+  }
 
   return (
     <ErrorBoundary

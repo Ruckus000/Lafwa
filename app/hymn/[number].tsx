@@ -21,6 +21,7 @@ import { useSettingsStore } from '../../src/stores/settingsStore';
 import { getHymnWithSections, HymnWithSections, isHymnFavorite, toggleFavoriteHymn, recordReading } from '../../src/db/queries';
 import HymnReader from '../../src/components/HymnReader';
 import PresentationMode from '../../src/components/PresentationMode';
+import { ScreenErrorBoundary } from '../../src/components/ScreenErrorBoundary';
 
 export default function HymnDetailScreen() {
   const router = useRouter();
@@ -168,11 +169,21 @@ export default function HymnDetailScreen() {
         </View>
       </View>
 
-      {/* Hymn Reader */}
-      <HymnReader
-        hymnNumber={hymnNumber}
-        onPresentationMode={handlePresentationMode}
-      />
+      {/* Hymn Reader - wrapped in error boundary */}
+      <ScreenErrorBoundary
+        screenName="HymnReader"
+        fallbackTitle={{
+          ht: 'Pa kapab montre kantik sa a',
+          fr: 'Impossible d\'afficher ce cantique',
+          en: 'Unable to display this hymn',
+        }[language]}
+        onGoBack={() => router.back()}
+      >
+        <HymnReader
+          hymnNumber={hymnNumber}
+          onPresentationMode={handlePresentationMode}
+        />
+      </ScreenErrorBoundary>
     </SafeAreaView>
   );
 }

@@ -24,6 +24,7 @@ import { useResponsive } from '../../src/hooks/useResponsive';
 import { useSettingsStore } from '../../src/stores/settingsStore';
 import { useDailyVerse } from '../../src/hooks/useDailyVerse';
 import { VerseCardSkeleton } from '../../src/components/VerseCardSkeleton';
+import { ScreenErrorBoundary } from '../../src/components/ScreenErrorBoundary';
 
 // Time-based greetings
 const getGreeting = (language: 'ht' | 'fr' | 'en') => {
@@ -42,7 +43,7 @@ const getGreeting = (language: 'ht' | 'fr' | 'en') => {
 };
 
 
-export default function HomeScreen() {
+function HomeScreenContent() {
   const router = useRouter();
   const { colors, shadows, isDark } = useTheme();
   const { rs, rf, rw } = useResponsive();
@@ -386,6 +387,26 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function HomeScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="HomeScreen"
+      fallbackTitle={{
+        ht: 'Paj lakay pa kapab chaje',
+        fr: 'Page d\'accueil impossible à charger',
+        en: 'Home page could not load',
+      }[language]}
+      onGoBack={() => router.push('/bible')}
+    >
+      <HomeScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

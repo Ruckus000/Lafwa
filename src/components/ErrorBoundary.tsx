@@ -36,6 +36,9 @@ interface ErrorLogEntry {
   screen?: string;
 }
 
+// Maximum retry attempts before showing persistent error message
+const MAX_RETRY_ATTEMPTS = 3;
+
 // Translations for error messages
 const translations = {
   ht: {
@@ -45,6 +48,10 @@ const translations = {
     goBack: 'Retounen',
     showDetails: 'Montre detay',
     hideDetails: 'Kache detay',
+    errorIcon: 'Ikòn erè',
+    persistentTitle: 'Pwoblèm pèsistan',
+    persistentHint: 'Tanpri fèmen aplikasyon an epi re-ouvri li. Si pwoblèm nan kontinye, efase done aplikasyon an.',
+    retryCount: 'Tantativ',
   },
   fr: {
     defaultTitle: 'Quelque chose s\'est mal passé',
@@ -53,6 +60,10 @@ const translations = {
     goBack: 'Retour',
     showDetails: 'Afficher les détails',
     hideDetails: 'Masquer les détails',
+    errorIcon: 'Icône d\'erreur',
+    persistentTitle: 'Problème persistant',
+    persistentHint: 'Veuillez fermer et rouvrir l\'application. Si le problème persiste, effacez les données de l\'application.',
+    retryCount: 'Tentative',
   },
   en: {
     defaultTitle: 'Something went wrong',
@@ -61,6 +72,10 @@ const translations = {
     goBack: 'Go Back',
     showDetails: 'Show details',
     hideDetails: 'Hide details',
+    errorIcon: 'Error icon',
+    persistentTitle: 'Persistent problem',
+    persistentHint: 'Please close and reopen the app. If the problem continues, clear the app data.',
+    retryCount: 'Attempt',
   },
 };
 
@@ -91,6 +106,7 @@ interface ErrorBoundaryState {
   error: Error | null;
   errorInfo: React.ErrorInfo | null;
   showDetails: boolean;
+  retryCount: number;
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -101,6 +117,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       error: null,
       errorInfo: null,
       showDetails: false,
+      retryCount: 0,
     };
   }
 
@@ -149,12 +166,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   private handleReset = (): void => {
-    this.setState({
+    this.setState((prev) => ({
       hasError: false,
       error: null,
       errorInfo: null,
       showDetails: false,
-    });
+      retryCount: prev.retryCount + 1,
+    }));
 
     if (this.props.onReset) {
       this.props.onReset();
@@ -176,7 +194,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       showDetailsInDev = true,
     } = this.props;
 
-    const { hasError, error, errorInfo, showDetails } = this.state;
+    const { hasError, error, errorInfo, showDetails, retryCount } = this.state;
 
     if (!hasError) {
       return children;
@@ -185,35 +203,59 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const colors = getThemeColors(colorScheme);
     const t = translations[language];
     const isDev = __DEV__;
+    const isPersistentError = retryCount >= MAX_RETRY_ATTEMPTS;
+
+    // Use persistent error messages if max retries exceeded
+    const displayTitle = isPersistentError ? t.persistentTitle : (fallbackTitle || t.defaultTitle);
+    const displayHint = isPersistentError ? t.persistentHint : (fallbackHint || t.defaultHint);
 
     return (
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
         {/* Icon */}
-        <View style={[styles.iconContainer, { backgroundColor: colors.surfaceHover }]}>
-          <Ionicons name="alert-circle-outline" size={48} color={colors.textTertiary} />
+        <View 
+          style={[styles.iconContainer, { backgroundColor: colors.surfaceHover }]}
+          accessible={true}
+          accessibilityLabel={t.errorIcon}
+          accessibilityRole="image"
+        >
+          <Ionicons 
+            name={isPersistentError ? 'warning-outline' : 'alert-circle-outline'} 
+            size={48} 
+            color={isPersistentError ? '#ef4444' : colors.textTertiary} 
+          />
         </View>
 
         {/* Title */}
         <Text style={[styles.title, { color: colors.text }]}>
-          {fallbackTitle || t.defaultTitle}
+          {displayTitle}
         </Text>
 
         {/* Hint */}
         <Text style={[styles.hint, { color: colors.textTertiary }]}>
-          {fallbackHint || t.defaultHint}
+          {displayHint}
         </Text>
+
+        {/* Retry count indicator (only show after first retry) */}
+        {retryCount > 0 && retryCount < MAX_RETRY_ATTEMPTS && (
+          <Text style={[styles.retryCount, { color: colors.textMuted }]}>
+            {t.retryCount} {retryCount}/{MAX_RETRY_ATTEMPTS}
+          </Text>
+        )}
 
         {/* Actions */}
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.primaryButton, { backgroundColor: colors.primary }]}
-            onPress={this.handleReset}
-            accessibilityLabel={t.tryAgain}
-            accessibilityRole="button"
-          >
-            <Ionicons name="refresh" size={18} color="#fff" style={styles.buttonIcon} />
-            <Text style={styles.primaryButtonText}>{t.tryAgain}</Text>
-          </TouchableOpacity>
+          {/* Only show Try Again if not persistent error */}
+          {!isPersistentError && (
+            <TouchableOpacity
+              style={[styles.primaryButton, { backgroundColor: colors.primary }]}
+              onPress={this.handleReset}
+              accessibilityLabel={`${t.tryAgain} (${t.retryCount} ${retryCount + 1}/${MAX_RETRY_ATTEMPTS})`}
+              accessibilityRole="button"
+            >
+              <Ionicons name="refresh" size={18} color="#fff" style={styles.buttonIcon} />
+              <Text style={styles.primaryButtonText}>{t.tryAgain}</Text>
+            </TouchableOpacity>
+          )}
 
           {onGoBack && (
             <TouchableOpacity
@@ -320,6 +362,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 24,
+  },
+  retryCount: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 16,
   },
   actions: {
     flexDirection: 'column',

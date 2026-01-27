@@ -1,14 +1,23 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { useTheme } from '../src/hooks/useTheme';
 import { useSettingsStore } from '../src/stores/settingsStore';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
+import { setupGlobalErrorHandler } from '../src/utils/errorHandler';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
+
+// Set up global error handler for async errors (only once)
+let errorHandlerInitialized = false;
+if (!errorHandlerInitialized) {
+  setupGlobalErrorHandler();
+  errorHandlerInitialized = true;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -49,53 +58,72 @@ export default function RootLayout() {
     headerBackTitle: backTitle,
   };
 
+  // Root-level error fallback titles
+  const rootErrorTitle = {
+    ht: 'Aplikasyon an te kwaze',
+    fr: 'L\'application a planté',
+    en: 'The app crashed',
+  }[language];
+
+  const rootErrorHint = {
+    ht: 'Tanpri rekòmanse aplikasyon an.',
+    fr: 'Veuillez redémarrer l\'application.',
+    en: 'Please restart the application.',
+  }[language];
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <ScreenErrorBoundary 
+      screenName="RootLayout"
+      fallbackTitle={rootErrorTitle}
+      fallbackHint={rootErrorHint}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Library screens - now at root level with proper back navigation */}
-        <Stack.Screen
-          name="bookmarks"
-          options={{ ...pushScreenOptions, title: screenTitles.bookmarks }}
-        />
-        <Stack.Screen
-          name="highlights"
-          options={{ ...pushScreenOptions, title: screenTitles.highlights }}
-        />
-        <Stack.Screen
-          name="notes"
-          options={{ ...pushScreenOptions, title: screenTitles.notes }}
-        />
-        <Stack.Screen
-          name="favorites"
-          options={{ ...pushScreenOptions, title: screenTitles.favorites }}
-        />
-        <Stack.Screen
-          name="history"
-          options={{ ...pushScreenOptions, title: screenTitles.history }}
-        />
+          {/* Library screens - now at root level with proper back navigation */}
+          <Stack.Screen
+            name="bookmarks"
+            options={{ ...pushScreenOptions, title: screenTitles.bookmarks }}
+          />
+          <Stack.Screen
+            name="highlights"
+            options={{ ...pushScreenOptions, title: screenTitles.highlights }}
+          />
+          <Stack.Screen
+            name="notes"
+            options={{ ...pushScreenOptions, title: screenTitles.notes }}
+          />
+          <Stack.Screen
+            name="favorites"
+            options={{ ...pushScreenOptions, title: screenTitles.favorites }}
+          />
+          <Stack.Screen
+            name="history"
+            options={{ ...pushScreenOptions, title: screenTitles.history }}
+          />
 
-        {/* Modal screens */}
-        <Stack.Screen
-          name="search"
-          options={{
-            presentation: 'modal',
-            headerShown: false,
-          }}
-        />
+          {/* Modal screens */}
+          <Stack.Screen
+            name="search"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
 
-        {/* Info screens */}
-        <Stack.Screen
-          name="about"
-          options={{ ...pushScreenOptions, title: screenTitles.about }}
-        />
-        <Stack.Screen
-          name="feedback"
-          options={{ ...pushScreenOptions, title: screenTitles.feedback }}
-        />
-      </Stack>
-      <StatusBar style="auto" />
-    </GestureHandlerRootView>
+          {/* Info screens */}
+          <Stack.Screen
+            name="about"
+            options={{ ...pushScreenOptions, title: screenTitles.about }}
+          />
+          <Stack.Screen
+            name="feedback"
+            options={{ ...pushScreenOptions, title: screenTitles.feedback }}
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </GestureHandlerRootView>
+    </ScreenErrorBoundary>
   );
 }
