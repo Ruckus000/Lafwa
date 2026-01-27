@@ -15,10 +15,11 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useBookmarks } from '../src/hooks/useBookmarks';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
 import { Bookmark } from '../src/types/library';
 import { navigateToBible, navigateToHymn } from '../src/utils/navigation';
 
-export default function BookmarksScreen() {
+function BookmarksScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
@@ -175,6 +176,26 @@ export default function BookmarksScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
       />
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function BookmarksScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="BookmarksScreen"
+      fallbackTitle={{
+        ht: 'Pa kapab chaje makè yo',
+        fr: 'Impossible de charger les signets',
+        en: 'Unable to load bookmarks',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <BookmarksScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

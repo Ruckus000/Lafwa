@@ -15,10 +15,11 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useHistory } from '../src/hooks/useHistory';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
 import { HistoryItem } from '../src/types/library';
 import { navigateToBible, navigateToHymn } from '../src/utils/navigation';
 
-export default function HistoryScreen() {
+function HistoryScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
@@ -155,6 +156,26 @@ export default function HistoryScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
       />
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function HistoryScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="HistoryScreen"
+      fallbackTitle={{
+        ht: 'Pa kapab chaje istwa',
+        fr: "Impossible de charger l'historique",
+        en: 'Unable to load history',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <HistoryScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

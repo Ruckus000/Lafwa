@@ -16,6 +16,8 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useSearch } from '../src/hooks/useSearch';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
+import { HighlightedText } from '../src/components/HighlightedText';
 import { navigateToBible, navigateToHymn } from '../src/utils/navigation';
 import {
   SearchResultItem,
@@ -25,7 +27,7 @@ import {
   isHymnResult,
 } from '../src/types/search';
 
-export default function SearchScreen() {
+function SearchScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language, bibleVersion } = useSettingsStore();
@@ -80,6 +82,13 @@ export default function SearchScreen() {
       ? (data as BibleSearchResult).text
       : (data as HymnSearchResult).title_ht || (data as HymnSearchResult).title_fr || '';
 
+    // Highlight style - yellow background like verse highlights
+    const highlightStyle = {
+      backgroundColor: '#fef08a',
+      borderRadius: 2,
+      paddingHorizontal: 1,
+    };
+
     return (
       <TouchableOpacity
         style={[styles.resultItem, { borderColor: colors.border }]}
@@ -97,9 +106,13 @@ export default function SearchScreen() {
           <Text style={[styles.resultTitle, { color: colors.text }]}>
             {title}
           </Text>
-          <Text style={[styles.resultSnippet, { color: colors.textTertiary }]} numberOfLines={2}>
-            {snippet}
-          </Text>
+          <HighlightedText
+            text={snippet}
+            highlight={query}
+            style={[styles.resultSnippet, { color: colors.textTertiary }]}
+            highlightStyle={highlightStyle}
+            numberOfLines={2}
+          />
         </View>
       </TouchableOpacity>
     );
@@ -194,6 +207,26 @@ export default function SearchScreen() {
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function SearchScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="SearchScreen"
+      fallbackTitle={{
+        ht: 'Chèche pa mache',
+        fr: 'La recherche ne fonctionne pas',
+        en: 'Search is not working',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <SearchScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

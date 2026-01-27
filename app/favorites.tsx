@@ -15,10 +15,11 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useFavorites } from '../src/hooks/useFavorites';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
 import { Bookmark } from '../src/types/library';
 import { navigateToHymn } from '../src/utils/navigation';
 
-export default function FavoritesScreen() {
+function FavoritesScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
@@ -156,6 +157,26 @@ export default function FavoritesScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
       />
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function FavoritesScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="FavoritesScreen"
+      fallbackTitle={{
+        ht: 'Pa kapab chaje favori yo',
+        fr: 'Impossible de charger les favoris',
+        en: 'Unable to load favorites',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <FavoritesScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

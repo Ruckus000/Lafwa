@@ -15,6 +15,7 @@ import { useTheme } from '../src/hooks/useTheme';
 import { useHighlights } from '../src/hooks/useHighlights';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { EmptyState } from '../src/components/EmptyState';
+import { ScreenErrorBoundary } from '../src/components/ScreenErrorBoundary';
 import { Highlight, HighlightColor } from '../src/types/library';
 import { navigateToBible } from '../src/utils/navigation';
 
@@ -25,7 +26,7 @@ const HIGHLIGHT_COLORS: Record<HighlightColor, string> = {
   pink: '#fecaca',
 };
 
-export default function HighlightsScreen() {
+function HighlightsScreenContent() {
   const router = useRouter();
   const { colors } = useTheme();
   const { language } = useSettingsStore();
@@ -166,6 +167,26 @@ export default function HighlightsScreen() {
         removeClippedSubviews={Platform.OS === 'android'}
       />
     </SafeAreaView>
+  );
+}
+
+// Wrap with ErrorBoundary for graceful error handling
+export default function HighlightsScreen() {
+  const { language } = useSettingsStore();
+  const router = useRouter();
+
+  return (
+    <ScreenErrorBoundary
+      screenName="HighlightsScreen"
+      fallbackTitle={{
+        ht: 'Pa kapab chaje sikle yo',
+        fr: 'Impossible de charger les surlignages',
+        en: 'Unable to load highlights',
+      }[language]}
+      onGoBack={() => router.back()}
+    >
+      <HighlightsScreenContent />
+    </ScreenErrorBoundary>
   );
 }
 

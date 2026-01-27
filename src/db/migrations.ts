@@ -5,12 +5,18 @@
 
 import { SQLiteDatabase } from 'expo-sqlite';
 
-const CURRENT_SCHEMA_VERSION = 4;
+const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_CONTENT_VERSION = 2;  // Bumped to trigger daily_verses seed update
 
 interface MigrationResult {
   previousVersion: number;
   currentVersion: number;
   migrationsRun: number[];
+}
+
+interface VersionInfo {
+  schemaVersion: number;
+  contentVersion: number;
 }
 
 /**
@@ -19,9 +25,11 @@ interface MigrationResult {
 async function getSchemaVersion(db: SQLiteDatabase): Promise<number> {
   try {
     // Create version table if it doesn't exist
+    // Note: content_version column may be added by migration v5 or getVersionInfo
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS schema_version (
-        version INTEGER PRIMARY KEY
+        version INTEGER PRIMARY KEY,
+        content_version INTEGER DEFAULT 0
       );
     `);
 
@@ -37,11 +45,128 @@ async function getSchemaVersion(db: SQLiteDatabase): Promise<number> {
 }
 
 /**
+ * Get both schema and content versions from database
+ */
+async function getVersionInfo(db: SQLiteDatabase): Promise<VersionInfo> {
+  try {
+    // Ensure table exists with content_version column
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS schema_version (
+        version INTEGER PRIMARY KEY,
+        content_version INTEGER DEFAULT 0
+      );
+    `);
+
+    // Check if content_version column exists (for existing installs)
+    const tableInfo = await db.getAllAsync<{ name: string }>(
+      "PRAGMA table_info(schema_version)"
+    );
+    const hasContentVersion = tableInfo.some((col) => col.name === 'content_version');
+
+    if (!hasContentVersion) {
+      await db.execAsync('ALTER TABLE schema_version ADD COLUMN content_version INTEGER DEFAULT 0');
+    }
+
+    const result = await db.getFirstAsync<{ version: number; content_version: number }>(
+      'SELECT version, COALESCE(content_version, 0) as content_version FROM schema_version LIMIT 1'
+    );
+
+    return {
+      schemaVersion: result?.version ?? 1,
+      contentVersion: result?.content_version ?? 0,
+    };
+  } catch (error) {
+    console.warn('Error getting version info:', error);
+    return { schemaVersion: 1, contentVersion: 0 };
+  }
+}
+
+/**
+ * Check if bundled database content needs to be updated.
+ * Returns false on fresh install (we just copied the latest bundled DB).
+ */
+export async function needsContentUpdate(db: SQLiteDatabase): Promise<boolean> {
+  const { schemaVersion, contentVersion } = await getVersionInfo(db);
+
+  // If content_version is 0, this is either:
+  // 1. Fresh install - just set content_version and return false
+  // 2. Upgrade from old version without content versioning - need to update
+  //
+  // We can detect fresh install by checking if user data exists.
+  // On fresh install, there's no user data to preserve, so just set version.
+  if (contentVersion === 0) {
+    const hasUserData = await checkForUserData(db);
+    if (!hasUserData) {
+      // Fresh install - just set content version, no update needed
+      console.log('Fresh install detected - setting content version');
+      await setContentVersion(db, CURRENT_CONTENT_VERSION);
+      return false;
+    }
+    // Has user data but no content version - needs update
+    return true;
+  }
+
+  return contentVersion < CURRENT_CONTENT_VERSION;
+}
+
+/**
+ * Check if there's any user data in the database (bookmarks, highlights, notes, history)
+ */
+async function checkForUserData(db: SQLiteDatabase): Promise<boolean> {
+  try {
+    // Check bookmarks table
+    const bookmarks = await db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM bookmarks'
+    );
+    if (bookmarks && bookmarks.count > 0) return true;
+
+    // Check highlights table
+    const highlights = await db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM highlights'
+    );
+    if (highlights && highlights.count > 0) return true;
+
+    // Check notes table
+    const notes = await db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM notes'
+    );
+    if (notes && notes.count > 0) return true;
+
+    // Check reading_history table
+    const history = await db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM reading_history'
+    );
+    if (history && history.count > 0) return true;
+
+    return false;
+  } catch (e) {
+    // Tables might not exist yet - definitely fresh install
+    return false;
+  }
+}
+
+/**
+ * Set the content version after a successful content update
+ */
+export async function setContentVersion(db: SQLiteDatabase, version: number): Promise<void> {
+  await db.execAsync(`UPDATE schema_version SET content_version = ${version}`);
+}
+
+/**
  * Set schema version in database
+ * Preserves content_version when updating schema version
  */
 async function setSchemaVersion(db: SQLiteDatabase, version: number): Promise<void> {
-  await db.runAsync('DELETE FROM schema_version');
-  await db.runAsync('INSERT INTO schema_version (version) VALUES (?)', [version]);
+  // Get current content version to preserve it
+  const current = await db.getFirstAsync<{ content_version: number }>(
+    'SELECT COALESCE(content_version, 0) as content_version FROM schema_version LIMIT 1'
+  );
+  const contentVersion = current?.content_version ?? 0;
+
+  await db.execAsync(`
+    DELETE FROM schema_version;
+    INSERT INTO schema_version (version, content_version) VALUES (${version}, ${contentVersion});
+  `);
 }
 
 /**
@@ -148,6 +273,23 @@ const migrations: Record<number, (db: SQLiteDatabase) => Promise<void>> = {
     `);
 
     console.log('Notes table migration complete - now language-agnostic');
+  },
+
+  // Migration to v5: Add content version tracking
+  5: async (db: SQLiteDatabase) => {
+    console.log('Running migration v5: Adding content version tracking');
+
+    // Check if content_version column already exists
+    const tableInfo = await db.getAllAsync<{ name: string }>(
+      "PRAGMA table_info(schema_version)"
+    );
+    const hasContentVersion = tableInfo.some((col) => col.name === 'content_version');
+
+    if (!hasContentVersion) {
+      await db.execAsync('ALTER TABLE schema_version ADD COLUMN content_version INTEGER DEFAULT 0');
+    }
+
+    console.log('Content version tracking added');
   },
 };
 

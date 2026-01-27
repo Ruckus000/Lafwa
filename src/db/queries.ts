@@ -214,8 +214,13 @@ export const getBookmarks = async (type: 'bible' | 'hymn'): Promise<Bookmark[]> 
       ORDER BY b.created_at DESC
     `);
   } else {
+    // Note: hymns table has title_fr and title_ht columns, not 'title'
+    // COALESCE provides fallback: Haitian → French → generated fallback
     return await db.getAllAsync<Bookmark>(`
-      SELECT b.*, h.number, h.title
+      SELECT 
+        b.*,
+        h.number,
+        COALESCE(h.title_ht, h.title_fr, 'Kantik #' || h.number) as title
       FROM bookmarks b
       JOIN hymns h ON b.reference_id = h.id
       WHERE b.type = 'hymn'
@@ -436,7 +441,22 @@ export const getDailyVerse = async (
   const result = await db.getFirstAsync<DailyVerseRow>(sql, [version, version, today]);
 
   if (!result) {
-    console.warn(`No daily verse found for day ${today}`);
+    // Debug: Check if daily_verses table has data for this day
+    const dvCount = await db.getFirstAsync<{ count: number }>(
+      'SELECT COUNT(*) as count FROM daily_verses WHERE day_of_year = ?',
+      [today]
+    );
+    const bvSample = await db.getFirstAsync<{ book: string }>(
+      'SELECT DISTINCT book FROM bible_verses WHERE version = ? LIMIT 1',
+      [version]
+    );
+    
+    console.warn(
+      `No daily verse found for day ${today}. ` +
+      `daily_verses has ${dvCount?.count ?? 0} entries for this day. ` +
+      `Sample bible_verses book: ${bvSample?.book ?? 'none'}. ` +
+      `Version: ${version}`
+    );
     return null;
   }
 

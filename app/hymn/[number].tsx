@@ -49,12 +49,25 @@ export default function HymnDetailScreen() {
   }, [hymn?.id, loading]);
 
   const loadHymn = async () => {
+    // Validate hymnNumber before querying
+    if (isNaN(hymnNumber) || hymnNumber < 0) {
+      console.error('Invalid hymn number:', params.number);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
-      const [hymnData, favorite] = await Promise.all([
-        getHymnWithSections(hymnNumber),
-        isHymnFavorite(hymnNumber),
-      ]);
+      // IMPORTANT: Load hymn FIRST to get actual database ID
+      // Then check favorite status using hymn.id (NOT hymnNumber!)
+      // hymn.number and hymn.id are different: id = AUTOINCREMENT primary key
+      const hymnData = await getHymnWithSections(hymnNumber);
+      
+      // Only check favorite if hymn exists - use hymn.id for bookmark lookup
+      const favorite = hymnData 
+        ? await isHymnFavorite(hymnData.id) 
+        : false;
+      
       setHymn(hymnData);
       setIsFavorite(favorite);
     } catch (e) {
