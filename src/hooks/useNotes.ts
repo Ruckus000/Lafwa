@@ -8,7 +8,7 @@ import { Alert } from 'react-native';
 import { getAllNotes, deleteNote, getNotesCount, NoteWithVerse } from '../db/queries';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useLibraryStore } from '../stores/libraryStore';
-import { getVersionFromLanguage } from '../utils/version';
+
 
 interface UseNotesOptions {
   pageSize?: number;
@@ -34,8 +34,7 @@ export function useNotes(options: UseNotesOptions = {}): UseNotesResult {
   const [totalCount, setTotalCount] = useState(0);
   const [offset, setOffset] = useState(0);
   
-  const language = useSettingsStore((state) => state.language);
-  const version = getVersionFromLanguage(language);
+  const version = useSettingsStore((state) => state.bibleVersion);
   const decrementCount = useLibraryStore((state) => state.decrementCount);
   const invalidateLibrary = useLibraryStore((state) => state.invalidate);
 

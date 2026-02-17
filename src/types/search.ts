@@ -8,7 +8,7 @@ export interface BibleSearchResult {
   chapter: number;
   verse: number;
   text: string;
-  version: 'ht' | 'fr';
+  version: 'ht' | 'fr' | 'en';
 }
 
 export interface HymnSearchResult {

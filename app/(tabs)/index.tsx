@@ -25,6 +25,7 @@ import { useSettingsStore } from '../../src/stores/settingsStore';
 import { useDailyVerse } from '../../src/hooks/useDailyVerse';
 import { VerseCardSkeleton } from '../../src/components/VerseCardSkeleton';
 import { ScreenErrorBoundary } from '../../src/components/ScreenErrorBoundary';
+import { getBookByName } from '../../src/data/bibleBooks';
 
 // Time-based greetings
 const getGreeting = (language: 'ht' | 'fr' | 'en') => {
@@ -208,6 +209,13 @@ function HomeScreenContent() {
     },
   ];
 
+  const lastReadDisplayName = useMemo(() => {
+    if (!lastReadBible) return '';
+    const bookData = getBookByName(lastReadBible.book);
+    if (!bookData) return lastReadBible.book;
+    return { ht: bookData.nameHt, fr: bookData.nameFr, en: bookData.nameEn }[language];
+  }, [lastReadBible, language]);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['top']}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
@@ -340,7 +348,7 @@ function HomeScreenContent() {
               </View>
               <View style={styles.continueText}>
                 <Text style={[styles.continueTitle, dynamicStyles.continueTitle, { color: colors.text }]}>
-                  {lastReadBible.book} {lastReadBible.chapter}
+                  {lastReadDisplayName} {lastReadBible.chapter}
                 </Text>
                 <Text style={[styles.continueSubtitle, dynamicStyles.continueSubtitle, { color: colors.textTertiary }]}>
                   {{ ht: 'Kontinye li', fr: 'Continuer la lecture', en: 'Continue reading' }[language]}

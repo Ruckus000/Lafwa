@@ -3,7 +3,7 @@
  * Navigation flow: BookPicker → ChapterPicker → Reading View
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -47,17 +47,25 @@ export default function BibleScreen() {
   const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
 
+  // Track processed deep link to avoid re-triggering when lastReadBible changes
+  const processedParams = useRef<string | null>(null);
+
   // Handle deep linking from daily verse or restore last read position
   useEffect(() => {
-    if (params.book && params.chapter) {
-      // Deep link takes priority
-      const bookData = getBookByName(params.book);
+    const paramKey = params.book && params.chapter
+      ? `${params.book}:${params.chapter}`
+      : null;
+
+    if (paramKey && paramKey !== processedParams.current) {
+      // Deep link takes priority — process once per unique param combo
+      processedParams.current = paramKey;
+      const bookData = getBookByName(params.book!);
       if (bookData) {
         setSelectedBook(bookData);
-        setSelectedChapter(parseInt(params.chapter, 10));
+        setSelectedChapter(parseInt(params.chapter!, 10));
         setScreen('reader');
       }
-    } else if (lastReadBible && !selectedBook) {
+    } else if (!paramKey && lastReadBible && !selectedBook) {
       // Restore last reading position on initial load
       const bookData = getBookByName(lastReadBible.book);
       if (bookData) {
@@ -79,7 +87,7 @@ export default function BibleScreen() {
     setSelectedChapter(chapter);
     setScreen('reader');
     if (selectedBook) {
-      setLastReadBible(selectedBook.nameHt, chapter);
+      setLastReadBible(selectedBook.nameFr, chapter);
     }
   }, [selectedBook, setLastReadBible]);
 
@@ -87,13 +95,14 @@ export default function BibleScreen() {
   const handleChapterChange = useCallback((newChapter: number) => {
     setSelectedChapter(newChapter);
     if (selectedBook) {
-      setLastReadBible(selectedBook.nameHt, newChapter);
+      setLastReadBible(selectedBook.nameFr, newChapter);
     }
   }, [selectedBook, setLastReadBible]);
 
   // Toggle language
   const toggleVersion = useCallback(() => {
-    setBibleVersion(bibleVersion === 'ht' ? 'fr' : 'ht');
+    const next = bibleVersion === 'ht' ? 'fr' : bibleVersion === 'fr' ? 'en' : 'ht';
+    setBibleVersion(next);
   }, [bibleVersion, setBibleVersion]);
 
   // Navigation handlers
@@ -141,7 +150,7 @@ export default function BibleScreen() {
 
   // Render Reading View
   if (screen === 'reader' && selectedBook) {
-    const bookName = language === 'ht' ? selectedBook.nameHt : selectedBook.nameFr;
+    const bookName = bibleVersion === 'ht' ? selectedBook.nameHt : bibleVersion === 'en' ? selectedBook.nameEn : selectedBook.nameFr;
 
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]} edges={['top']}>

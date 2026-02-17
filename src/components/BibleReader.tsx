@@ -92,7 +92,6 @@ export default function BibleReader({
   const loadContent = async () => {
     setLoading(true);
     try {
-      // Single query gets all user data (bookmarks, highlights, notes)
       const data = await getChapterWithUserData(book.nameFr, chapter, version);
       setVerses(data);
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
@@ -119,6 +118,14 @@ export default function BibleReader({
     }
   }, [chapter, onChapterChange]);
 
+  // Keep refs in sync so the mount-time PanResponder always calls fresh callbacks
+  const goToNextChapterRef = useRef(goToNextChapter);
+  const goToPreviousChapterRef = useRef(goToPreviousChapter);
+  useEffect(() => {
+    goToNextChapterRef.current = goToNextChapter;
+    goToPreviousChapterRef.current = goToPreviousChapter;
+  });
+
   // Simple pan responder for swipe detection (no animations)
   const panResponder = useRef(
     PanResponder.create({
@@ -127,10 +134,10 @@ export default function BibleReader({
         return Math.abs(gestureState.dx) > 20 && Math.abs(gestureState.dy) < 50;
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx < -SWIPE_THRESHOLD && chapter < book.chapters) {
-          goToNextChapter();
-        } else if (gestureState.dx > SWIPE_THRESHOLD && chapter > 1) {
-          goToPreviousChapter();
+        if (gestureState.dx < -SWIPE_THRESHOLD) {
+          goToNextChapterRef.current();
+        } else if (gestureState.dx > SWIPE_THRESHOLD) {
+          goToPreviousChapterRef.current();
         }
       },
     })
