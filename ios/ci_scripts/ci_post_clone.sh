@@ -7,8 +7,9 @@ set -e
 
 export HOMEBREW_NO_INSTALL_CLEANUP=TRUE
 
-# 1. Install Node.js (Xcode Cloud has Homebrew but not Node)
-brew install node
+# 1. Install Node.js LTS (Xcode Cloud has Homebrew but not Node)
+brew install node@22
+export PATH="/usr/local/opt/node@22/bin:$PATH"
 
 # 2. Install JS dependencies (deterministic via lockfile)
 cd "$CI_PRIMARY_REPOSITORY_PATH"
